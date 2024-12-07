@@ -1,93 +1,143 @@
-# Datte node
 
+# 🍃 Datte Project
 
+Bienvenue dans **Datte**, une application modulaire et robuste conçue pour offrir des solutions complètes et flexibles pour la gestion des utilisateurs, des rôles, des droits et des ventes. Ce projet est construit avec une architecture claire et modulaire pour assurer une scalabilité et une maintenabilité optimale.
 
-## Getting started
+---
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## 📁 Structure du projet
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/datte-company/datte-node.git
-git branch -M main
-git push -uf origin main
+src/
+└── users/
+|    ├── controller/
+|    ├── service/
+|    └── repository/
+|    └── .../      # Autres gestions
+└── tests/
+    ├── controller/
+    |    └── .../
+    └── service/
+        └── .../
 ```
 
-## Integrate with your tools
+---
 
-- [ ] [Set up project integrations](https://gitlab.com/datte-company/datte-node/-/settings/integrations)
+## 🛠️ Modules principaux - MVP (Minimum Viable Product)
 
-## Collaborate with your team
+### 1️⃣ **Module Utilisateur et Authentification**
+- 🔐 Gestion complète des utilisateurs : inscription, connexion, déconnexion et suppression.
+- 🔑 Authentification robuste : mots de passe sécurisés, jetons JWT, authentification à deux facteurs.
+- 👤 Gestion des profils personnalisables : langues, notifications, préférences.
+- ⚙️ Rôles et permissions intégrés avec le module Rôle/Droit.
+- 🔔 Notifications de sécurité et gestion avancée des mots de passe.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+---
 
-## Test and Deploy
+## 📐 Design Patterns appliqués pour le MVP
 
-Use the built-in continuous integration in GitLab.
+- **Factory Method** : Création de rôles, utilisateurs et profils.
+- **Strategy** : Calcul des frais de livraison, gestion des réductions.
+- **Decorator** : Enrichissement des résumés de commande et gestion des profils.
+- **Observer** : Suivi des événements de commandes et alertes de sécurité.
+- **Composite** : Gestion hiérarchique des équipes.
+- **Template Method** : Processus standardisés extensibles.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+---
 
-***
+## ⚙️ Prérequis
 
-# Editing this README
+- express 4.21
+- ts-node 10.9
+- typescript 5.7
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+---
 
-## Suggestions for a good README
+## 🚀 Lancer le projet
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+1. **Cloner le dépôt** :
+    ```bash
+    git@gitlab.com:datte-company/datte-node.git
+    cd datte-node
+    ```
 
-## Name
-Choose a self-explaining name for your project.
+2. **Compiler et exécuter** :
+    ```bash
+    npm install
+    npm run start
+    ```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+3. **Accéder à l'application** :
+    - URL par défaut : [http://localhost:3000/api/v1.0.0](http://localhost:3000/api/v1.0.0)
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+---
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## 🖥️ Endpoints principaux pour le MVP
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+| Méthode | Endpoint                                | Description                                           |
+|---------|-----------------------------------------|-------------------------------------------------------|
+| **Utilisateurs**                                                                                          |
+| POST    | `/users/register`                       | Inscrire un nouvel utilisateur                        |
+| POST    | `/users/login`                          | Authentifier un utilisateur (connexion)               |
+| GET     | `/users`                                | Récupérer la liste de tous les utilisateurs           |
+| GET     | `/users/{id}`                           | Récupérer les détails d'un utilisateur spécifique     |
+| POST    | `/users`                                | Créer un nouvel utilisateur                           |
+| PUT     | `/users/{id}`                           | Mettre à jour les informations d'un utilisateur       |
+| DELETE  | `/users/{id}`                           | Supprimer un utilisateur                              |
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+| **Adresses**                                                                                              |
+| POST    | `/address`                              | Créer une adresse                                     |
+| GET     | `/address/{id}`                         | Récupérer une adresse par ID                          |
+| PUT     | `/address/{id}`                         | Mettre à jour une adresse                             |
+| DELETE  | `/address/{id}`                         | Supprimer une adresse                                 |
+| POST    | `/users/{userId}/address`               | Associer une adresse à un utilisateur                 |
+| POST    | `/companies/{companyId}/address`        | Associer une adresse à une entreprise                 |
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+| **Rôles et Permissions**                                                                                   |
+| GET     | `/roles`                               | Liste des rôles disponibles                           |
+| POST    | `/roles`                               | Créer un nouveau rôle                                 |
+| POST    | `/users/{userId}/roles/{roleId}`        | Assigner un rôle à un utilisateur                     |
+| DELETE  | `/users/{userId}/roles/{roleId}`        | Retirer un rôle d'un utilisateur                      |
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+| **Genres**                                                                                               |
+| POST    | `/genders`                             | Ajouter un genre                                     |
+| GET     | `/genders/{id}`                        | Récupérer les détails d'un genre                     |
+| PUT     | `/genders/{id}`                        | Modifier un genre                                    |
+| DELETE  | `/genders/{id}`                        | Supprimer un genre                                   |
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+| **Postes (Métiers)**                                                                                     |
+| POST    | `/positions`                           | Ajouter un poste (métier)                            |
+| GET     | `/positions`                           | Récupérer la liste des postes                        |
+| GET     | `/positions/{id}`                      | Récupérer les détails d'un poste spécifique          |
+| PUT     | `/positions/{id}`                      | Modifier un poste                                    |
+| DELETE  | `/positions/{id}`                      | Supprimer un poste                                   |
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+| **Entreprises**                                                                                         |
+| POST    | `/companies`                           | Créer une entreprise                                 |
+| GET     | `/companies`                           | Récupérer la liste des entreprises                  |
+| GET     | `/companies/{id}`                      | Récupérer les détails d'une entreprise              |
+| PUT     | `/companies/{id}`                      | Modifier une entreprise                              |
+| DELETE  | `/companies/{id}`                      | Supprimer une entreprise                             |
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+---
 
-## License
-For open source projects, say how it is licensed.
+## 👨‍💻 Contributeurs
+- **Kazakh** - Développeur principal
+- **Kazakh** - Architecte logicielle
+- **Kazakh** - Responsable des tests
+- **Kazakh** - La personne qui se prend tout le travail
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+---
+
+## 📝 License
+
+Ce projet n'est pas sous licence MIT (MAIS BIENTÖT). Donc ne consultez pas le fichier `LICENSE` pour ne pas voir plus d'informations, qui n'existent pas.
+
+---
+
+## 🌟 Remerciements
+
+Un grand merci à tous les contributeurs et testeurs pour leur aide précieuse (donc, qu'à moi pour le moment) 😘 !
+
+---
