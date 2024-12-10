@@ -12,7 +12,7 @@ export class UserService {
 
     // Get a user by ID
     public async getUserById(userId: number): Promise<UserDTO | null> {
-        // Find the user by ID in the repository
+        // Find the user by ID from the repository
         const userEntity : User | null = await this.userRepository.findById(userId);
 
         // If the user is not found, return null
@@ -21,4 +21,40 @@ export class UserService {
         // Return the user in DTO format
         return UserMapper.toDTO(userEntity);
     }
+
+    // Get all users
+    public async getUsers(): Promise<Array<UserDTO> | null> {
+        // Find all users from the repository
+        const usersEntity: Array<User> | null = await this.userRepository.getAllUsers();
+
+        // If users don't found, return null
+        if(!usersEntity) {return null;}
+
+        // Return all users in DTO format
+        return usersEntity.map(userEntity => UserMapper.toDTO(userEntity));
+    }
+    
+
+    // Create user
+    public async createUser(user: User): Promise<UserDTO | null> {
+        // Verify if this user exist
+        const userExist: UserDTO | null = await this.getUserById(user.getId());
+        
+        // If user exist, return null
+        if(userExist) {return null}
+
+        // Create user from repository
+        const createdUser: User | null = await this.userRepository.createUser(user);
+
+        // User didn't created
+        if(!createdUser) {return null;}
+
+        return UserMapper.toDTO(createdUser);
+    }
+
+    // Modify user
+
+
+
+    // Delete user
 }

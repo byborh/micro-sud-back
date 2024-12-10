@@ -12,6 +12,16 @@ export class UserRepository {
 
     // Find a user by ID
     public async findById(userId: number): Promise<User | null> {
-        return this.users.find(user => user.getId() === userId) || null;
+        const user = this.users.find(user => user.getId() === userId)
+        return user || null;
+    }
+
+    public async getAllUsers(): Promise<Array<User>> {
+        return this.users;
+    }
+
+    public async createUser(user: User): Promise<User | null> {
+        this.users.push(user);
+        return this.findById(user.getId());
     }
 }
