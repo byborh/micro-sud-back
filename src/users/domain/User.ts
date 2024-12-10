@@ -67,4 +67,8 @@ export class User implements UserContract {
     public getTelnumber(): string | undefined {
         return this.telnumber;
     }
+
+    public setTelnumber(telnumber: string): void {
+        this.telnumber = telnumber;
+    }
 }

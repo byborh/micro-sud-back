@@ -1,6 +1,7 @@
 import { User } from "../domain/User";
+import { IUserRepository } from "./IUserRepository";
 
-export class UserRepository {
+export class UserRepository implements IUserRepository {
 
     // Une Fausse base de données
     // A MODIFIER
@@ -16,12 +17,33 @@ export class UserRepository {
         return user || null;
     }
 
+    // Find all users
     public async getAllUsers(): Promise<Array<User>> {
         return this.users;
     }
 
+    // Create user
     public async createUser(user: User): Promise<User | null> {
         this.users.push(user);
         return this.findById(user.getId());
     }
+
+    // Modify user
+    public async modifyUser(user: User): Promise<User | null> {
+        const updatedUsers = this.users.map((_, i) => 
+          i === user.getId() ? user : _
+        );
+        this.users = updatedUsers;
+        return user;
+    }      
+
+    // Delete user
+    public async deleteUser(user: User): Promise<boolean> {
+        const index = this.users.indexOf(user);
+        if (index !== -1) {
+          this.users.splice(index, 1);
+          return true;
+        }
+        return false;
+    }  
 }
