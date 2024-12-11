@@ -1,6 +1,6 @@
 // Interface de l'utilisateur
 export interface UserContract {
-    id: number;
+    id: string;
     firstname?: string;
     lastname?: string;
     pseudo?: string;

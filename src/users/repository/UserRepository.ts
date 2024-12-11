@@ -8,11 +8,11 @@ export class UserRepository implements IUserRepository {
     // Il faut utiliser un service de base de données (MySQL, MongoDB, etc.)
     private users: User[] = [
         // Liste des utilisateurs
-        new User(1, "John", "Doe", "johndoe", "XfV8I@example.com", "password1", "123-456-7890")
+        new User("ded8ac4c84db4cc08be45a3e0f36f0e2", "John", "Doe", "johndoe", "XfV8I@example.com", "password1", "123-456-7890")
     ]
 
     // Find a user by ID
-    public async findById(userId: number): Promise<User | null> {
+    public async findById(userId: string): Promise<User | null> {
         const user = this.users.find(user => user.getId() === userId)
         return user || null;
     }
@@ -30,12 +30,16 @@ export class UserRepository implements IUserRepository {
 
     // Modify user
     public async modifyUser(user: User): Promise<User | null> {
-        const updatedUsers = this.users.map((_, i) => 
-          i === user.getId() ? user : _
-        );
-        this.users = updatedUsers;
-        return user;
-    }      
+        const index = this.users.findIndex(u => u.getId() === user.getId());
+        
+        if (index !== -1) {
+          this.users[index] = user;
+          return user;
+        }
+        
+        return null; // L'utilisateur n'a pas été trouvé
+      }
+      
 
     // Delete user
     public async deleteUser(user: User): Promise<boolean> {

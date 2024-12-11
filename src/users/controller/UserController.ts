@@ -11,10 +11,12 @@ export class UserController {
     // Get a user by ID
     public async getUserById(req: Request, res: Response): Promise<void> {
         // Get the user ID from the request and pass to number type
-        const userId = parseInt(req.params.id);
+        const userId = req.params.id;
 
         // If the user ID is NaN, return an error
-        if(isNaN(userId)) {
+        
+        // A CHANGER CAR AVANT JE VERIFIE SI L'ID EST NUMERIQUE ALORS QUE MAINTENANT IL EST EN STRING
+        if(!userId) {
             res.status(400).json({error: "Invalid user ID."});
             return;
         }

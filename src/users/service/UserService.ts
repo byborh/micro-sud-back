@@ -2,7 +2,7 @@ import { User } from "../domain/User";
 import { UserRepository } from "../repository/UserRepository";
 import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
-import { IdGenerator } from "../core/idGenerator";
+import { IdGenerator } from "../../core/idGenerator";
 
 export class UserService {
     private userRepository: UserRepository;
@@ -12,7 +12,7 @@ export class UserService {
     }
 
     // Get a user by ID
-    public async getUserById(userId: number): Promise<UserDTO | null> {
+    public async getUserById(userId: string): Promise<UserDTO | null> {
         // Find the user by ID from the repository
         const userEntity : User | null = await this.userRepository.findById(userId);
 
@@ -56,7 +56,7 @@ export class UserService {
 
         // Generate id for the user
         const idGenerator = IdGenerator.getInstance();
-        const userId: number = idGenerator.generateId();
+        const userId: string = idGenerator.generateId();
 
         // Assign id to user
         user.setId(userId);
@@ -131,12 +131,10 @@ export class UserService {
     }
 
     // Delete user
-    public async deleteUser(userId: number): Promise<boolean> {
+    public async deleteUser(userId: string): Promise<boolean> {
         const user: UserDTO | null = await this.getUserById(userId); // Find the user by ID
         if(!user) {return false;} // User not found
         // Delete the user
         return this.userRepository.deleteUser(UserMapper.toEntity(user));
-    }
-
-    
+    }   
 }

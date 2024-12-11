@@ -2,7 +2,7 @@
 import { UserContract } from '../contract/UserContract';
 
 export class User implements UserContract {
-    public id: number;
+    public id: string;
     public firstname?: string;
     public lastname?: string;
     public pseudo?: string;
@@ -10,7 +10,7 @@ export class User implements UserContract {
     public password: string;
     public telnumber?: string;
 
-    constructor(id: number, email: string, password: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string) {
+    constructor(id: string, email: string, password: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -25,11 +25,11 @@ export class User implements UserContract {
         Changer le type d'id, il faut le mettre en string
     */
 
-    public getId(): number {
+    public getId(): string {
         return this.id;
     }
 
-    public setId(id: number): void {
+    public setId(id: string): void {
         this.id = id;
     }
 

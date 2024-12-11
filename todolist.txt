@@ -1,0 +1,10 @@
+corriger le générateur d'id !
+générer que des id tout collé !
+générer qu'au moment de la créatio de l'user !
+
+créer les endpoints dans le controller
+
+créer un repository avec une vraie bdd (du genre : sql) !
+faire la même chose avec mongodb ou redis pour tester !
+
+créer des tests unitaires pour chaque méthodes de service et de controller !
