@@ -2,6 +2,7 @@ import { User } from "../domain/User";
 import { UserRepository } from "../repository/UserRepository";
 import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
+import { IdGenerator } from "../core/idGenerator";
 
 export class UserService {
     private userRepository: UserRepository;
@@ -38,7 +39,12 @@ export class UserService {
     // Create user
     // A CREER : 
     /*
-        étant donné que 
+        étant donné que l'id n'existe pas, on doit la générer tous seul.
+        pas besoin de vérifier si l'id existe (OPTIONEL)
+
+        est ce qu'on va faire lier un utilisateur à son mail et c'est le mail qui deviendra un genre d'id ?
+
+        Il faut changer le type d'id
     */
     public async createUser(user: User): Promise<UserDTO | null> {
         // Verify if this user exist
@@ -46,6 +52,14 @@ export class UserService {
         
         // If user exist, return null
         if(existingUser) return null;
+
+
+        // Generate id for the user
+        const idGenerator = IdGenerator.getInstance();
+        const userId: number = idGenerator.generateId();
+
+        // Assign id to user
+        user.setId(userId);
 
         // Create user from repository
         const createdUser: User | null = await this.userRepository.createUser(user);
@@ -55,6 +69,7 @@ export class UserService {
 
         return UserMapper.toDTO(createdUser);
     }
+   
 
     // Modify user
     public async modifyUser(user: User): Promise<UserDTO | null> {

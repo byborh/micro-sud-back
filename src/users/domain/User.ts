@@ -18,10 +18,19 @@ export class User implements UserContract {
         this.email = email;
         this.password = password; // il faut hasher le mot de passe
         this.telnumber = telnumber;
-    }    
+    }
+
+    // A CHANGER :
+    /* 
+        Changer le type d'id, il faut le mettre en string
+    */
 
     public getId(): number {
         return this.id;
+    }
+
+    public setId(id: number): void {
+        this.id = id;
     }
 
     public getFirstname(): string | undefined {
