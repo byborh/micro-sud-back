@@ -36,37 +36,83 @@ export class UserService {
     
 
     // Create user
+    // A CREER : 
+    /*
+        étant donné que 
+    */
     public async createUser(user: User): Promise<UserDTO | null> {
         // Verify if this user exist
         const existingUser: UserDTO | null = await this.getUserById(user.getId());
         
         // If user exist, return null
-        if(existingUser) {return null}
+        if(existingUser) return null;
 
         // Create user from repository
         const createdUser: User | null = await this.userRepository.createUser(user);
 
         // User didn't created
-        if(!createdUser) {return null;}
+        if(!createdUser) return null;
 
         return UserMapper.toDTO(createdUser);
     }
 
     // Modify user
-    public async modifyUser(user: User): Promise<User | null> {
+    public async modifyUser(user: User): Promise<UserDTO | null> {
         // Verify if this user exist
         const existingUser: UserDTO | null = await this.getUserById(user.getId());
-
-        // If user don't exist, return null 
         if(!existingUser) {return null;}
 
-        // si une donnée d'un attribut a changée alors on la remplace pour la nouvelle
-        // sinon on laisse l'ancienne avec son ancienne donnée de l'attribut
+        
+        const modifiedUser = new User(
+            user.getId(), // Can't be changed
+            user.getEmail(),
+            user.getPassword(),
+            user.getFirstname(), // Can be null
+            user.getLastname(), // Can be null
+            user.getPseudo(), // Can be null
+            user.getTelnumber() // Can be null
+        );
 
-        // il faut utiliser plein de getteurs setteurs
 
-        // Return user
-        return null;
+        // Verify if email n password are not "null"
+        if(modifiedUser.getEmail === null && modifiedUser.getPassword() === null) return null;
+
+
+        // Compare n Verify if user was changed something
+        let hasChanges: boolean = false;
+        if(modifiedUser.getEmail() !== user.getEmail()) {
+            modifiedUser.setEmail(user.getEmail());
+            hasChanges = true;
+        }
+        if(modifiedUser.getPassword() !== user.getPassword()) {
+            modifiedUser.setPassword(user.getPassword());
+            hasChanges = true;
+        }
+        if(modifiedUser.getFirstname() !== user.getFirstname()) {
+            modifiedUser.setFirstname(user.getFirstname() ?? '');
+            hasChanges = true;
+        }
+        if(modifiedUser.getLastname() !== user.getLastname()) {
+            modifiedUser.setLastname(user.getLastname() ?? '');
+            hasChanges = true;
+        }
+        if(modifiedUser.getPseudo() !== user.getPseudo()) {
+            modifiedUser.setPseudo(user.getPseudo() ?? '');
+            hasChanges = true;
+        }
+        if(modifiedUser.getTelnumber() !== user.getTelnumber()) {
+            modifiedUser.setTelnumber(user.getTelnumber() ?? '');
+            hasChanges = true;
+        }
+        if(!hasChanges) return null;
+
+        // Modify existing user
+        const finalUser: User | null = await this.userRepository.modifyUser(modifiedUser);
+
+        // User didn't modified
+        if(!finalUser) return null;
+
+        return UserMapper.toDTO(finalUser);
     }
 
     // Delete user
