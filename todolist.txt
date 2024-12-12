@@ -2,7 +2,10 @@ corriger le générateur d'id !
 générer que des id tout collé !
 générer qu'au moment de la créatio de l'user !
 
+----------------------------------------------------
 créer les endpoints dans le controller
+
+créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
 créer un repository avec une vraie bdd (du genre : sql) !
 faire la même chose avec mongodb ou redis pour tester !

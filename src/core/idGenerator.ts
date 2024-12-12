@@ -1,40 +1,31 @@
-// Générer automatiquement une id
+import { randomBytes, createHash } from 'crypto';
 
-// À télécharger le 'crypto' : Ceci est une bibliothèque Node.js qui fournit des fonctionnalités de cryptographie, incluant la génération d'UUIDs.
-import { randomUUID } from 'crypto';
-
-// La classe IdGenerator va s'assurer que l'ID généré est unique en utilisant le pattern Singleton pour éviter plusieurs instances de la classe.
 export class IdGenerator {
-  // Propriété statique pour maintenir l'unique instance de la classe (Singleton).
   private static instance: IdGenerator;
 
-  // Le constructeur est privé pour empêcher la création d'instances de IdGenerator de l'extérieur (contrôle d'accès au Singleton).
   private constructor() {}
 
-  // Méthode statique pour obtenir l'instance unique de la classe IdGenerator.
-  // Si l'instance n'existe pas encore, elle est créée ici.
   public static getInstance(): IdGenerator {
-    // Si l'instance n'existe pas, on la crée
     if (!IdGenerator.instance) {
       IdGenerator.instance = new IdGenerator();
     }
-    // Retourner l'instance unique de IdGenerator.
     return IdGenerator.instance;
   }
 
-  // Méthode pour générer une nouvelle ID en appelant la fonction randomUUID de 'crypto'.
+  // Générer un ID plus court, basé sur un hash SHA-256 de données aléatoires
   public generateId(): string {
-    // randomUUID génère un identifiant unique basé sur un algorithme de cryptographie (UUID v4).
-    return randomUUID();
+    // Générer des données aléatoires pour garantir l'unicité
+    const randomData = randomBytes(16).toString('hex'); // 16 octets = 32 caractères hexadécimaux
+
+    // Créer un hash SHA-256 à partir de ces données aléatoires
+    const hash = createHash('sha256').update(randomData).digest('base64');
+
+    // Retourner une version raccourcie de l'ID, par exemple en prenant les 16 premiers caractères.
+    return hash.replace(/\+/g, '').replace(/\//g, '').substring(0, 16);
   }
 }
 
 // Utilisation
-// On récupère l'instance unique du générateur d'ID.
 const idGenerator = IdGenerator.getInstance();
-
-// Générer un ID unique en appelant la méthode generateId().
 const uniqueId = idGenerator.generateId();
-
-// Afficher l'ID unique généré dans la console.
-console.log(uniqueId);
+console.log(uniqueId); // Exemple : "eFJj9lHVZbQtY0Ep"

@@ -57,6 +57,7 @@ export class UserService {
         // Generate id for the user
         const idGenerator = IdGenerator.getInstance();
         const userId: string = idGenerator.generateId();
+        console.log(userId); // Exemple : "eFJj9lHVZbQtY0Ep"
 
         // Assign id to user
         user.setId(userId);

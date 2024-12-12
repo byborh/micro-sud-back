@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../service/UserService";
+import { User } from "../domain/User";
 
 export class UserController {
     // Service
@@ -10,7 +11,7 @@ export class UserController {
 
     // Get a user by ID
     public async getUserById(req: Request, res: Response): Promise<void> {
-        // Get the user ID from the request and pass to number type
+        // Get the user ID from the request
         const userId = req.params.id;
 
         // If the user ID is NaN, return an error
@@ -36,6 +37,15 @@ export class UserController {
         } catch (error) {
             console.error(error);
             res.status(500).json({error: "Internal server error"});
+        }
+    }
+
+    // Get all users
+    public async getAllUsers(): Promise<Array<User> | null> {
+        try {
+            
+        } catch (error) {
+            
         }
     }
 }
