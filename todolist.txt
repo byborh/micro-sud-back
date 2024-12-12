@@ -5,6 +5,18 @@ générer qu'au moment de la créatio de l'user !
 ----------------------------------------------------
 créer les endpoints dans le controller
 
+à réfléchier si je dois créer un dossier modules dans src et de stocker tous les modules de dans : 
+
+├── core/
+│   ├── idGenerator.ts
+│   └── ...
+├── middlewares/
+│   ├── validateParamMiddleware.ts
+│   └── ...
+├── modules/
+│   ├── users/
+│   └── ...
+
 créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
 créer un repository avec une vraie bdd (du genre : sql) !

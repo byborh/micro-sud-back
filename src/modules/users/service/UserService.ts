@@ -2,7 +2,7 @@ import { User } from "../domain/User";
 import { UserRepository } from "../repository/UserRepository";
 import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
-import { IdGenerator } from "../../core/idGenerator";
+import { IdGenerator } from "@core/idGenerator";
 
 export class UserService {
     private userRepository: UserRepository;

@@ -8,7 +8,9 @@ export class UserRepository implements IUserRepository {
     // Il faut utiliser un service de base de données (MySQL, MongoDB, etc.)
     private users: User[] = [
         // Liste des utilisateurs
-        new User("ded8ac4c84db4cc08be45a3e0f36f0e2", "John", "Doe", "johndoe", "XfV8I@example.com", "password1", "123-456-7890")
+        new User("RuigsFkjS1owzGCa", "John", "Doe", "johndoe", "XfV8I@example.com", "password1", "123-456-7890"),
+        new User("RuigsFkjS1owzGCb", "Emilia", "Clarke", "khalisia", "beauty@got.com", "johnSnowILoveU", "321-656-7001"),
+        new User("RuigsFkjS1owzGCc", "eminem@example.com", "slimshady", "")
     ]
 
     // Find a user by ID

@@ -6,8 +6,8 @@
 | **Utilisateurs** | | | |
 | POST | /users/register | Inscrire un nouvel utilisateur | [ ] |
 | POST | /users/login | Authentifier un utilisateur (connexion) | [ ] |
-| GET | /users | Récupérer la liste de tous les utilisateurs | [ ] |
-| GET | /users/{id} | Récupérer les détails d'un utilisateur spécifique | [ ✅] |
+| GET | /users | Récupérer la liste de tous les utilisateurs | [✅] |
+| GET | /users/{id} | Récupérer les détails d'un utilisateur spécifique | [✅] |
 | POST | /users | Créer un nouvel utilisateur | [ ] |
 | PUT | /users/{id} | Mettre à jour les informations d'un utilisateur | [ ] |
 | DELETE | /users/{id} | Supprimer un utilisateur | [ ] |

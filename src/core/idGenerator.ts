@@ -1,3 +1,17 @@
+/**
+ * This class provides a singleton utility for generating unique IDs.
+ * The IDs are created using a SHA-256 hash of random data, ensuring uniqueness and security.
+ * 
+ * Key features:
+ * - Singleton pattern: Ensures only one instance of the IdGenerator exists in the application.
+ * - Secure ID generation: Combines random bytes and SHA-256 hashing to produce IDs.
+ * - Shortened output: The generated ID is truncated for convenience, retaining its uniqueness.
+ * 
+ * Usage:
+ * 1. Access the generator via `IdGenerator.getInstance()`.
+ * 2. Call the `generateId()` method to obtain a new unique ID.
+ */
+
 import { randomBytes, createHash } from 'crypto';
 
 export class IdGenerator {
