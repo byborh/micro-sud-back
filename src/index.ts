@@ -9,7 +9,7 @@ const port = 3000;
 app.use(express.json());
 
 // Ajout du module utilisateur
-app.use('/users', createUserModule());
+app.use('/api/v0.0.1/users', createUserModule());
 
 app.get('/', (req, res) => {
   res.send('Bonjour !');

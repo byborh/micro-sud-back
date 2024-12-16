@@ -14,8 +14,14 @@ export class UserRepository implements IUserRepository {
     ]
 
     // Find a user by ID
-    public async findById(userId: string): Promise<User | null> {
-        const user = this.users.find(user => user.getId() === userId)
+    public async findUserById(userId: string): Promise<User | null> {
+        const user = this.users.find(user => user.getId() === userId);
+        return user || null;
+    }
+
+    // Find a user by Email
+    public async findUserByEmail(email: string): Promise<User | null> {
+        const user = this.users.find(user => user.getEmail() === email);
         return user || null;
     }
 
@@ -27,7 +33,7 @@ export class UserRepository implements IUserRepository {
     // Create user
     public async createUser(user: User): Promise<User | null> {
         this.users.push(user);
-        return this.findById(user.getId());
+        return this.findUserById(user.getId());
     }
 
     // Modify user

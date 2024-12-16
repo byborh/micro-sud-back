@@ -6,24 +6,24 @@ import { validateParamMiddleware } from '@middlewares/validateParamMiddleware';
 export const userRoutes = (userController: UserController): express.Router => {
   const router = express.Router();
 
-  router.get('/users/:id', 
+  router.get('/:id', 
     validateParamMiddleware('id', 'Invalid user ID'),
     (req: Request, res: Response) => userController.getUserById(req, res)
   );
 
-  router.get('/users', (req: Request, res: Response) => userController.getAllUsers(req, res));
+  router.get('/', (req: Request, res: Response) => userController.getAllUsers(req, res));
 
-  router.post('/users',
-    validateParamMiddleware('id', 'This user already exists.'),
+  router.post('/',
+    // validateParamMiddleware('email', 'This user already exists.'),
     (req: Request, res: Response) => userController.createUser(req, res)
   );
 
-  router.put('/users/:id',
+  router.put('/:id',
     validateParamMiddleware('id', 'This user already exists.'),
     (req: Request, res: Response) => userController.modifyUser(req, res)
   );
 
-  router.delete('/users/:id',
+  router.delete('/:id',
     validateParamMiddleware('id', 'This user already exists.'),
     (req: Request, res: Response) => userController.deleteUser(req, res)
   );

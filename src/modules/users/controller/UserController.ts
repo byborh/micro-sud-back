@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import { UserService } from "../service/UserService";
+import { UserDTO } from "../dto/UserDTO";
+import { UserMapper } from "../mapper/UserMapper";
+import { User } from "../domain/User";
 
 export class UserController {
     // Service
@@ -54,9 +57,15 @@ export class UserController {
         // Verify permissions ...
 
         try {
-            const user = await this.userService.createUser(req.body);
+            // Change the type of user
+            const userDTO: UserDTO = req.body;
+            const userEntity: User = UserMapper.toEntity(userDTO);
+
+            // Use the service to create the user
+            const user = await this.userService.createUser(userEntity);
+
             if(!user) {
-                res.status(404).json({error: "User not found"});
+                res.status(404).json({error: "User didn't created"});
                 return;
             }
             res.status(201).json(user);
@@ -71,9 +80,15 @@ export class UserController {
         // Verify permissions ...
 
         try {
-            const user = await this.userService.modifyUser(req.body);
+            // Change the type of user
+            const userDTO: UserDTO = req.body;
+            const userEntity: User = UserMapper.toEntity(userDTO);
+
+            // Use the service to modify the user
+            const user = await this.userService.modifyUser(userEntity);
+
             if(!user) {
-                res.status(404).json({error: "User not found"});
+                res.status(404).json({error: "User didn't modified"});
                 return;
             }
             res.status(201).json(user);
@@ -90,7 +105,7 @@ export class UserController {
         try {
             const user = await this.userService.deleteUser(req.params.id);
             if(!user) {
-                res.status(404).json({error: "User not found"});
+                res.status(404).json({error: "User didn't deleted"});
                 return;
             }
             res.status(201).json(user);

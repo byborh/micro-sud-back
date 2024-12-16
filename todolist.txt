@@ -1,11 +1,12 @@
-corriger le générateur d'id !
-générer que des id tout collé !
-générer qu'au moment de la créatio de l'user !
+corriger le générateur d'id ! - OK
+générer que des id tout collé ! - OK
+générer qu'au moment de la création de l'user ! - OK
+ça génère automatiquement au moment de lancement du serveur, il faut enlever ce petit détail
 
 ----------------------------------------------------
 créer les endpoints dans le controller
 
-à réfléchier si je dois créer un dossier modules dans src et de stocker tous les modules de dans : 
+à réfléchier si je dois créer un dossier modules dans src et de stocker tous les modules de dans :  - OK
 
 ├── core/
 │   ├── idGenerator.ts
@@ -16,10 +17,27 @@ créer les endpoints dans le controller
 ├── modules/
 │   ├── users/
 │   └── ...
+- OK
 
-créer des tokens pour l'autorisation des utilisateurs / gérer les droits
+----------------------------------------------------
+
+il faut transférer tous les "req.body" à une entité dans le controller - OK
+
+----------------------------------------------------
+
+IMPORTANT : 
+
+on peut créer le même user à l'infinie, à modifier !! - OK
+il faut vérifier son mail, s'il est existant, alors, on le publie pas - OK
+
+----------------------------------------------------
+
+je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier ce qui n'existe pas dans la fausse bdd
 
 créer un repository avec une vraie bdd (du genre : sql) !
 faire la même chose avec mongodb ou redis pour tester !
+
+
+créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
 créer des tests unitaires pour chaque méthodes de service et de controller !

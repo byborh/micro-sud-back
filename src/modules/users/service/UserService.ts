@@ -14,7 +14,19 @@ export class UserService {
     // Get a user by ID
     public async getUserById(userId: string): Promise<UserDTO | null> {
         // Find the user by ID from the repository
-        const userEntity : User | null = await this.userRepository.findById(userId);
+        const userEntity: User | null = await this.userRepository.findUserById(userId);
+
+        // If the user is not found, return null
+        if(!userEntity) {return null;} 
+
+        // Return the user in DTO format
+        return UserMapper.toDTO(userEntity);
+    }
+
+    // Get a user by Email
+    public async getUserByEmail(email: string): Promise<UserDTO | null> {
+        // Find the user by Email from the repository
+        const userEntity: User | null = await this.userRepository.findUserByEmail(email);
 
         // If the user is not found, return null
         if(!userEntity) {return null;} 
@@ -48,17 +60,26 @@ export class UserService {
     */
     public async createUser(user: User): Promise<UserDTO | null> {
         // Verify if this user exist
-        const existingUser: UserDTO | null = await this.getUserById(user.getId());
-        
-        // If user exist, return null
-        if(existingUser) return null;
+        const userVerif: UserDTO | null = await this.getUserByEmail(user.getEmail());
+        if(userVerif) return null;
 
-
-        // Generate id for the user
+        // Declare variables
+        let existingUser: UserDTO | null = null;
+        let userId: string;
+    
+        // Initialize IdGenerator
         const idGenerator = IdGenerator.getInstance();
-        const userId: string = idGenerator.generateId();
-        console.log(userId); // Exemple : "eFJj9lHVZbQtY0Ep"
-
+    
+        // Make sure that ID is unique
+        do {
+            userId = idGenerator.generateId();
+            console.log(`Generated ID: ${userId}`);
+    
+            // Verify if this id exist
+            existingUser = await this.getUserById(userId);
+    
+        } while (existingUser !== null);
+    
         // Assign id to user
         user.setId(userId);
 
@@ -70,6 +91,7 @@ export class UserService {
 
         return UserMapper.toDTO(createdUser);
     }
+    
    
 
     // Modify user
