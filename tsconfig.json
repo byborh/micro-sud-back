@@ -10,9 +10,12 @@
       "forceConsistentCasingInFileNames": true,
       "baseUrl": "./", 
       "paths": {
-        "@core/*": ["src/core/*"],
+        "@core/*": ["src/cores/*"],
         "@middlewares/*": ["src/middlewares/*"],
-        "@modules/*": ["src/modules/*"]
+        "@modules/*": ["src/modules/*"],
+        
+        // Databases
+        "@db/*": ["src/config/db/*"]
       }
     },
     "include": ["src/**/*"],

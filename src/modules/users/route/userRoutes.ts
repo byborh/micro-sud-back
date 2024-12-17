@@ -1,6 +1,6 @@
 // src/modules/users/routes/userRoutes.ts
 import express, { Request, Response } from 'express';
-import { UserController } from '../controller/UserController';
+import { UserController } from '../controllers/UserController';
 import { validateParamMiddleware } from '@middlewares/validateParamMiddleware';
 
 export const userRoutes = (userController: UserController): express.Router => {

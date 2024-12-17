@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserService } from "../service/UserService";
+import { UserService } from "../services/UserService";
 import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
 import { User } from "../domain/User";

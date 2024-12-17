@@ -1,5 +1,5 @@
-import { User } from "../domain/User";
-import { IUserRepository } from "./IUserRepository";
+import { User } from "../../domain/User";
+import { IUserRepository } from "../contract/IUserRepository";
 
 export class UserRepository implements IUserRepository {
 

@@ -1,5 +1,5 @@
 // faire un contract avec l'interface de l'utilisateur (User)
-import { UserContract } from '../contract/UserContract';
+import { UserContract } from '../contracts/UserContract';
 
 export class User implements UserContract {
     public id: string;

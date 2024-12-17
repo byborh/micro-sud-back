@@ -1,8 +1,8 @@
 // src/modules/users/index.ts
 import express from 'express';
-import { UserController } from './controller/UserController';
-import { UserService } from './service/UserService';
-import { UserRepository } from './repository/UserRepository';
+import { UserController } from './controllers/UserController';
+import { UserService } from './services/UserService';
+import { UserRepository } from './repositories/drivers/UserRepository';
 import { userRoutes } from './route/userRoutes';
 
 export const createUserModule = (): express.Router => {

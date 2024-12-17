@@ -4,7 +4,9 @@ générer qu'au moment de la création de l'user ! - OK
 ça génère automatiquement au moment de lancement du serveur, il faut enlever ce petit détail
 
 ----------------------------------------------------
-créer les endpoints dans le controller
+créer les endpoints dans le controller - OK
+
+Sécuriser ces mêmes endpoints avec plus de couches
 
 à réfléchier si je dois créer un dossier modules dans src et de stocker tous les modules de dans :  - OK
 
@@ -36,7 +38,6 @@ je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier
 
 créer un repository avec une vraie bdd (du genre : sql) !
 faire la même chose avec mongodb ou redis pour tester !
-
 
 créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 

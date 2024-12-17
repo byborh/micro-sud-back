@@ -1,4 +1,4 @@
-import { User } from "../domain/User";
+import { User } from "../../domain/User";
 
 export interface IUserRepository {
     findUserById(userId: string): Promise<User | null>
