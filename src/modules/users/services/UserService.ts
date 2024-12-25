@@ -72,7 +72,7 @@ export class UserService {
     
         // Make sure that ID is unique
         do {
-            userId = idGenerator.generateId();
+            userId = idGenerator.generateId(16); // Generate a unique ID of 16 characters
             console.log(`Generated ID: ${userId}`);
     
             // Verify if this id exist

@@ -27,19 +27,19 @@ export class IdGenerator {
   }
 
   // Générer un ID plus court, basé sur un hash SHA-256 de données aléatoires
-  public generateId(): string {
+  public generateId(length: number): string {
     // Générer des données aléatoires pour garantir l'unicité
-    const randomData = randomBytes(16).toString('hex'); // 16 octets = 32 caractères hexadécimaux
+    const randomData = randomBytes(length).toString('hex'); // Ex: 16 octets = 32 caractères hexadécimaux
 
     // Créer un hash SHA-256 à partir de ces données aléatoires
     const hash = createHash('sha256').update(randomData).digest('base64');
 
     // Retourner une version raccourcie de l'ID, par exemple en prenant les 16 premiers caractères.
-    return hash.replace(/\+/g, '').replace(/\//g, '').substring(0, 16);
+    return hash.replace(/\+/g, '').replace(/\//g, '').substring(0, length);
   }
 }
 
 // Utilisation
-const idGenerator = IdGenerator.getInstance();
-const uniqueId = idGenerator.generateId();
-console.log(uniqueId); // Exemple : "eFJj9lHVZbQtY0Ep"
+// const idGenerator = IdGenerator.getInstance();
+// const uniqueId = idGenerator.generateId();
+// console.log(uniqueId); // Exemple : "eFJj9lHVZbQtY0Ep"
