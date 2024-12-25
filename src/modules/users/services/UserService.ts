@@ -1,5 +1,6 @@
 import { User } from "../domain/User";
 import { UserRepository } from "../repositories/drivers/UserRepository";
+import { USerRepositoryMyQSL } from "../repositories/drivers/UserRepositoryMySQL";
 import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "src/cores/idGenerator";

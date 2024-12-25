@@ -34,6 +34,8 @@ il faut vérifier son mail, s'il est existant, alors, on le publie pas - OK
 
 ----------------------------------------------------
 
+modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id
+
 je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier ce qui n'existe pas dans la fausse bdd
 
 créer un repository avec une vraie bdd (du genre : sql) !

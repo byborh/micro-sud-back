@@ -27,7 +27,7 @@ export class UserRepository implements IUserRepository {
 
     // Find all users
     public async getAllUsers(): Promise<Array<User>> {
-        return this.users;
+        return this.users || null;
     }
 
     // Create user
