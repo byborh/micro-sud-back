@@ -13,6 +13,12 @@ export class UserRepository implements IUserRepository {
         new User("RuigsFkjS1owzGCc", "eminem@example.com", "slimshady", "")
     ]
 
+    // Find a user by field
+    public async findUserByField(field: string, value: string): Promise<User | null> {
+        const user = this.users.find(user => user[field] === value);
+        return user || null;
+    }
+
     // Find a user by ID
     public async findUserById(userId: string): Promise<User | null> {
         const user = this.users.find(user => user.getId() === userId);

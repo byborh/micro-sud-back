@@ -7,7 +7,7 @@ export class DatabaseFactory {
     static createDatabase(type: DatabaseType, config: any): IDatabase {
         switch(type) {
             case "mysql":
-                return new MySQLDatabase(config);
+                return new MySQLDatabase();
             case "redis":
                 return new RedisDatabase(config);
             default:

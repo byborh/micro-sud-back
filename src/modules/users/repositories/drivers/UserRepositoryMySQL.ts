@@ -1,122 +1,155 @@
 import { User } from "@modules/users/domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
-import { dbConfig } from "@db/config";
-import { Pool, RowDataPacket, createPool, ResultSetHeader } from "mysql2/promise";
+import { IDatabase } from "@db/contract/IDatabase";
 
 
-export class USerRepositoryMyQSL implements IUserRepository {
-    private db: Pool;
+export class UserRepositoryMySQL implements IUserRepository {
+    private db: IDatabase;
 
-    constructor() {
-        // Creation of the connection MySQL witdh the pool of connections
-        const {host, user, password, database, port} = dbConfig.mysql;
-
-        this.db = createPool({
-            host,
-            user,
-            password,
-            database,
-            port
-        })
+    constructor(db: IDatabase) {
+        // Injection of database
+        this.db = db;
     }
 
+    async findUserByField(field: string, value: string): Promise<User | null> {
+        try {
+            // SQL query
+            const query: string = `SELECT * FROM users WHERE ${field} = ? LIMIT 1`;
+    
+            // Find a user by field from the database
+            const [rows]: [Array<User>] = await this.db.query(query, [value]);
+    
+            // If the user is not found, return null
+            if(!rows.length) return null;
+    
+            // Return the user
+            const user = rows[0];
+            return new User(user.id, user.email, user.password, user.firstname, user.lastname, user.pseudo, user.telnumber) || null;
+        } catch(error) {
+            console.error("Error finding user by field:", error);
+            throw new Error("Failed to find user by field.");
+        }
+    }
 
-    // Properties from the interface
     async findUserById(userId: string): Promise<User | null> {
-        // Find a user by ID from the database
-        const [rows] = await this.db.execute<RowDataPacket[]>(
-            "SELECT * FROM users WHERE id = ? LIMIT 1",
-            [userId]
-        );
-
-        // If the user is not found, return null
-        if(!rows.length) return null;
-
-        // Return the user
-        const user = rows[0];
-        return new User(user.id, user.email, user.password, user.firstname, user.lastname, user.pseudo, user.telnumber) || null;
+        return this.findUserByField('id', userId);
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
-        // Find a user by Email from the database
-        const [rows] = await this.db.execute<RowDataPacket[]>(
-            "SELECT * FROM users WHERE email = ? LIMIT = 1",
-            [email]
-        );
-
-        // if the user is not found, return null
-        if(!rows.length) return null;
-
-        // Return the user
-        const user = rows[0];
-        return new User(user.id, user.email, user.password, user.firstname, user.lastname, user.pseudo, user.telnumber) || null;
+        return this.findUserByField('email', email);
     }
 
-    async getAllUsers(): Promise<Array<User> | null> {
-        // Find all users from the database
-        const [rows] = await this.db.execute<RowDataPacket[]>(
-            "SELECT * FROM users",
-        );
-
-        // If users don't found, return null
-        if(!rows.length) return null;
-
-        // Retrun all users
-        return rows.map(user => new User(user.id, user.email, user.password, user.firstname, user.lastname, user.pseudo, user.telnumber)) || null;
+    async getAllUsers(): Promise<User[] | null> {
+        try {
+            // SQL query
+            const query = "SELECT * FROM users";
+    
+            // Execute the query and type the rows correctly
+            const [rows]: [Array<{
+                id: string;
+                email: string;
+                password: string;
+                firstname?: string;
+                lastname?: string;
+                pseudo?: string;
+                telnumber?: string;
+            }>] = await this.db.query(query);
+    
+            // If no users found, return null
+            if (!rows.length) return null;
+    
+            // Map the rows to User entities
+            return rows.map(row => new User(
+                row.id,
+                row.email,
+                row.password,
+                row.firstname,
+                row.lastname,
+                row.pseudo,
+                row.telnumber
+            ));
+        } catch (error) {
+            console.error("Error fetching all users:", error);
+            throw new Error("Failed to fetch all users.");
+        }
     }
 
     async createUser(user: User): Promise<User | null> {
-        // Insert the user in the database
-        const [result] = await this.db.execute<ResultSetHeader>(
-            "INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getPseudo(),
-                user.getTelnumber()
-            ]
-        );
+        try {
+            // SQL query
+            const query: string = "INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            // Insert the user in the database
+            const [result] = await this.db.query<any>(
+                query,
+                [
+                    user.getId(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getFirstname(),
+                    user.getLastname(),
+                    user.getPseudo(),
+                    user.getTelnumber()
+                ]
+            );
+            
+            // If the user is not created, return null
+            if (result.affectedRows === 0) {
+                return null;
+            }
         
-        // If the user is not created, return null
-        if (result.affectedRows === 0) {
-            return null;
+            // Return the user
+            return this.findUserById(user.getId());
+        } catch (error) {
+            console.error("Error fetching creating user:", error);
+            throw new Error("Failed to fetch create user");
         }
-    
-        // Return the user
-        return this.findUserById(user.getId());
     }
 
     async modifyUser(user: User): Promise<User | null> {
-        const [result] = await this.db.execute<ResultSetHeader>(
-            "UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ? WHERE id = ?",
-            [
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getPseudo(),
-                user.getTelnumber()
-            ]
-        );
+        try {
+            // SQL query
+            const query: string = "UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ? WHERE id = ?";
 
-        if (result.affectedRows === 0) {
-            return null;
+            // Update the user in the database
+            const [result] = await this.db.query<any>(
+                query,
+                [
+                    user.getId(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getFirstname(),
+                    user.getLastname(),
+                    user.getPseudo(),
+                    user.getTelnumber()
+                ]
+            );
+
+            if (result.affectedRows === 0) {
+                return null;
+            }
+            return this.findUserById(user.getId());
+        } catch (error) {
+            console.error("Error modifying user:", error);
+            throw new Error("Failed to fetch modify user.");
         }
-        return this.findUserById(user.getId());
     }
     
     async deleteUser(user: User): Promise<boolean> {
-        // Delete the user from the database
-        const [result] = await this.db.execute<ResultSetHeader>(
-            "DELETE FROM users WHERE id = ?",
-            [user.getId()]
-        )
-        
-        // Return true if the user is deleted, false otherwise
-        return result.affectedRows > 0;
+        try {
+            const query: string = "DELETE FROM users WHERE id = ?";
+
+            // Delete the user from the database
+            const [result] = await this.db.query<any>(
+                query,
+                [user.getId()]
+            )
+            
+            // Return true if the user is deleted, false otherwise
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error("Error fetching deleting user:", error);
+            throw new Error("Failed to fetch delete user.");
+        }
     }
 }

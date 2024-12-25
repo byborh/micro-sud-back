@@ -34,6 +34,12 @@ il faut vérifier son mail, s'il est existant, alors, on le publie pas - OK
 
 ----------------------------------------------------
 
+stocker les requêtes SQL dans un fichier séparé (json) et de faire appel à ce fichier quand on en a besoin. comme ça, les gens n'ont qu'à modifier le fichier
+
+utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
+
+Faire des tests unitaires
+
 modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id
 
 je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier ce qui n'existe pas dans la fausse bdd

@@ -1,18 +1,22 @@
 import { createPool, Pool } from 'mysql2/promise';
 import { IDatabase } from "../contract/IDatabase";
+import { dbConfig } from '@db/config';
 
 // MySQL Database Config
 export class MySQLDatabase implements IDatabase {
     private pool: Pool;
 
-    constructor(private config: {
-        host: string;
-        port: number;
-        user: string;
-        password: string;
-        databse: string
-    }) {
-        this.pool = createPool(this.config)
+    constructor() {
+        this.pool = createPool({
+            host: dbConfig.mysql.host,
+            port: dbConfig.mysql.port,
+            user: dbConfig.mysql.user,
+            password: dbConfig.mysql.password,
+            database: dbConfig.mysql.database,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0
+        });
     }
 
     async connect(): Promise<void> {

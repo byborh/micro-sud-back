@@ -1,15 +1,20 @@
 import { User } from "../domain/User";
 import { UserRepository } from "../repositories/drivers/UserRepository";
-import { USerRepositoryMyQSL } from "../repositories/drivers/UserRepositoryMySQL";
+import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL";
 import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "src/cores/idGenerator";
+import { DatabaseFactory } from "@db/DatabaseFactory";
 
 export class UserService {
-    private userRepository: UserRepository;
+    private userRepository: UserRepositoryMySQL;
 
-    constructor(userRepository: UserRepository) {
-        this.userRepository = userRepository;
+    constructor() {
+        // Creation dynamicly of the database
+        const database = DatabaseFactory.createDatabase("mysql", null);
+
+        // Creation of the repository injecting the database
+        this.userRepository = new UserRepositoryMySQL(database);
     }
 
     // Get a user by ID
