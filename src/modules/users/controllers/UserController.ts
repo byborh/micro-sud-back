@@ -61,6 +61,11 @@ export class UserController {
             const userDTO: UserDTO = req.body;
             const userEntity: User = UserMapper.toEntity(userDTO);
 
+            if (!userEntity.getEmail || !userEntity.getPassword) {
+                res.status(400).json({ error: "Email and password are required." });
+                return;
+            }
+
             // Use the service to create the user
             const user = await this.userService.createUser(userEntity);
 

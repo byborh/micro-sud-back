@@ -2,12 +2,14 @@
 import express from 'express';
 import { UserController } from './controllers/UserController';
 import { UserService } from './services/UserService';
-import { UserRepository } from './repositories/drivers/UserRepository';
+import { UserRepositoryMySQL } from './repositories/drivers/UserRepositoryMySQL';
 import { userRoutes } from './route/userRoutes';
+import { MySQLDatabase } from '@db/drivers/MySQLDatabase';
 
 export const createUserModule = (): express.Router => {
-  const userRepository = new UserRepository();
-  const userService = new UserService(userRepository);
+  const mySQLDatabase = new MySQLDatabase;
+  const userRepositoryMySQL = new UserRepositoryMySQL(mySQLDatabase);
+  const userService = new UserService(userRepositoryMySQL);
   const userController = new UserController(userService);
 
   // Le contrôleur sera injecté dans les routes

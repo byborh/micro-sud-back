@@ -40,13 +40,38 @@ utiliser une bibliothèque dédiée comme winston ou pino pour une gestion effic
 
 Faire des tests unitaires
 
-modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id
+modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id - OK
 
 je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier ce qui n'existe pas dans la fausse bdd
 
-créer un repository avec une vraie bdd (du genre : sql) !
+créer un repository avec une vraie bdd (du genre : sql) ! - OK
 faire la même chose avec mongodb ou redis pour tester !
+
+tester si la bdd fonctionne correctement
 
 créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
-créer des tests unitaires pour chaque méthodes de service et de controller !
+Le mot de passe ne se stocke pas dans la bdd, pq ??
+
+
+{
+    "user1": {
+      "id": "12345",
+      "firstname": "Alice",
+      "lastname": "Wonderland",
+      "pseudo": "aliceW",
+      "email": "alice@example.com",
+      "password": "securePassword123",
+      "telnumber": "555-1234"
+    },
+    "user2": {
+      "id": "67890",
+      "firstname": "Bob",
+      "lastname": "Builder",
+      "pseudo": "bobTheBuilder",
+      "email": "bob@example.com",
+      "password": "fixIt456",
+      "telnumber": "555-5678"
+    }
+  }
+  

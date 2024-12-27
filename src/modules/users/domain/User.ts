@@ -3,12 +3,12 @@ import { UserContract } from '../contracts/UserContract';
 
 export class User implements UserContract {
     public id: string;
-    public firstname?: string;
-    public lastname?: string;
-    public pseudo?: string;
+    public firstname?: string | null;
+    public lastname?: string | null;
+    public pseudo?: string | null;
     public email: string;
     public password: string;
-    public telnumber?: string;
+    public telnumber?: string | null;
 
     constructor(id: string, email: string, password: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string) {
         this.id = id;
@@ -33,7 +33,7 @@ export class User implements UserContract {
         this.id = id;
     }
 
-    public getFirstname(): string | undefined {
+    public getFirstname(): string | null {
         return this.firstname;
     }
 
@@ -41,7 +41,7 @@ export class User implements UserContract {
         this.firstname = firstname;
     }
 
-    public getLastname(): string | undefined {
+    public getLastname(): string | null {
         return this.lastname;
     }
 
@@ -49,7 +49,7 @@ export class User implements UserContract {
         this.lastname = lastname;
     }
 
-    public getPseudo(): string | undefined {
+    public getPseudo(): string | null {
         return this.pseudo;
     }
 
@@ -73,7 +73,7 @@ export class User implements UserContract {
         this.password = password;
     }
 
-    public getTelnumber(): string | undefined {
+    public getTelnumber(): string | null {
         return this.telnumber;
     }
 

@@ -9,7 +9,7 @@ import { DatabaseFactory } from "@db/DatabaseFactory";
 export class UserService {
     private userRepository: UserRepositoryMySQL;
 
-    constructor() {
+    constructor(userRepository: UserRepositoryMySQL) {
         // Creation dynamicly of the database
         const database = DatabaseFactory.createDatabase("mysql", null);
 
@@ -89,8 +89,18 @@ export class UserService {
         // Assign id to user
         user.setId(userId);
 
+        const cleanedUser: User = new User(
+            user.getId(),
+            user.getEmail(),
+            user.getPassword(),
+            user.getFirstname() || null,
+            user.getLastname() || null,
+            user.getPseudo() || null,
+            user.getTelnumber() || null
+        );
+
         // Create user from repository
-        const createdUser: User | null = await this.userRepository.createUser(user);
+        const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
 
         // User didn't created
         if(!createdUser) return null;
@@ -98,7 +108,6 @@ export class UserService {
         return UserMapper.toDTO(createdUser);
     }
     
-   
 
     // Modify user
     public async modifyUser(user: User): Promise<UserDTO | null> {

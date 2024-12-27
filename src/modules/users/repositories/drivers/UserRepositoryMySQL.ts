@@ -17,19 +17,22 @@ export class UserRepositoryMySQL implements IUserRepository {
             const query: string = `SELECT * FROM users WHERE ${field} = ? LIMIT 1`;
     
             // Find a user by field from the database
-            const [rows]: [Array<User>] = await this.db.query(query, [value]);
+            const [rows]: any = await this.db.query(query, [value]);
     
-            // If the user is not found, return null
-            if(!rows.length) return null;
+            // Validate rows
+            if (!rows || !Array.isArray(rows) || rows.length === 0) {
+                return null;
+            }
     
-            // Return the user
+            // Map the result to a User instance
             const user = rows[0];
             return new User(user.id, user.email, user.password, user.firstname, user.lastname, user.pseudo, user.telnumber) || null;
-        } catch(error) {
+        } catch (error) {
             console.error("Error finding user by field:", error);
             throw new Error("Failed to find user by field.");
         }
     }
+    
 
     async findUserById(userId: string): Promise<User | null> {
         return this.findUserByField('id', userId);
@@ -56,7 +59,7 @@ export class UserRepositoryMySQL implements IUserRepository {
             }>] = await this.db.query(query);
     
             // If no users found, return null
-            if (!rows.length) return null;
+            if (!rows.length) return [];
     
             // Map the rows to User entities
             return rows.map(row => new User(
@@ -70,7 +73,7 @@ export class UserRepositoryMySQL implements IUserRepository {
             ));
         } catch (error) {
             console.error("Error fetching all users:", error);
-            throw new Error("Failed to fetch all users.");
+            throw new Error(`Failed to fetch all users: ${error}`);
         }
     }
 
@@ -86,10 +89,10 @@ export class UserRepositoryMySQL implements IUserRepository {
                     user.getId(),
                     user.getEmail(),
                     user.getPassword(),
-                    user.getFirstname(),
-                    user.getLastname(),
-                    user.getPseudo(),
-                    user.getTelnumber()
+                    user.getFirstname() || null,
+                    user.getLastname() || null,
+                    user.getPseudo() || null,
+                    user.getTelnumber() || null
                 ]
             );
             
