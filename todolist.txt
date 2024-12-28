@@ -39,7 +39,6 @@ modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longu
 - Le mot de passe ne se stocke pas dans la bdd, pq ??
 
 
-
 tester si la bdd MySQL fonctionne correctement
 
 utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs

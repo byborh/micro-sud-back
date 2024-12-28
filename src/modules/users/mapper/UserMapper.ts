@@ -8,7 +8,7 @@ export class UserMapper {
         return new User(
             dto.id,
             dto.email,
-            '', // Le mot de passe n'est pas stocké en clair, on utilise une valeur par défault
+            dto.password || '', // Le mot de passe n'est pas stocké en clair, on utilise une valeur par défault
             dto.firstname,
             dto.lastname,
             dto.pseudo,

@@ -58,8 +58,8 @@ export class UserController {
 
         try {
             // Change the type of user
-            const userDTO: UserDTO = req.body;
-            const userEntity: User = UserMapper.toEntity(userDTO);
+            const userDTO: UserDTO = req.body as User;
+            const userEntity: User = UserMapper.toEntity(userDTO as User);
 
             if (!userEntity.getEmail || !userEntity.getPassword) {
                 res.status(400).json({ error: "Email and password are required." });
@@ -67,13 +67,15 @@ export class UserController {
             }
 
             // Use the service to create the user
-            const user = await this.userService.createUser(userEntity);
+            const user: UserDTO = await this.userService.createUser(userEntity);
 
             if(!user) {
                 res.status(404).json({error: "User didn't created"});
                 return;
             }
+
             res.status(201).json(user);
+            return;
         } catch (error) {
             console.error(error);
             res.status(500).json({error: "Internal server error"});
@@ -86,17 +88,19 @@ export class UserController {
 
         try {
             // Change the type of user
-            const userDTO: UserDTO = req.body;
-            const userEntity: User = UserMapper.toEntity(userDTO);
+            const userDTO: UserDTO = req.body as User;
+            const userEntity: User = UserMapper.toEntity(userDTO as User);
 
             // Use the service to modify the user
-            const user = await this.userService.modifyUser(userEntity);
+            const user: UserDTO = await this.userService.modifyUser(userEntity);
 
             if(!user) {
                 res.status(404).json({error: "User didn't modified"});
                 return;
             }
+
             res.status(201).json(user);
+            return;
         } catch (error) {
             console.error(error);
             res.status(500).json({error: "Internal server error"});
@@ -108,12 +112,15 @@ export class UserController {
         // Verify permissions ...
 
         try {
-            const user = await this.userService.deleteUser(req.params.id);
-            if(!user) {
+            const deletedOrNot: boolean = await this.userService.deleteUser(req.params.id);
+            
+            if(!deletedOrNot) {
                 res.status(404).json({error: "User didn't deleted"});
                 return;
             }
-            res.status(201).json(user);
+
+            res.status(201).json(deletedOrNot);
+            return;
         } catch (error) {
             console.error(error);
             res.status(500).json({error: "Internal server error"});

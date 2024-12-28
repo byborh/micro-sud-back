@@ -128,9 +128,8 @@ export class UserRepositoryMySQL implements IUserRepository {
                 ]
             );
 
-            if (result.affectedRows === 0) {
-                return null;
-            }
+            if (result.affectedRows === 0) return null;
+            
             return this.findUserById(user.getId());
         } catch (error) {
             console.error("Error modifying user:", error);

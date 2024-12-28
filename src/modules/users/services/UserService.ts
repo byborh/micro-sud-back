@@ -53,17 +53,7 @@ export class UserService {
         return usersEntity.map(userEntity => UserMapper.toDTO(userEntity));
     }
     
-
     // Create user
-    // A CREER : 
-    /*
-        étant donné que l'id n'existe pas, on doit la générer tous seul.
-        pas besoin de vérifier si l'id existe (OPTIONEL)
-
-        est ce qu'on va faire lier un utilisateur à son mail et c'est le mail qui deviendra un genre d'id ?
-
-        Il faut changer le type d'id
-    */
     public async createUser(user: User): Promise<UserDTO | null> {
         // Verify if this user exist
         const userVerif: UserDTO | null = await this.getUserByEmail(user.getEmail());
@@ -79,13 +69,14 @@ export class UserService {
         // Make sure that ID is unique
         do {
             userId = idGenerator.generateId(16); // Generate a unique ID of 16 characters
-            console.log(`Generated ID: ${userId}`);
     
             // Verify if this id exist
             existingUser = await this.getUserById(userId);
     
         } while (existingUser !== null);
     
+        console.log(`Generated ID: ${userId}`);
+        
         // Assign id to user
         user.setId(userId);
 
@@ -101,22 +92,22 @@ export class UserService {
 
         // Create user from repository
         const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
-
+        
         // User didn't created
         if(!createdUser) return null;
 
         return UserMapper.toDTO(createdUser);
     }
-    
 
     // Modify user
     public async modifyUser(user: User): Promise<UserDTO | null> {
         // Verify if this user exist
-        const existingUser: UserDTO | null = await this.getUserById(user.getId());
-        if(!existingUser) {return null;}
+        const exUser: UserDTO | null = await this.getUserById(user.getId());
+        if(!exUser) return null;
 
+        const existingUser: User = UserMapper.toEntity(exUser);
         
-        const modifiedUser = new User(
+        const modifiedUser: User = new User(
             user.getId(), // Can't be changed
             user.getEmail(),
             user.getPassword(),
@@ -131,30 +122,30 @@ export class UserService {
         if(modifiedUser.getEmail === null && modifiedUser.getPassword() === null) return null;
 
 
-        // Compare n Verify if user was changed something
+        // Compare n Verify if user was changed somewhere
         let hasChanges: boolean = false;
-        if(modifiedUser.getEmail() !== user.getEmail()) {
-            modifiedUser.setEmail(user.getEmail());
+        if(modifiedUser.getEmail() !== existingUser.getEmail()) {
+            modifiedUser.setEmail(existingUser.getEmail());
             hasChanges = true;
         }
-        if(modifiedUser.getPassword() !== user.getPassword()) {
-            modifiedUser.setPassword(user.getPassword());
+        if(modifiedUser.getPassword() !== existingUser.getPassword()) {
+            modifiedUser.setPassword(existingUser.getPassword());
             hasChanges = true;
         }
-        if(modifiedUser.getFirstname() !== user.getFirstname()) {
-            modifiedUser.setFirstname(user.getFirstname() ?? '');
+        if(modifiedUser.getFirstname() !== existingUser.getFirstname()) {
+            modifiedUser.setFirstname(existingUser.getFirstname() ?? '');
             hasChanges = true;
         }
-        if(modifiedUser.getLastname() !== user.getLastname()) {
-            modifiedUser.setLastname(user.getLastname() ?? '');
+        if(modifiedUser.getLastname() !== existingUser.getLastname()) {
+            modifiedUser.setLastname(existingUser.getLastname() ?? '');
             hasChanges = true;
         }
-        if(modifiedUser.getPseudo() !== user.getPseudo()) {
-            modifiedUser.setPseudo(user.getPseudo() ?? '');
+        if(modifiedUser.getPseudo() !== existingUser.getPseudo()) {
+            modifiedUser.setPseudo(existingUser.getPseudo() ?? '');
             hasChanges = true;
         }
-        if(modifiedUser.getTelnumber() !== user.getTelnumber()) {
-            modifiedUser.setTelnumber(user.getTelnumber() ?? '');
+        if(modifiedUser.getTelnumber() !== existingUser.getTelnumber()) {
+            modifiedUser.setTelnumber(existingUser.getTelnumber() ?? '');
             hasChanges = true;
         }
         if(!hasChanges) return null;
