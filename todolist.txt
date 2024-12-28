@@ -1,12 +1,12 @@
 corriger le générateur d'id ! - OK
+
 générer que des id tout collé ! - OK
+
 générer qu'au moment de la création de l'user ! - OK
-ça génère automatiquement au moment de lancement du serveur, il faut enlever ce petit détail
 
-----------------------------------------------------
+ça génère automatiquement au moment de lancement du serveur, il faut enlever ce petit détail - OK
+
 créer les endpoints dans le controller - OK
-
-Sécuriser ces mêmes endpoints avec plus de couches
 
 à réfléchier si je dois créer un dossier modules dans src et de stocker tous les modules de dans :  - OK
 
@@ -21,57 +21,66 @@ Sécuriser ces mêmes endpoints avec plus de couches
 │   └── ...
 - OK
 
-----------------------------------------------------
-
 il faut transférer tous les "req.body" à une entité dans le controller - OK
 
-----------------------------------------------------
-
-IMPORTANT : 
-
 on peut créer le même user à l'infinie, à modifier !! - OK
+
 il faut vérifier son mail, s'il est existant, alors, on le publie pas - OK
 
-----------------------------------------------------
+je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier ce qui n'existe pas dans la fausse bdd (normal, car c'est statique)
 
-stocker les requêtes SQL dans un fichier séparé (json) et de faire appel à ce fichier quand on en a besoin. comme ça, les gens n'ont qu'à modifier le fichier
+créer un repository avec une vraie bdd (du genre : sql) ! - OK
+
+modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id - OK
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+
+- Le mot de passe ne se stocke pas dans la bdd, pq ??
+
+
+
+tester si la bdd MySQL fonctionne correctement
 
 utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
 
 Faire des tests unitaires
 
-modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id - OK
+créer la bdd mongodb et vérifier si elle fonctionne correctement
 
-je peux pas vérifier les endpoints : "put" et "delete" car, il ne peut modifier ce qui n'existe pas dans la fausse bdd
+créer la bdd redis et vérifier si elle fonctionne correctement
 
-créer un repository avec une vraie bdd (du genre : sql) ! - OK
-faire la même chose avec mongodb ou redis pour tester !
+stocker les requêtes SQL dans un fichier séparé (peut être : json) et de faire appel à ce fichier quand on en a besoin. comme ça, les gens n'ont qu'à modifier le fichier
 
-tester si la bdd fonctionne correctement
+faire pareil avec des requêtes mongodb
+
+faire pareil avec des requêtes redis
 
 créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
-Le mot de passe ne se stocke pas dans la bdd, pq ??
+Sécuriser les endpoints avec plus de couches
 
+------------------------------------------------------------------------------------------------------------------------------------------
+
+exemple d'utilisateurs :
 
 {
-    "user1": {
-      "id": "12345",
-      "firstname": "Alice",
-      "lastname": "Wonderland",
-      "pseudo": "aliceW",
-      "email": "alice@example.com",
-      "password": "securePassword123",
-      "telnumber": "555-1234"
-    },
-    "user2": {
-      "id": "67890",
-      "firstname": "Bob",
-      "lastname": "Builder",
-      "pseudo": "bobTheBuilder",
-      "email": "bob@example.com",
-      "password": "fixIt456",
-      "telnumber": "555-5678"
-    }
-  }
+  "id": "12345",
+  "firstname": "Alice",
+  "lastname": "Wonderland",
+  "pseudo": "aliceW",
+  "email": "alice@example.com",
+  "password": "securePassword123",
+  "telnumber": "555-1234"
+}
+
+{
+  "id": "67890",
+  "firstname": "Bob",
+  "lastname": "Builder",
+  "pseudo": "bobTheBuilder",
+  "email": "bob@example.com",
+  "password": "fixIt456",
+  "telnumber": "555-5678"
+}
   
