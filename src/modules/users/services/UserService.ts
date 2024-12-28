@@ -23,10 +23,12 @@ export class UserService {
         const userEntity: User | null = await this.userRepository.findUserById(userId);
 
         // If the user is not found, return null
-        if(!userEntity) {return null;} 
+        if(!userEntity) return null;
+
+        console.log("User found in getUserById Service :", UserMapper.toDTO(userEntity as User) as User);
 
         // Return the user in DTO format
-        return UserMapper.toDTO(userEntity);
+        return UserMapper.toDTO(userEntity as User) as User;
     }
 
     // Get a user by Email
@@ -101,12 +103,26 @@ export class UserService {
 
     // Modify user
     public async modifyUser(user: User): Promise<UserDTO | null> {
-        // Verify if this user exist
-        const exUser: UserDTO | null = await this.getUserById(user.getId());
-        if(!exUser) return null;
+        console.log("User to modify in service before all functions:", user);
+
+        if (!user.getId()) {
+            console.error("Invalid user ID provided for modification:", user);
+            throw new Error("User ID is required.");
+        }
+
+        // Verify if this user exist        
+        const exUser: UserDTO | null = await this.getUserById(user.getId()) as User;
+        if(!exUser) {
+            console.error("User not found:", exUser);
+            throw new Error("User not found.");
+        }
 
         const existingUser: User = UserMapper.toEntity(exUser);
-        
+        existingUser.setPassword(exUser.password);
+
+        console.log("exUser:", exUser);
+        console.log("existingUser:", existingUser);
+
         const modifiedUser: User = new User(
             user.getId(), // Can't be changed
             user.getEmail(),
@@ -119,36 +135,27 @@ export class UserService {
 
 
         // Verify if email n password are not "null"
-        if(modifiedUser.getEmail === null && modifiedUser.getPassword() === null) return null;
+        if(modifiedUser.getEmail === null && modifiedUser.getPassword() === null) {
+            console.error("Email or password can't be null:", modifiedUser);
+            throw new Error("Email or password can't be null.");
+        }
 
 
         // Compare n Verify if user was changed somewhere
         let hasChanges: boolean = false;
-        if(modifiedUser.getEmail() !== existingUser.getEmail()) {
-            modifiedUser.setEmail(existingUser.getEmail());
-            hasChanges = true;
+        if(modifiedUser.getEmail() !== existingUser.getEmail()) hasChanges = true;
+        if(modifiedUser.getPassword() !== existingUser.getPassword()) hasChanges = true;    
+        if(modifiedUser.getFirstname() !== existingUser.getFirstname())  hasChanges = true;
+        if(modifiedUser.getLastname() !== existingUser.getLastname())  hasChanges = true;
+        if(modifiedUser.getPseudo() !== existingUser.getPseudo())  hasChanges = true;
+        if(modifiedUser.getTelnumber() !== existingUser.getTelnumber()) hasChanges = true;
+
+        if(!hasChanges)  {
+            console.error("User is not different. The same user like before:", modifiedUser);
+            throw new Error("User is not different. The same user like before.");
         }
-        if(modifiedUser.getPassword() !== existingUser.getPassword()) {
-            modifiedUser.setPassword(existingUser.getPassword());
-            hasChanges = true;
-        }
-        if(modifiedUser.getFirstname() !== existingUser.getFirstname()) {
-            modifiedUser.setFirstname(existingUser.getFirstname() ?? '');
-            hasChanges = true;
-        }
-        if(modifiedUser.getLastname() !== existingUser.getLastname()) {
-            modifiedUser.setLastname(existingUser.getLastname() ?? '');
-            hasChanges = true;
-        }
-        if(modifiedUser.getPseudo() !== existingUser.getPseudo()) {
-            modifiedUser.setPseudo(existingUser.getPseudo() ?? '');
-            hasChanges = true;
-        }
-        if(modifiedUser.getTelnumber() !== existingUser.getTelnumber()) {
-            modifiedUser.setTelnumber(existingUser.getTelnumber() ?? '');
-            hasChanges = true;
-        }
-        if(!hasChanges) return null;
+
+        console.log("User to modify in service after all functions:", modifiedUser);
 
         // Modify existing user
         const finalUser: User | null = await this.userRepository.modifyUser(modifiedUser);

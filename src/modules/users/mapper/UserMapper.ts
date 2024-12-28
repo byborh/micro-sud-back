@@ -20,6 +20,7 @@ export class UserMapper {
         return {
             id: user.getId(),
             email: user.getEmail(),
+            password: user.getPassword(),
             firstname: user.getFirstname(),
             lastname: user.getLastname(),
             pseudo: user.getPseudo(),

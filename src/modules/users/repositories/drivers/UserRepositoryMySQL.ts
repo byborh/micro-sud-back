@@ -1,6 +1,9 @@
 import { User } from "@modules/users/domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
+import { ResultSetHeader } from "mysql2/promise";
+import { UserDTO } from "@modules/users/dto/UserDTO";
+import { UserMapper } from "@modules/users/mapper/UserMapper";
 
 
 export class UserRepositoryMySQL implements IUserRepository {
@@ -13,69 +16,99 @@ export class UserRepositoryMySQL implements IUserRepository {
 
     async findUserByField(field: string, value: string): Promise<User | null> {
         try {
+            // Validate field
+            const allawedFields = ['id', 'email', 'firstname', 'lastname', 'pseudo', 'telnumber'];
+            if(!allawedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
+
             // SQL query
             const query: string = `SELECT * FROM users WHERE ${field} = ? LIMIT 1`;
     
             // Find a user by field from the database
-            const [rows]: any = await this.db.query(query, [value]);
+            const [rows]: [any[], any] = await this.db.query(query, [value]);
+
+            console.log("Raw query result:", rows);
     
             // Validate rows
-            if (!rows || !Array.isArray(rows) || rows.length === 0) {
+            if (!rows || rows.length === 0) {
+                console.error("No user found for field:", field, "with value:", value);
                 return null;
+            };
+
+            const user = Array.isArray(rows) ? rows[0] : rows
+
+            console.log("User found:", user);
+
+            // Verify if all required fields are present
+            if (!user.id || !user.email || !user.password) {
+                console.error("Invalid user data:", user);
+                throw new Error("User data is incomplete.");
             }
     
             // Map the result to a User instance
-            const user = rows[0];
-            return new User(user.id, user.email, user.password, user.firstname, user.lastname, user.pseudo, user.telnumber) || null;
+            return new User(
+                user.id,
+                user.email,
+                user.password,
+                user.firstname || null,
+                user.lastname || null,
+                user.pseudo || null,
+                user.telnumber || null
+            );
         } catch (error) {
             console.error("Error finding user by field:", error);
             throw new Error("Failed to find user by field.");
         }
     }
     
-
     async findUserById(userId: string): Promise<User | null> {
-        return this.findUserByField('id', userId);
+        try {
+            if(!userId) return null;
+            return this.findUserByField('id', userId);
+        } catch (error) {
+            console.error("Error finding user by id:", error);
+            throw new Error("Failed to find user by id.");
+        }
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
-        return this.findUserByField('email', email);
-    }
-
-    async getAllUsers(): Promise<User[] | null> {
         try {
-            // SQL query
-            const query = "SELECT * FROM users";
-    
-            // Execute the query and type the rows correctly
-            const [rows]: [Array<{
-                id: string;
-                email: string;
-                password: string;
-                firstname?: string;
-                lastname?: string;
-                pseudo?: string;
-                telnumber?: string;
-            }>] = await this.db.query(query);
-    
-            // If no users found, return null
-            if (!rows.length) return [];
-    
-            // Map the rows to User entities
-            return rows.map(row => new User(
-                row.id,
-                row.email,
-                row.password,
-                row.firstname,
-                row.lastname,
-                row.pseudo,
-                row.telnumber
-            ));
+            if(!email) return null;
+            return this.findUserByField('email', email);
         } catch (error) {
-            console.error("Error fetching all users:", error);
-            throw new Error(`Failed to fetch all users: ${error}`);
+            console.error("Error finding user by email:", error);
+            throw new Error("Failed to find user by email.");
         }
     }
+
+    async getAllUsers(): Promise<User[]> {
+        try {
+            // SQL query
+            const query: string = `SELECT * FROM users LIMIT 100;`;
+            
+            // Fetch all users from the database
+            const [rows]: [any, any] = await this.db.query(query);
+    
+            console.log("Raw query result:", rows);
+            console.log("Number of users fetched:", rows.length);
+            
+
+            // const users = rows && Array.isArray(rows) ? rows : rows.data || [];
+    
+            // Vérifier si rows est un tableau ou un objet unique
+            const rowsArray = Array.isArray(rows) ? rows : [rows]; // Si c'est un objet unique, on le met dans un tableau
+    
+            if (rowsArray.length === 0) {
+                console.error("No users found in the database.");
+                return [];
+            }
+    
+            // Utiliser le UserMapper pour mapper chaque ligne en une entité User
+            return rowsArray.map(row => UserMapper.toEntity(row));
+        } catch (error) {
+            console.error("Error getting users:", error);
+            throw new Error("Failed to get users.");
+        }
+    }  
 
     async createUser(user: User): Promise<User | null> {
         try {
@@ -83,7 +116,7 @@ export class UserRepositoryMySQL implements IUserRepository {
             const query: string = "INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             // Insert the user in the database
-            const [result] = await this.db.query<any>(
+            const result: [ResultSetHeader, any] = await this.db.query(
                 query,
                 [
                     user.getId(),
@@ -95,45 +128,49 @@ export class UserRepositoryMySQL implements IUserRepository {
                     user.getTelnumber() || null
                 ]
             );
+
+            console.log("Query result:", result);
             
             // If the user is not created, return null
-            if (result.affectedRows === 0) {
-                return null;
-            }
+            if (!result) null;
         
             // Return the user
             return this.findUserById(user.getId());
         } catch (error) {
-            console.error("Error fetching creating user:", error);
+            console.error("Error creating user:", error,);
             throw new Error("Failed to fetch create user");
         }
     }
 
     async modifyUser(user: User): Promise<User | null> {
         try {
+            console.log("User to modify:", user);
+            
             // SQL query
             const query: string = "UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ? WHERE id = ?";
 
             // Update the user in the database
-            const [result] = await this.db.query<any>(
+            const result: [ResultSetHeader, any] = await this.db.query(
                 query,
                 [
-                    user.getId(),
                     user.getEmail(),
                     user.getPassword(),
-                    user.getFirstname(),
-                    user.getLastname(),
-                    user.getPseudo(),
-                    user.getTelnumber()
+                    user.getFirstname() || null,
+                    user.getLastname() || null,
+                    user.getPseudo() || null,
+                    user.getTelnumber() || null,
+                    user.getId()
                 ]
             );
 
-            if (result.affectedRows === 0) return null;
+            console.log("Query result from modifyUser:", result);
+
+            if (!result) return null;
             
             return this.findUserById(user.getId());
         } catch (error) {
             console.error("Error modifying user:", error);
-            throw new Error("Failed to fetch modify user.");
+            throw new Error("Failed to modify user.");
         }
     }
     
@@ -142,16 +179,16 @@ export class UserRepositoryMySQL implements IUserRepository {
             const query: string = "DELETE FROM users WHERE id = ?";
 
             // Delete the user from the database
-            const [result] = await this.db.query<any>(
+            const result: [ResultSetHeader, any] = await this.db.query<any>(
                 query,
                 [user.getId()]
             )
             
             // Return true if the user is deleted, false otherwise
-            return result.affectedRows > 0;
+            return !result ? false : true;
         } catch (error) {
-            console.error("Error fetching deleting user:", error);
-            throw new Error("Failed to fetch delete user.");
+            console.error("Error deleting user:", error);
+            throw new Error("Failed to delete user.");
         }
     }
 }

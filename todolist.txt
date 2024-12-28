@@ -33,13 +33,17 @@ créer un repository avec une vraie bdd (du genre : sql) ! - OK
 
 modifier le générateur d'id pour qu'il prenne en paramètre un nombre de longueur à générer pour l'id - OK
 
+Le mot de passe ne se stocke pas dans la bdd, pq ?? - OK
+
+tester si la bdd MySQL fonctionne correctement - OK
+
 ------------------------------------------------------------------------------------------------------------------------------------------
 
+l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément
 
-- Le mot de passe ne se stocke pas dans la bdd, pq ??
+ça supprime le mdp si la requête n'a pas de mdp. ça ne doit pas le supprimer
 
-
-tester si la bdd MySQL fonctionne correctement
+ne pas oublier de retourner le mdp aussi pour toutes les requêtes get
 
 utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
 

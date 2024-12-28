@@ -37,7 +37,7 @@ export class UserController {
 
         try {
             // Get all users from the service
-            const users = await this.userService.getUsers();
+            const users: Array<UserDTO> = await this.userService.getUsers();
 
             if(!users) {
                 res.status(404).json({error: "Users not found"});
@@ -90,17 +90,25 @@ export class UserController {
             // Change the type of user
             const userDTO: UserDTO = req.body as User;
             const userEntity: User = UserMapper.toEntity(userDTO as User);
+            userEntity.setId(req.params.id);
+
+            if (!userEntity.getEmail || !userEntity.getPassword) {
+                res.status(400).json({ error: "Email and password are required." });
+                return null;
+            }
+
+            console.log("User to modify in controller:", userEntity);
 
             // Use the service to modify the user
             const user: UserDTO = await this.userService.modifyUser(userEntity);
 
             if(!user) {
                 res.status(404).json({error: "User didn't modified"});
-                return;
+                return null;
             }
 
             res.status(201).json(user);
-            return;
+            return null;
         } catch (error) {
             console.error(error);
             res.status(500).json({error: "Internal server error"});
