@@ -39,6 +39,11 @@ tester si la bdd MySQL fonctionne correctement - OK
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 
+créer des tokens pour l'autorisation des utilisateurs / gérer les droits
+
+- créer un fichier pour le chiffrement/hashage des mdp
+
+
 l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément
 
 ça supprime le mdp si la requête n'a pas de mdp. ça ne doit pas le supprimer
@@ -47,8 +52,7 @@ ne pas oublier de retourner le mdp aussi pour toutes les requêtes get
 
 utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
 
-
-- Faire des tests unitaires
+Faire des tests unitaires
 
 les imports de ce genre ne fonctionne pas dans les fichier .test.ts :
 import { UserController } from "@modules/users/controllers/UserController";
@@ -63,8 +67,6 @@ stocker les requêtes SQL dans un fichier séparé (peut être : json) et de fai
 faire pareil avec des requêtes mongodb
 
 faire pareil avec des requêtes redis
-
-créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
 Sécuriser les endpoints avec plus de couches
 
