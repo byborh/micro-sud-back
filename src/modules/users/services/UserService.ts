@@ -172,5 +172,5 @@ export class UserService {
         if(!user) {return false;} // User not found
         // Delete the user
         return this.userRepository.deleteUser(UserMapper.toEntity(user));
-    }   
+    }
 }

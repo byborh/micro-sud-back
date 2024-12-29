@@ -13,11 +13,12 @@
         "@core/*": ["src/cores/*"],
         "@middlewares/*": ["src/middlewares/*"],
         "@modules/*": ["src/modules/*"],
+        "@users/*": ["src/modules/users/*"],
         
         // Databases
         "@db/*": ["src/config/db/*"]
       },
-      "strictNullChecks": false // Il faut le renlever plus tard, car ça dit : null = undefined
+      "strictNullChecks": false, // Il faut le renlever plus tard, car ça dit : null = undefined
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]

@@ -47,7 +47,12 @@ ne pas oublier de retourner le mdp aussi pour toutes les requêtes get
 
 utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
 
-Faire des tests unitaires
+
+- Faire des tests unitaires
+
+les imports de ce genre ne fonctionne pas dans les fichier .test.ts :
+import { UserController } from "@modules/users/controllers/UserController";
+
 
 créer la bdd mongodb et vérifier si elle fonctionne correctement
 
