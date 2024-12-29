@@ -1,3 +1,4 @@
+-- Create users table
 CREATE TABLE users (
     id VARCHAR(255) PRIMARY KEY,
     firstname VARCHAR(255) DEFAULT NULL,
@@ -7,3 +8,16 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     telnumber VARCHAR(20) DEFAULT NULL
 );
+
+-- Create salt table for password encryption
+CREATE TABLE salt (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) NOT NULL
+);
+
+-- Add foreign key constraint
+ALTER TABLE salt
+ADD CONSTRAINT fk_user_id
+FOREIGN KEY (user_id) REFERENCES users(id)
+ON DELETE CASCADE;

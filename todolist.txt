@@ -43,6 +43,8 @@ créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
 - créer un fichier pour le chiffrement/hashage des mdp
 
+mettre une limite minimum de 8 charachteres pour les mot de passe
+
 
 l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément
 

@@ -5,6 +5,7 @@ import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "src/cores/idGenerator";
 import { DatabaseFactory } from "@db/DatabaseFactory";
+import { PasswordManager } from "@core/cryptography/PasswordManager";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -64,6 +65,7 @@ export class UserService {
         // Declare variables
         let existingUser: UserDTO | null = null;
         let userId: string;
+
     
         // Initialize IdGenerator
         const idGenerator = IdGenerator.getInstance();
@@ -78,9 +80,31 @@ export class UserService {
         } while (existingUser !== null);
     
         console.log(`Generated ID: ${userId}`);
-        
+
         // Assign id to user
         user.setId(userId);
+
+
+        // Password management
+        const passwordManager = PasswordManager.getInstance();
+
+        // Creation of the salt
+        const salt: string = passwordManager.generateSalt();
+
+        // Creation of hashed password
+        const hashedPassword: string = passwordManager.hashPassword(user.getPassword(), salt);
+
+        console.log('Hash:', hashedPassword);
+        console.log('Salt:', salt);
+
+        // Verification
+        const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
+        console.log('Mot de passe valide:', isValid);
+        // A CREER UNE TABLE DANS LA BDD POUR STOCKER LE SALT
+        // IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        // Assign hashed password to user
+        user.setPassword(hashedPassword);
 
         const cleanedUser: User = new User(
             user.getId(),
