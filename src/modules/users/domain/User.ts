@@ -1,5 +1,5 @@
 // faire un contract avec l'interface de l'utilisateur (User)
-import { UserContract } from '../contracts/UserContract';
+import { UserContract } from '../contracts/IUser';
 
 export class User implements UserContract {
     public id: string;
@@ -16,14 +16,9 @@ export class User implements UserContract {
         this.lastname = lastname;
         this.pseudo = pseudo;
         this.email = email;
-        this.password = password; // il faut hasher le mot de passe
+        this.password = password; // il faut hasher le mot de passe | -> | EN COURS 
         this.telnumber = telnumber;
     }
-
-    // A CHANGER :
-    /* 
-        Changer le type d'id, il faut le mettre en string
-    */
 
     public getId(): string {
         return this.id;

@@ -1,4 +1,4 @@
-import { UserContract } from "../contracts/UserContract";
+import { UserContract } from "../contracts/IUser";
 
 /*
     The password is optional.

@@ -4,6 +4,7 @@ import { IDatabase } from "@db/contract/IDatabase";
 import { ResultSetHeader } from "mysql2/promise";
 import { UserDTO } from "@modules/users/dto/UserDTO";
 import { UserMapper } from "@modules/users/mapper/UserMapper";
+import { CredentialData } from "@modules/users/domain/CredentialData";
 
 
 export class UserRepositoryMySQL implements IUserRepository {
@@ -110,22 +111,36 @@ export class UserRepositoryMySQL implements IUserRepository {
         }
     }  
 
-    async createUser(user: User): Promise<User | null> {
+    async createUser(user: User, credentialData: CredentialData): Promise<User | null> {
         try {
             // SQL query
-            const query: string = "INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            const query: string = `
+            -- Insert the user in the users table
+            INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            
+            -- Insert the credential data in the salt table
+            INSERT INTO salt (id, userid, salt)
+            VALUES (?, ?, ?);`;
+            
 
             // Insert the user in the database
             const result: [ResultSetHeader, any] = await this.db.query(
                 query,
                 [
+                    // User table
                     user.getId(),
                     user.getEmail(),
                     user.getPassword(),
                     user.getFirstname() || null,
                     user.getLastname() || null,
                     user.getPseudo() || null,
-                    user.getTelnumber() || null
+                    user.getTelnumber() || null,
+                    
+                    // Salt table
+                    credentialData.getId(),
+                    user.getId(),
+                    credentialData.getSalt()
                 ]
             );
 
@@ -142,23 +157,36 @@ export class UserRepositoryMySQL implements IUserRepository {
         }
     }
 
-    async modifyUser(user: User): Promise<User | null> {
+    async modifyUser(user: User, credentialData?: CredentialData): Promise<User | null> {
         try {
             console.log("User to modify:", user);
             
             // SQL query
-            const query: string = "UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ? WHERE id = ?";
+            const query: string = `
+            -- Update user
+            UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ?
+            WHERE id = ?;
+            
+            -- Update salt
+            UPDATE salt
+            SET salt = ?
+            WHERE userid = ?;`;
 
             // Update the user in the database
             const result: [ResultSetHeader, any] = await this.db.query(
                 query,
                 [
+                    // User table
                     user.getEmail(),
                     user.getPassword(),
                     user.getFirstname() || null,
                     user.getLastname() || null,
                     user.getPseudo() || null,
                     user.getTelnumber() || null,
+                    user.getId(),
+
+                    // Salt table
+                    credentialData?.getSalt() || null,
                     user.getId()
                 ]
             );
@@ -176,12 +204,20 @@ export class UserRepositoryMySQL implements IUserRepository {
     
     async deleteUser(user: User): Promise<boolean> {
         try {
-            const query: string = "DELETE FROM users WHERE id = ?";
+            const query: string = `
+            -- Delete user
+            DELETE FROM users WHERE id = ?
+            
+            -- Delete salt
+            DELETE FROM salt WHERE userid = ?;`;
 
             // Delete the user from the database
             const result: [ResultSetHeader, any] = await this.db.query<any>(
                 query,
-                [user.getId()]
+                [
+                    user.getId(),
+                    user.getId()
+                ]
             )
             
             // Return true if the user is deleted, false otherwise

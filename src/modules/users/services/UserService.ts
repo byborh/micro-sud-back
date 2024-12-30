@@ -6,6 +6,7 @@ import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "src/cores/idGenerator";
 import { DatabaseFactory } from "@db/DatabaseFactory";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
+import { CredentialData } from "../domain/CredentialData";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -66,6 +67,7 @@ export class UserService {
         let existingUser: UserDTO | null = null;
         let userId: string;
 
+
     
         // Initialize IdGenerator
         const idGenerator = IdGenerator.getInstance();
@@ -83,7 +85,6 @@ export class UserService {
 
         // Assign id to user
         user.setId(userId);
-
 
         // Password management
         const passwordManager = PasswordManager.getInstance();
@@ -106,6 +107,13 @@ export class UserService {
         // Assign hashed password to user
         user.setPassword(hashedPassword);
 
+
+        // Creation of id of the credential data
+        const credentialDataId: string = idGenerator.generateId(8);
+
+        // Creation of the credential data
+        const credentialData: CredentialData = new CredentialData(credentialDataId, user.getId(), salt);
+
         const cleanedUser: User = new User(
             user.getId(),
             user.getEmail(),
@@ -117,7 +125,7 @@ export class UserService {
         );
 
         // Create user from repository
-        const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
+        const createdUser: User | null = await this.userRepository.createUser(cleanedUser, credentialData);
         
         // User didn't created
         if(!createdUser) return null;
@@ -150,7 +158,7 @@ export class UserService {
         const modifiedUser: User = new User(
             user.getId(), // Can't be changed
             user.getEmail(),
-            user.getPassword(),
+            user.getPassword(), // Can be null
             user.getFirstname(), // Can be null
             user.getLastname(), // Can be null
             user.getPseudo(), // Can be null

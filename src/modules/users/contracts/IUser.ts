@@ -1,4 +1,4 @@
-// Interface de l'utilisateur
+// Interface of the user
 export interface UserContract {
     id: string;
     firstname?: string;
