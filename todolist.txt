@@ -39,25 +39,29 @@ tester si la bdd MySQL fonctionne correctement - OK
 
 créer un fichier pour le chiffrement/hashage des mdp - OK
 
+mettre une limite minimum de 8 charachteres pour les mot de passe - OK
+
+Faire la base des tests unitaires - OK
+
 ------------------------------------------------------------------------------------------------------------------------------------------
-
-créer des tokens pour l'autorisation des utilisateurs / gérer les droits
-
-mettre une limite minimum de 8 charachteres pour les mot de passe -> créer un middleware qui va détecter le nombre de lettres dans une chaîne de charachteres
 
 recréer la méthode modifyUser. elle est pourrie
 
-créer des exceptions si nécessaire
-
 l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément
-
-ça supprime le mdp si la requête n'a pas de mdp. ça ne doit pas le supprimer
 
 ne pas oublier de retourner le mdp aussi pour toutes les requêtes get
 
+ça supprime le mdp si la requête n'a pas de mdp. ça ne doit pas le supprimer
+
+créer des exceptions si nécessaire
+
+créer des logs pour chaque C_UD des utilisateurs
+
+créer des tokens pour l'autorisation des utilisateurs / gérer les droits
+
 utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
 
-Faire des tests unitaires
+Corriger les tests unitaires
 
 les imports de ce genre ne fonctionne pas dans les fichier .test.ts :
 import { UserController } from "@modules/users/controllers/UserController";

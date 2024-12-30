@@ -1,0 +1,87 @@
+
+session-based Authentication côté serveur + JWT côté client
+
+
+User - permissions qu'à ce qui le concerne et rien de plus -CRUD- sur lui même.
+
+Admin - accès à tous mais mais ne peut modifier ou supprimer -CR__-
+
+Manager - toute les permissions -CRUD-, même les mdp
+
+
+
+- Rôles de base
+
+User
+Permissions : Accès limité aux fonctionnalités de base
+    Consulter les informations personnelles
+    Modifier sa propre information
+    Gérer ses préférences
+    Effectuer des recherches basiques
+    Lancer des requêtes simples
+
+Administrator
+Permissions : Toutes les fonctions disponibles pour un utilisateur standard, plus des droits d'administration
+    Gérer les comptes et les utilisateurs
+    Configurer les paramètres généraux
+    Surveiller les activités
+    Mettre à jour le système
+    Gérer les permissions globales
+
+Developer
+Permissions : Accès à toutes les fonctionnalités techniques et de développement
+    Programmer et développer nouvelles fonctionnalités
+    Tester le système
+    Mettre à jour le code existant
+    Déboguer les problèmes
+    Optimiser les performances
+
+Account Manager
+Permissions : Contrôle total sur le compte et ses utilisateurs
+    Gérer les abonnements et factures
+    Planifier les mises à jour
+    Surveiller l'utilisation du système
+    Négocier avec les fournisseurs
+    Gérer les partenariats
+
+
+- Rôles spécifiques par domaine
+
+Data Manager
+Permissions : Consultation et gestion des données principales
+    Importer/exporter des données
+    Créer et modifier des rapports
+    Analyser les tendances
+    Nettoyer et optimiser les données
+    Configurer les alertes
+
+Security Officer
+Permissions : Configuration des paramètres de sécurité
+    Configurer les paramètres de sécurité
+    Mettre à jour les logiciels
+    Effectuer des audits de sécurité
+    Former les utilisateurs sur la sécurité
+    Répondre aux incidents de sécurité
+
+Financial Analyst
+Permissions : Consultation des données financières, rapports
+    Générer des rapports financiers
+    Effectuer des prévisions
+    Identifier les tendances
+    Optimiser les coûts
+    Surveiller les KPI financiers
+
+Project Manager
+Permissions : Suivi des tâches, gestion des équipes
+    Planifier les projets
+    Assigner les tâches
+    Suivre les délais
+    Gérer le budget
+    Coordonner les équipes
+
+
+User ----> Administrator ----> Account Manager ----> Developer  
+            │  
+            ├----> Data Manager ----> Security Officer ----> Financial Analyst ----> Project Manager
+
+-0----------1-----------2----------3--------4-----------5----------6----------------------7-------->

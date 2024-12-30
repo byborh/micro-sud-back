@@ -114,19 +114,18 @@ export class UserRepositoryMySQL implements IUserRepository {
     async createUser(user: User, credentialData: CredentialData): Promise<User | null> {
         try {
             // SQL query
-            const query: string = `
+            const query_1: string = `
             -- Insert the user in the users table
             INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber)
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             
             -- Insert the credential data in the salt table
             INSERT INTO salt (id, userid, salt)
             VALUES (?, ?, ?);`;
-            
 
             // Insert the user in the database
-            const result: [ResultSetHeader, any] = await this.db.query(
-                query,
+            const result_1: [ResultSetHeader, any] = await this.db.query(
+                query_1,
                 [
                     // User table
                     user.getId(),
@@ -136,7 +135,22 @@ export class UserRepositoryMySQL implements IUserRepository {
                     user.getLastname() || null,
                     user.getPseudo() || null,
                     user.getTelnumber() || null,
-                    
+                ]
+            );
+
+            console.log("Query result create user:", result_1);
+
+
+            // SQL query
+            const query_2: string = `
+            -- Insert the credential data in the salt table
+            INSERT INTO salt (id, userid, salt)
+            VALUES (?, ?, ?);`;
+
+            // Insert the user in the database
+            const result_2: [ResultSetHeader, any] = await this.db.query(
+                query_2,
+                [
                     // Salt table
                     credentialData.getId(),
                     user.getId(),
@@ -144,16 +158,17 @@ export class UserRepositoryMySQL implements IUserRepository {
                 ]
             );
 
-            console.log("Query result:", result);
+            console.log("Query result:", result_2);
             
             // If the user is not created, return null
-            if (!result) null;
+            if (!result_1) return null;
+            if (!result_2) return null;
         
             // Return the user
             return this.findUserById(user.getId());
         } catch (error) {
             console.error("Error creating user:", error,);
-            throw new Error("Failed to fetch create user");
+            throw new Error("Failed to create user");
         }
     }
 
@@ -165,7 +180,7 @@ export class UserRepositoryMySQL implements IUserRepository {
             const query: string = `
             -- Update user
             UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ?
-            WHERE id = ?;
+            WHERE id = ?
             
             -- Update salt
             UPDATE salt

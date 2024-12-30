@@ -14,6 +14,9 @@ export class UserController {
     // Get a user by ID
     public async getUserById(req: Request, res: Response): Promise<void> {
         try {
+            // Verify permissions ...
+
+
             // Get the user from the service
             const userDto = await this.userService.getUserById(req.params.id);
 

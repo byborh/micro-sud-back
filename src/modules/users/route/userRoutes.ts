@@ -2,6 +2,7 @@
 import express, { Request, Response } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
+import { lengthRequirementMiddleware } from '@middlewares/lengthRequirementMiddleware';
 
 export const userRoutes = (userController: UserController): express.Router => {
   const router = express.Router();
@@ -16,6 +17,8 @@ export const userRoutes = (userController: UserController): express.Router => {
   router.post('/',
     validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),
     validateAttributeMiddleware('body', 'password', 'Password missing or invalid in request body'),
+    lengthRequirementMiddleware(8, 'password'),
+    lengthRequirementMiddleware(3, 'email'),
     (req: Request, res: Response) => userController.createUser(req, res)
   );
 
