@@ -2,7 +2,6 @@ import { User } from "@modules/users/domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 import { ResultSetHeader } from "mysql2/promise";
-import { UserDTO } from "@modules/users/dto/UserDTO";
 import { UserMapper } from "@modules/users/mapper/UserMapper";
 
 
