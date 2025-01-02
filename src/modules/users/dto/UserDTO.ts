@@ -8,6 +8,7 @@ import { UserContract } from "../contracts/IUser";
     But it's not required in response (ex: when getting a user).
     It's more secure to not send the password in the response. (Only if user has the right permissions)
 */
-export interface UserDTO extends Omit<UserContract, "password"> { // Omit excludes the password
+export interface UserDTO extends Omit<UserContract, "password" | "salt"> { // Omit excludes the password
     password?: string; // Password is optional
+    salt?: string; // Salt is optional
 }

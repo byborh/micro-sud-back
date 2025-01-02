@@ -6,7 +6,6 @@ import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "src/cores/idGenerator";
 import { DatabaseFactory } from "@db/DatabaseFactory";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { CredentialData } from "../domain/CredentialData";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -27,10 +26,16 @@ export class UserService {
         // If the user is not found, return null
         if(!userEntity) return null;
 
-        console.log("User found in getUserById Service :", UserMapper.toDTO(userEntity as User) as User);
+        const userDTO: UserDTO = UserMapper.toDTO(userEntity as User) as User;
+
+        // ONLY FOR TEST / FOR ADMIN
+        userDTO.password = userEntity.getPassword();
+        userDTO.salt = userEntity.getSalt();
+
+        console.log("User found in getUserById Service :", userDTO);
 
         // Return the user in DTO format
-        return UserMapper.toDTO(userEntity as User) as User;
+        return userDTO;
     }
 
     // Get a user by Email
@@ -101,31 +106,28 @@ export class UserService {
         // Verification
         const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
         console.log('Mot de passe valide:', isValid);
-        // A CREER UNE TABLE DANS LA BDD POUR STOCKER LE SALT
-        // IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         // Assign hashed password to user
         user.setPassword(hashedPassword);
+        user.setSalt(salt);
 
-
-        // Creation of id of the credential data
-        const credentialDataId: string = idGenerator.generateId(8);
-
-        // Creation of the credential data
-        const credentialData: CredentialData = new CredentialData(credentialDataId, user.getId(), salt);
+        
 
         const cleanedUser: User = new User(
             user.getId(),
             user.getEmail(),
             user.getPassword(),
+            user.getSalt(),
             user.getFirstname() || null,
             user.getLastname() || null,
             user.getPseudo() || null,
-            user.getTelnumber() || null
+            user.getTelnumber() || null,
         );
 
+        console.log(cleanedUser);
+
         // Create user from repository
-        const createdUser: User | null = await this.userRepository.createUser(cleanedUser, credentialData);
+        const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
         
         // User didn't created
         if(!createdUser) return null;
@@ -149,10 +151,12 @@ export class UserService {
             throw new Error("User not found.");
         }
 
+        console.log("exUser:", exUser);
+
         const existingUser: User = UserMapper.toEntity(exUser);
         existingUser.setPassword(exUser.password);
+        existingUser.setSalt(exUser.salt);
 
-        console.log("exUser:", exUser);
         console.log("existingUser:", existingUser);
 
         const modifiedUser: User = new User(
@@ -162,7 +166,8 @@ export class UserService {
             user.getFirstname(), // Can be null
             user.getLastname(), // Can be null
             user.getPseudo(), // Can be null
-            user.getTelnumber() // Can be null
+            user.getTelnumber(), // Can be null
+            user.getSalt()
         );
 
 
@@ -176,16 +181,42 @@ export class UserService {
         // Compare n Verify if user was changed somewhere
         let hasChanges: boolean = false;
         if(modifiedUser.getEmail() !== existingUser.getEmail()) hasChanges = true;
-        if(modifiedUser.getPassword() !== existingUser.getPassword()) hasChanges = true;    
         if(modifiedUser.getFirstname() !== existingUser.getFirstname())  hasChanges = true;
         if(modifiedUser.getLastname() !== existingUser.getLastname())  hasChanges = true;
         if(modifiedUser.getPseudo() !== existingUser.getPseudo())  hasChanges = true;
         if(modifiedUser.getTelnumber() !== existingUser.getTelnumber()) hasChanges = true;
 
-        if(!hasChanges)  {
+        // Verify if password was changed
+
+        // Password management
+        const passwordManager = PasswordManager.getInstance();
+
+        console.log("modifiedUser:", modifiedUser)
+
+        // Verification
+        const isPasswordValid: boolean = passwordManager.verifyPassword(modifiedUser.getPassword(), existingUser.getSalt(), existingUser.getPassword());
+        console.log('Mot de passe valide:', isPasswordValid);
+
+        if(!isPasswordValid) hasChanges = true;
+        
+
+        if(hasChanges)  {
             console.error("User is not different. The same user like before:", modifiedUser);
             throw new Error("User is not different. The same user like before.");
         }
+
+        // Creation of the salt
+        const salt: string = passwordManager.generateSalt();
+
+        // Creation of hashed password
+        const hashedPassword: string = passwordManager.hashPassword(modifiedUser.getPassword(), salt);
+
+        console.log('Hash:', hashedPassword);
+        console.log('Salt:', salt);
+
+        modifiedUser.setSalt(salt);
+        modifiedUser.setPassword(hashedPassword);
+
 
         console.log("User to modify in service after all functions:", modifiedUser);
 

@@ -15,7 +15,8 @@ export class MySQLDatabase implements IDatabase {
             database: dbConfig.mysql.database,
             waitForConnections: true,
             connectionLimit: 10,
-            queueLimit: 0
+            queueLimit: 0,
+            rowsAsArray: false
         });
     }
 

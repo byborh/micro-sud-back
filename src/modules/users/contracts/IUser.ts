@@ -6,5 +6,6 @@ export interface UserContract {
     pseudo?: string;
     email: string;
     password: string;
+    salt: string;
     telnumber?: string;
 }

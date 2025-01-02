@@ -6,7 +6,8 @@ CREATE TABLE users (
     pseudo VARCHAR(255) DEFAULT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    telnumber VARCHAR(20) DEFAULT NULL
+    telnumber VARCHAR(20) DEFAULT NULL,
+    salt VARCHAR(255) NOT NULL
 );
 
 -- Create salt table for password encryption

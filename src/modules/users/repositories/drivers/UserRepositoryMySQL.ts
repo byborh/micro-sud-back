@@ -4,7 +4,6 @@ import { IDatabase } from "@db/contract/IDatabase";
 import { ResultSetHeader } from "mysql2/promise";
 import { UserDTO } from "@modules/users/dto/UserDTO";
 import { UserMapper } from "@modules/users/mapper/UserMapper";
-import { CredentialData } from "@modules/users/domain/CredentialData";
 
 
 export class UserRepositoryMySQL implements IUserRepository {
@@ -50,6 +49,7 @@ export class UserRepositoryMySQL implements IUserRepository {
                 user.id,
                 user.email,
                 user.password,
+                user.salt,
                 user.firstname || null,
                 user.lastname || null,
                 user.pseudo || null,
@@ -64,6 +64,7 @@ export class UserRepositoryMySQL implements IUserRepository {
     async findUserById(userId: string): Promise<User | null> {
         try {
             if(!userId) return null;
+            console.log("User to find by id in repository:", this.findUserByField('id', userId));
             return this.findUserByField('id', userId);
         } catch (error) {
             console.error("Error finding user by id:", error);
@@ -84,17 +85,26 @@ export class UserRepositoryMySQL implements IUserRepository {
     async getAllUsers(): Promise<User[]> {
         try {
             // SQL query
-            const query: string = `SELECT * FROM users LIMIT 100;`;
-            
+            const query: string = `SELECT * FROM users;`;
+    
             // Fetch all users from the database
-            const [rows]: [any, any] = await this.db.query(query);
+            const [rawResult]: [any, any] = await this.db.query(query);
+            const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
+
+            console.log("Type of rows:", typeof rows);
+            console.log("Is rows an array?", Array.isArray(rows));
+
     
             console.log("Raw query result:", rows);
-            console.log("Number of users fetched:", rows.length);
-            
-
-            // const users = rows && Array.isArray(rows) ? rows : rows.data || [];
+            console.log("Number of users fetched:", Array.isArray(rows) ? rows.length : 0);
     
+
+            console.log("Query executed:", query);
+            console.log("Raw result type:", typeof rows);
+            console.log("Raw result isArray:", Array.isArray(rows));
+            console.log("Raw result length:", rows.length);
+            console.log("Raw result content:", rows);
+
             // Vérifier si rows est un tableau ou un objet unique
             const rowsArray = Array.isArray(rows) ? rows : [rows]; // Si c'est un objet unique, on le met dans un tableau
     
@@ -109,22 +119,17 @@ export class UserRepositoryMySQL implements IUserRepository {
             console.error("Error getting users:", error);
             throw new Error("Failed to get users.");
         }
-    }  
+    }    
 
-    async createUser(user: User, credentialData: CredentialData): Promise<User | null> {
+    async createUser(user: User): Promise<User | null> {
         try {
             // SQL query
             const query_1: string = `
-            -- Insert the user in the users table
-            INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            
-            -- Insert the credential data in the salt table
-            INSERT INTO salt (id, userid, salt)
-            VALUES (?, ?, ?);`;
+            INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber, salt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
 
             // Insert the user in the database
-            const result_1: [ResultSetHeader, any] = await this.db.query(
+            const result: [ResultSetHeader, any] = await this.db.query(
                 query_1,
                 [
                     // User table
@@ -135,34 +140,14 @@ export class UserRepositoryMySQL implements IUserRepository {
                     user.getLastname() || null,
                     user.getPseudo() || null,
                     user.getTelnumber() || null,
+                    user.getSalt()
                 ]
             );
 
-            console.log("Query result create user:", result_1);
-
-
-            // SQL query
-            const query_2: string = `
-            -- Insert the credential data in the salt table
-            INSERT INTO salt (id, userid, salt)
-            VALUES (?, ?, ?);`;
-
-            // Insert the user in the database
-            const result_2: [ResultSetHeader, any] = await this.db.query(
-                query_2,
-                [
-                    // Salt table
-                    credentialData.getId(),
-                    user.getId(),
-                    credentialData.getSalt()
-                ]
-            );
-
-            console.log("Query result:", result_2);
+            console.log("Query result create user:", result);
             
             // If the user is not created, return null
-            if (!result_1) return null;
-            if (!result_2) return null;
+            if (!result) return null;
         
             // Return the user
             return this.findUserById(user.getId());
@@ -172,20 +157,15 @@ export class UserRepositoryMySQL implements IUserRepository {
         }
     }
 
-    async modifyUser(user: User, credentialData?: CredentialData): Promise<User | null> {
+    async modifyUser(user: User): Promise<User | null> {
         try {
             console.log("User to modify:", user);
             
             // SQL query
             const query: string = `
             -- Update user
-            UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ?
-            WHERE id = ?
-            
-            -- Update salt
-            UPDATE salt
-            SET salt = ?
-            WHERE userid = ?;`;
+            UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ?, salt = ?
+            WHERE id = ?`;
 
             // Update the user in the database
             const result: [ResultSetHeader, any] = await this.db.query(
@@ -198,11 +178,8 @@ export class UserRepositoryMySQL implements IUserRepository {
                     user.getLastname() || null,
                     user.getPseudo() || null,
                     user.getTelnumber() || null,
+                    user.getSalt(),
                     user.getId(),
-
-                    // Salt table
-                    credentialData?.getSalt() || null,
-                    user.getId()
                 ]
             );
 
@@ -221,16 +198,12 @@ export class UserRepositoryMySQL implements IUserRepository {
         try {
             const query: string = `
             -- Delete user
-            DELETE FROM users WHERE id = ?
-            
-            -- Delete salt
-            DELETE FROM salt WHERE userid = ?;`;
+            DELETE FROM users WHERE id = ?`;
 
             // Delete the user from the database
             const result: [ResultSetHeader, any] = await this.db.query<any>(
                 query,
                 [
-                    user.getId(),
                     user.getId()
                 ]
             )

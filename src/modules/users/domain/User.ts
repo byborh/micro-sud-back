@@ -9,8 +9,9 @@ export class User implements UserContract {
     public email: string;
     public password: string;
     public telnumber?: string | null;
+    public salt: string;
 
-    constructor(id: string, email: string, password: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string) {
+    constructor(id: string, email: string, password: string, salt: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -18,6 +19,7 @@ export class User implements UserContract {
         this.email = email;
         this.password = password; // il faut hasher le mot de passe | -> | EN COURS 
         this.telnumber = telnumber;
+        this.salt = salt;
     }
 
     public getId(): string {
@@ -74,5 +76,13 @@ export class User implements UserContract {
 
     public setTelnumber(telnumber: string): void {
         this.telnumber = telnumber;
+    }
+
+    public getSalt(): string | null {
+        return this.salt;
+    }
+
+    public setSalt(salt: string): void {
+        this.salt = salt;
     }
 }
