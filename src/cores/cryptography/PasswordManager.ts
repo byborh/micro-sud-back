@@ -1,5 +1,5 @@
 import { pbkdf2Sync } from 'crypto';
-import { IdGenerator } from '../idGenerator';
+import { IdGenerator } from './idGenerator';
 
 // Gère les mots de passe
 

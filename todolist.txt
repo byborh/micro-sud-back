@@ -49,6 +49,8 @@ recréer la méthode modifyUser. elle est pourrie - OK
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 
+concevoir une abstraction générique pour les endpoints
+
 faire des logs plus parlant
 
 l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément

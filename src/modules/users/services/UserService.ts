@@ -1,9 +1,8 @@
 import { User } from "../domain/User";
-import { UserRepository } from "../repositories/drivers/UserRepository";
 import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL";
 import { UserMapper } from "../mapper/UserMapper";
 import { UserDTO } from "../dto/UserDTO";
-import { IdGenerator } from "src/cores/idGenerator";
+import { IdGenerator } from "@core/cryptography/idGenerator";
 import { DatabaseFactory } from "@db/DatabaseFactory";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
 
@@ -21,7 +20,7 @@ export class UserService {
     // Get a user by ID
     public async getUserById(userId: string): Promise<UserDTO | null> {
         // Find the user by ID from the repository
-        const userEntity: User | null = await this.userRepository.findUserById(userId);
+        const userEntity: User | null = await this.userRepository.findUserByField("id", userId);
 
         // If the user is not found, return null
         if(!userEntity) return null;
@@ -41,7 +40,7 @@ export class UserService {
     // Get a user by Email
     public async getUserByEmail(email: string): Promise<UserDTO | null> {
         // Find the user by Email from the repository
-        const userEntity: User | null = await this.userRepository.findUserByEmail(email);
+        const userEntity: User | null = await this.userRepository.findUserByField("email", email);
 
         // If the user is not found, return null
         if(!userEntity) {return null;} 

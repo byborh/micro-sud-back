@@ -1,12 +1,13 @@
 import { User } from "@modules/users/domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
-import { ResultSetHeader } from "mysql2/promise";
-import { UserMapper } from "@modules/users/mapper/UserMapper";
+import { FoundationRepositoryMySQL } from "@core/foundation/repositories/FoundationRepositoryMySQL";
+import { Foundation } from "@core/foundation/domain/Foundation";
 
 
 export class UserRepositoryMySQL implements IUserRepository {
     private db: IDatabase;
+    private foundationRepository: FoundationRepositoryMySQL;
 
     constructor(db: IDatabase) {
         // Injection of database
@@ -15,202 +16,83 @@ export class UserRepositoryMySQL implements IUserRepository {
 
     async findUserByField(field: string, value: string): Promise<User | null> {
         try {
-            // Validate field
-            const allawedFields = ['id', 'email', 'firstname', 'lastname', 'pseudo', 'telnumber'];
-            if(!allawedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
+            // Call FoundationRepositoryMySQL to find a user by field
+            const user: Foundation<User> = await this.foundationRepository.findResourceByField<User>('users', field, value);
 
-            // SQL query
-            const query: string = `SELECT * FROM users WHERE ${field} = ? LIMIT 1`;
-    
-            // Find a user by field from the database
-            const [rows]: [any[], any] = await this.db.query(query, [value]);
+            // If no user is found, return null
+            if(!user) return null;
 
-            console.log("Raw query result:", rows);
-    
-            // Validate rows
-            if (!rows || rows.length === 0) {
-                console.error("No user found for field:", field, "with value:", value);
-                return null;
-            };
-
-            const user = Array.isArray(rows) ? rows[0] : rows
-
-            console.log("User found:", user);
-
-            // Verify if all required fields are present
-            if (!user.id || !user.email || !user.password) {
-                console.error("Invalid user data:", user);
-                throw new Error("User data is incomplete.");
-            }
-    
-            // Map the result to a User instance
-            return new User(
-                user.id,
-                user.email,
-                user.password,
-                user.salt,
-                user.firstname || null,
-                user.lastname || null,
-                user.pseudo || null,
-                user.telnumber || null
-            );
-        } catch (error) {
-            console.error("Error finding user by field:", error);
-            throw new Error("Failed to find user by field.");
-        }
-    }
-    
-    async findUserById(userId: string): Promise<User | null> {
-        try {
-            if(!userId) return null;
-            console.log("User to find by id in repository:", this.findUserByField('id', userId));
-            return this.findUserByField('id', userId);
-        } catch (error) {
-            console.error("Error finding user by id:", error);
-            throw new Error("Failed to find user by id.");
-        }
-    }
-
-    async findUserByEmail(email: string): Promise<User | null> {
-        try {
-            if(!email) return null;
-            return this.findUserByField('email', email);
-        } catch (error) {
-            console.error("Error finding user by email:", error);
-            throw new Error("Failed to find user by email.");
+            // Return the user
+            return user.data;
+        } catch(error) {
+            console.error("Error finding user in UserRepository:", error);
+            throw new Error("Failed to find user.");
         }
     }
 
     async getAllUsers(): Promise<User[]> {
         try {
-            // SQL query
-            const query: string = `SELECT * FROM users;`;
-    
-            // Fetch all users from the database
-            const [rawResult]: [any, any] = await this.db.query(query);
-            const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
+            // Call FoundationRepositoryMySQL to find users
+            const users: Foundation<User>[] = await this.foundationRepository.findAllResources<User>('users');
 
-            console.log("Type of rows:", typeof rows);
-            console.log("Is rows an array?", Array.isArray(rows));
+            // If no users are found, return null
+            if(!users) return null;
 
-    
-            console.log("Raw query result:", rows);
-            console.log("Number of users fetched:", Array.isArray(rows) ? rows.length : 0);
-    
-
-            console.log("Query executed:", query);
-            console.log("Raw result type:", typeof rows);
-            console.log("Raw result isArray:", Array.isArray(rows));
-            console.log("Raw result length:", rows.length);
-            console.log("Raw result content:", rows);
-
-            // Vérifier si rows est un tableau ou un objet unique
-            const rowsArray = Array.isArray(rows) ? rows : [rows]; // Si c'est un objet unique, on le met dans un tableau
-    
-            if (rowsArray.length === 0) {
-                console.error("No users found in the database.");
-                return [];
-            }
-    
-            // Utiliser le UserMapper pour mapper chaque ligne en une entité User
-            return rowsArray.map(row => UserMapper.toEntity(row));
+            // Return the users
+            return users.map(user => user.data);
         } catch (error) {
-            console.error("Error getting users:", error);
+            console.error("Error getting users in UserRepository:", error);
             throw new Error("Failed to get users.");
         }
     }    
 
     async createUser(user: User): Promise<User | null> {
         try {
-            // SQL query
-            const query_1: string = `
-            INSERT INTO users (id, email, password, firstname, lastname, pseudo, telnumber, salt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
+            // Create a resource from the user
+            const resource: Foundation<User> = new Foundation<User>(user);
 
-            // Insert the user in the database
-            const result: [ResultSetHeader, any] = await this.db.query(
-                query_1,
-                [
-                    // User table
-                    user.getId(),
-                    user.getEmail(),
-                    user.getPassword(),
-                    user.getFirstname() || null,
-                    user.getLastname() || null,
-                    user.getPseudo() || null,
-                    user.getTelnumber() || null,
-                    user.getSalt()
-                ]
-            );
+            // Call FoundationRepositoryMySQL to create a user
+            const createdUser: Foundation<User> = await this.foundationRepository.createResource<User>('users', resource);
 
-            console.log("Query result create user:", result);
-            
-            // If the user is not created, return null
-            if (!result) return null;
-        
+            // If no user is found, return null
+            if(!createdUser) return null;
+
             // Return the user
-            return this.findUserById(user.getId());
+            return createdUser.data;
         } catch (error) {
-            console.error("Error creating user:", error,);
+            console.error("Error creating user in UserRepository:", error,);
             throw new Error("Failed to create user");
         }
     }
 
     async modifyUser(user: User): Promise<User | null> {
         try {
-            console.log("User to modify:", user);
-            
-            // SQL query
-            const query: string = `
-            -- Update user
-            UPDATE users SET email = ?, password = ?, firstname = ?, lastname = ?, pseudo = ?, telnumber = ?, salt = ?
-            WHERE id = ?`;
+            // Create a resource from the user
+            const resource: Foundation<User> = new Foundation<User>(user);
 
-            // Update the user in the database
-            const result: [ResultSetHeader, any] = await this.db.query(
-                query,
-                [
-                    // User table
-                    user.getEmail(),
-                    user.getPassword(),
-                    user.getFirstname() || null,
-                    user.getLastname() || null,
-                    user.getPseudo() || null,
-                    user.getTelnumber() || null,
-                    user.getSalt(),
-                    user.getId(),
-                ]
-            );
+            // Call FoundationRepositoryMySQL to create a user
+            const createdUser: Foundation<User> = await this.foundationRepository.modifyResource<User>('users', resource, user.getId());
 
-            console.log("Query result from modifyUser:", result);
+            // If no user is found, return null
+            if(!createdUser) return null;
 
-            if (!result) return null;
-            
-            return this.findUserById(user.getId());
+            // Return the user
+            return createdUser.data;
         } catch (error) {
-            console.error("Error modifying user:", error);
+            console.error("Error modifying user in UserRepository:", error);
             throw new Error("Failed to modify user.");
         }
     }
     
     async deleteUser(user: User): Promise<boolean> {
         try {
-            const query: string = `
-            -- Delete user
-            DELETE FROM users WHERE id = ?`;
+            // Call FoundationRepositoryMySQL to find a user by field
+            const deletedUser: boolean = await this.foundationRepository.deleteResource<User>('users', user.getId());
 
-            // Delete the user from the database
-            const result: [ResultSetHeader, any] = await this.db.query<any>(
-                query,
-                [
-                    user.getId()
-                ]
-            )
-            
-            // Return true if the user is deleted, false otherwise
-            return !result ? false : true;
+            // Return true if the user was deleted successfully, false otherwise
+            return deletedUser;
         } catch (error) {
-            console.error("Error deleting user:", error);
+            console.error("Error deleting user in UserRepository:", error);
             throw new Error("Failed to delete user.");
         }
     }

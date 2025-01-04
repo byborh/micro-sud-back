@@ -10,8 +10,8 @@ export class PermissionController {
     public async getPermissionById(req: Request, res: Response): Promise<void> {
         try {
 
-        } catch (e) {
-            console.error("Internal server error. Cannot get permission by id", e);
+        } catch (error) {
+            console.error("Internal server error. Cannot get permission by id", error);
             throw new Error("Internal server error");
         }
     }
@@ -19,8 +19,8 @@ export class PermissionController {
     public async getAllPermissions(req: Request, res: Response): Promise<void> {
         try {
 
-        } catch (e) {
-            console.error("Internal server error. Cannot get permissions", e);
+        } catch (error) {
+            console.error("Internal server error. Cannot get permissions", error);
             throw new Error("Internal server error");
         }
     }
@@ -28,8 +28,8 @@ export class PermissionController {
     public async createPermission(req: Request, res: Response): Promise<void> {
         try {
 
-        } catch (e) {
-            console.error("Internal server error. Cannot create permission", e);
+        } catch (error) {
+            console.error("Internal server error. Cannot create permission", error);
             throw new Error("Internal server error");
         }
     }
@@ -37,8 +37,8 @@ export class PermissionController {
     public async modifyPermission(req: Request, res: Response): Promise<void> {
         try {
 
-        } catch (e) {
-            console.error("Internal server error. Cannot modify permission", e);
+        } catch (error) {
+            console.error("Internal server error. Cannot modify permission", error);
             throw new Error("Internal server error");
         }
     }
@@ -46,8 +46,8 @@ export class PermissionController {
     public async deletePermission(req: Request, res: Response): Promise<void> {
         try {
 
-        } catch (e) {
-            console.error("Internal server error. Cannot delete permission", e);
+        } catch (error) {
+            console.error("Internal server error. Cannot delete permission", error);
             throw new Error("Internal server error");
         }
     }

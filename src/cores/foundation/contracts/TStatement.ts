@@ -1,0 +1,1 @@
+export type TStatement = "SELECT" | "INSERT" | "UPDATE" | "DELETE";
