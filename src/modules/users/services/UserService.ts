@@ -5,9 +5,13 @@ import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "@core/cryptography/idGenerator";
 import { DatabaseFactory } from "@db/DatabaseFactory";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
+import { FoundationService } from "@core/foundation/services/FoundationService";
+import { ETable } from "@core/foundation/contracts/ETable";
+import { Foundation } from "@core/foundation/domain/Foundation";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
+    private foundationService: FoundationService;
 
     constructor(userRepository: UserRepositoryMySQL) {
         // Creation dynamicly of the database
@@ -19,17 +23,17 @@ export class UserService {
 
     // Get a user by ID
     public async getUserById(userId: string): Promise<UserDTO | null> {
-        // Find the user by ID from the repository
-        const userEntity: User | null = await this.userRepository.findUserByField("id", userId);
+        // Find the user by ID from the Foundation Service
+        const user: Foundation<User> = await this.foundationService.getResourceByField<User>("id", ETable.USERS, userId);
 
         // If the user is not found, return null
-        if(!userEntity) return null;
+        if(!user) return null;
 
-        const userDTO: UserDTO = UserMapper.toDTO(userEntity as User) as User;
+        const userDTO: UserDTO = UserMapper.toDTO(user.data as User) as User;
 
         // ONLY FOR TEST / FOR ADMIN
-        userDTO.password = userEntity.getPassword();
-        userDTO.salt = userEntity.getSalt();
+        userDTO.password = user.data.getPassword();
+        userDTO.salt = user.data.getSalt();
 
         console.log("User found in getUserById Service :", userDTO);
 
@@ -39,26 +43,33 @@ export class UserService {
 
     // Get a user by Email
     public async getUserByEmail(email: string): Promise<UserDTO | null> {
-        // Find the user by Email from the repository
-        const userEntity: User | null = await this.userRepository.findUserByField("email", email);
+        // Find the user by email from the Foundation Service
+        const user: Foundation<User> = await this.foundationService.getResourceByField<User>("email", ETable.USERS, email);
 
         // If the user is not found, return null
-        if(!userEntity) {return null;} 
+        if(!user) return null;
+
+        const userDTO: UserDTO = UserMapper.toDTO(user.data as User) as User;
+
+        // ONLY FOR TEST / FOR ADMIN
+        userDTO.password = user.data.getPassword();
+        userDTO.salt = user.data.getSalt();
+
+        console.log("User found in getUserByEmail Service :", userDTO);
 
         // Return the user in DTO format
-        return UserMapper.toDTO(userEntity);
+        return userDTO;
     }
 
     // Get all users
     public async getUsers(): Promise<Array<UserDTO> | null> {
-        // Find all users from the repository
-        const usersEntity: Array<User> | null = await this.userRepository.getAllUsers();
+        const users: Foundation<User>[] = await this.foundationService.getAllResources<User>(ETable.USERS);
 
         // If users don't found, return null
-        if(!usersEntity) {return null;}
+        if(!users) {return null;}
 
         // Return all users in DTO format
-        return usersEntity.map(userEntity => UserMapper.toDTO(userEntity));
+        return users.map(user => UserMapper.toDTO(user.data));
     }
     
     // Create user
