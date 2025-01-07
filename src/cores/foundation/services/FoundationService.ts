@@ -51,15 +51,15 @@ export class FoundationService {
             console.error("Error finding resources in FoundationService:", error);
             throw new Error("Failed to find resources.");
         }
-     }
+    }
     
 
     async createResource<T extends TFoundation>(table: ETable, resource: Foundation<T>): Promise<Foundation<T> | null> {
         try {
             // Verify if table is provided
-            if(!table || !Object.values(ETable).includes(table)) {
+            if(!table || !Object.values(resource).includes(table)) {
                 throw new Error("Table is required or invalid table name.");
-            };
+            }
 
             // Call FoundationRepositoryMySQL to find resources
             const createdResource: Foundation<T> = await this.foundationRepository.createResource<T>(table, resource);
@@ -76,7 +76,7 @@ export class FoundationService {
     }
     
 
-    async modifyResource<T extends TFoundation>(table: ETable,resource: Foundation<T>, field: string): Promise<Foundation<T> | null> { 
+    async modifyResource<T extends TFoundation>(table: ETable, resource: Foundation<T>, field: string): Promise<Foundation<T> | null> {
         try {
             // Verify if field, table and value are provided
             if(!field || !table || !resource) {
@@ -87,6 +87,23 @@ export class FoundationService {
             if(!Object.values(ETable).includes(table)) {
                 throw new Error("Invalid table name.");
             };
+
+            // Verify if iD is existant
+            if (!resource.data.getId()) {
+                console.error("Invalid resource ID provided for modification:", resource.data);
+                throw new Error("Resource ID is required.");
+            }
+
+            // Verify if this resource exist
+            const resourceVerif: Foundation<T> | null = await this.getResourceByField("id", table, resource.data.getId());
+            if(!resourceVerif) {
+                console.error("Resource not found:", resourceVerif);
+                throw new Error("Resource not found.");
+            }
+
+            console.log("resourceVerif:", resourceVerif);
+
+
 
             // Call FoundationRepositoryMySQL to find resources
             const modifiedResource: Foundation<T> = await this.foundationRepository.modifyResource<T>(table, resource, field);
@@ -100,7 +117,7 @@ export class FoundationService {
             console.error("Error modifying resource in FoundationService:", error);
             throw new Error("Failed to modify resource.");
         }
-     }
+    }
     
     
     async deleteResource<T extends TFoundation>(table: ETable, field: string): Promise<boolean> { 
@@ -124,5 +141,23 @@ export class FoundationService {
             console.error("Error deleting resource in FoundationService:", error);
             throw new Error("Failed to delete resource.");
         }
+    }
+
+    // Compare dynamicly values of new and old resource
+    private compareResourceValues<T>(oldResource: T, newResource: T): boolean {
+        // Verify if objects arn't similare
+        if (oldResource === newResource) return false;
+
+        // Compare all proparties dynamicly
+        const oldKeys = Object.keys(oldResource);
+        for (const key of oldKeys) {
+            // if the value c hanged, return true
+            if (oldResource[key] !== newResource[key]) {
+                return true;
+            }
+        }
+
+        // No difference
+        return false;
     }
 }

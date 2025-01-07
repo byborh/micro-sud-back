@@ -1,13 +1,14 @@
-import { User } from "../domain/User";
-import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL";
-import { UserMapper } from "../mapper/UserMapper";
-import { UserDTO } from "../dto/UserDTO";
-import { IdGenerator } from "@core/cryptography/idGenerator";
-import { DatabaseFactory } from "@db/DatabaseFactory";
-import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { FoundationService } from "@core/foundation/services/FoundationService";
-import { ETable } from "@core/foundation/contracts/ETable";
-import { Foundation } from "@core/foundation/domain/Foundation";
+import {User} from "../domain/User";
+import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
+import {UserMapper} from "../mapper/UserMapper";
+import {UserDTO} from "../dto/UserDTO";
+import {IdGenerator} from "@core/cryptography/idGenerator";
+import {DatabaseFactory} from "@db/DatabaseFactory";
+import {PasswordManager} from "@core/cryptography/PasswordManager";
+import {FoundationService} from "@core/foundation/services/FoundationService";
+import {ETable} from "@core/foundation/contracts/ETable";
+import {Foundation} from "@core/foundation/domain/Foundation";
+import {TFoundation} from "@core/foundation/contracts/TFoundation";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -81,8 +82,6 @@ export class UserService {
         // Declare variables
         let existingUser: UserDTO | null = null;
         let userId: string;
-
-
     
         // Initialize IdGenerator
         const idGenerator = IdGenerator.getInstance();
@@ -121,9 +120,8 @@ export class UserService {
         user.setPassword(hashedPassword);
         user.setSalt(salt);
 
-        
 
-        const cleanedUser: User = new User(
+        const cleanedUser: Foundation<User> = new User(
             user.getId(),
             user.getEmail(),
             user.getPassword(),
@@ -132,29 +130,26 @@ export class UserService {
             user.getLastname() || null,
             user.getPseudo() || null,
             user.getTelnumber() || null,
-        );
+        ) as Foundation<User>;
 
         console.log(cleanedUser);
 
         // Create user from repository
-        const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
-        
+        // const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
+        const createdUser: Foundation<User> = await this.foundationService.createResource(ETable.USERS, cleanedUser);
+
         // User didn't created
         if(!createdUser) return null;
 
-        return UserMapper.toDTO(createdUser);
+        return UserMapper.toDTO(createdUser.data);
     }
 
     // Modify user
     public async modifyUser(user: User): Promise<UserDTO | null> {
         console.log("User to modify in service before all functions:", user);
 
-        if (!user.getId()) {
-            console.error("Invalid user ID provided for modification:", user);
-            throw new Error("User ID is required.");
-        }
 
-        // Verify if this user exist        
+        // Verify if this user exist
         const exUser: UserDTO | null = await this.getUserById(user.getId()) as User;
         if(!exUser) {
             console.error("User not found:", exUser);

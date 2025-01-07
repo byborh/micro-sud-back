@@ -13,11 +13,13 @@
  */
 
 import { randomBytes, createHash } from 'crypto';
+import {TFoundation} from "@core/foundation/contracts/TFoundation";
 
 export class IdGenerator {
   private static instance: IdGenerator;
 
-  private constructor() {}
+  private constructor() {
+  }
 
   public static getInstance(): IdGenerator {
     if (!IdGenerator.instance) {
