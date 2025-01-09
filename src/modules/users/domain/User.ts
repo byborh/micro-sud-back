@@ -19,7 +19,7 @@ export class User implements UserContract {
         this.lastname = lastname;
         this.pseudo = pseudo;
         this.email = email;
-        this.password = password; // il faut hasher le mot de passe | -> | EN COURS 
+        this.password = password;
         this.telnumber = telnumber;
         this.salt = salt;
     }

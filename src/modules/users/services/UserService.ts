@@ -1,13 +1,14 @@
-import { User } from "../domain/User";
-import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL";
-import { UserMapper } from "../mapper/UserMapper";
-import { UserDTO } from "../dto/UserDTO";
-import { IdGenerator } from "@core/cryptography/idGenerator";
-import { DatabaseFactory } from "@db/DatabaseFactory";
-import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { FoundationService } from "@core/foundation/services/FoundationService";
-import { ETable } from "@core/foundation/contracts/ETable";
-import { Foundation } from "@core/foundation/domain/Foundation";
+import {User} from "../domain/User";
+import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
+import {UserMapper} from "../mapper/UserMapper";
+import {UserDTO} from "../dto/UserDTO";
+import {IdGenerator} from "@core/cryptography/idGenerator";
+import {DatabaseFactory} from "@db/DatabaseFactory";
+import {PasswordManager} from "@core/cryptography/PasswordManager";
+import {FoundationService} from "@core/foundation/services/FoundationService";
+import {ETable} from "@core/foundation/contracts/ETable";
+import {Foundation} from "@core/foundation/domain/Foundation";
+import {TFoundation} from "@core/foundation/contracts/TFoundation";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -74,10 +75,6 @@ export class UserService {
     
     // Create user
     public async createUser(user: User): Promise<UserDTO | null> {
-        // Verify if this user exist
-        const userVerif: UserDTO | null = await this.getUserByEmail(user.getEmail());
-        if(userVerif) return null;
-
 
         // Password management
         const passwordManager = PasswordManager.getInstance();
@@ -92,33 +89,31 @@ export class UserService {
         console.log('Salt:', salt);
 
         // Verification
-        const isValid : boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
+        const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
         console.log('Mot de passe valide:', isValid);
 
         // Assign hashed password to user
         user.setPassword(hashedPassword);
         user.setSalt(salt);
 
-        
 
-        const cleanedUser: User = new User(
-            "", // ID will be generated automatically
+        const cleanedUser: Foundation<User> = new User(
+            "", // id will be generated automatically in Foundation Service
             user.getEmail(),
             user.getPassword(),
             user.getSalt(),
             user.getFirstname() || null,
             user.getLastname() || null,
             user.getPseudo() || null,
-            user.getTelnumber() || null,
-        );
+            user.getTelnumber() || null
+        ) as unknown as Foundation<User>;
 
         console.log(cleanedUser);
 
-        const foundationUser: Foundation<User> = {data: cleanedUser};
+        // Create user from repository
+        // const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
+        const createdUser: Foundation<User> = await this.foundationService.createResource(ETable.USERS, cleanedUser, 16, "email", user.getEmail());
 
-        // Call FoundationService to create a user
-        const createdUser: Foundation<User> = await this.foundationService.createResource<User>( ETable.USERS, foundationUser, 16, [foundationUser.data.getEmail() as keyof User]);
-        
         // User didn't created
         if(!createdUser) return null;
 
@@ -129,12 +124,8 @@ export class UserService {
     public async modifyUser(user: User): Promise<UserDTO | null> {
         console.log("User to modify in service before all functions:", user);
 
-        if (!user.getId()) {
-            console.error("Invalid user ID provided for modification:", user);
-            throw new Error("User ID is required.");
-        }
 
-        // Verify if this user exist        
+        // Verify if this user exist
         const exUser: UserDTO | null = await this.getUserById(user.getId()) as User;
         if(!exUser) {
             console.error("User not found:", exUser);
@@ -219,6 +210,52 @@ export class UserService {
         return UserMapper.toDTO(finalUser);
     }
 
+    public async modifyUser1(user: User): Promise<UserDTO | null> {
+        try {
+            console.log("User to modify in service:", user);
+    
+            // Vérifiez si les champs critiques ne sont pas null
+            if (!user.getEmail() || !user.getPassword()) {
+                throw new Error("Email and password cannot be null.");
+            }
+    
+            // Gestion des mots de passe
+            const passwordManager = PasswordManager.getInstance();
+            const salt = passwordManager.generateSalt();
+            const hashedPassword = passwordManager.hashPassword(user.getPassword(), salt);
+            user.setSalt(salt);
+            user.setPassword(hashedPassword);
+    
+            console.log("User with updated password and salt:", user);
+    
+            // Prépare les champs à mettre à jour
+            const updatedFields: Partial<User> = {
+                email: user.getEmail(),
+                firstname: user.getFirstname(),
+                lastname: user.getLastname(),
+                pseudo: user.getPseudo(),
+                telnumber: user.getTelnumber(),
+                password: user.getPassword(),
+                salt: user.getSalt(),
+            };
+    
+            // Utilise `modifyUser` pour appliquer les changements
+            const modifiedUser = await this.foundationService.modifyResource<User>(
+                ETable.USERS,
+                new Foundation(user), // Crée un objet Foundation<User>
+                updatedFields
+            );
+    
+            if (!modifiedUser) return null;
+    
+            return UserMapper.toDTO(modifiedUser.data);
+        } catch (error) {
+            console.error("Error modifying user:", error);
+            throw error;
+        }
+    }
+
+    
     // Delete user
     public async deleteUser(userId: string): Promise<boolean> {
         const user: UserDTO | null = await this.getUserById(userId); // Find the user by ID

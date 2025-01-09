@@ -47,19 +47,25 @@ export class DynamicSQLQuery {
         return { query, params };
     }
 
-    public static generateUpdateQuery<T extends TFoundation>(table: string, resource: Foundation<T>, specificField: string): { query: string; params: any[] } {
+    public static generateUpdateQuery<T extends TFoundation>(table: string, resource: Foundation<T>, specificField: keyof T = "id"): { query: string; params: any[] } {
         if (!this.validateTable(table)) {
             throw new Error(`Invalid table name: ${table}`);
         }
-
+    
+        // Obtenez uniquement les champs à mettre à jour
         const keys = Object.keys(resource.data);
         const params = Object.values(resource.data);
+    
+        // Créez la clause SET
         const updateFields = keys.map(key => `${key} = ?`).join(", ");
-        const query = `UPDATE ${table} SET ${updateFields} WHERE id = ?;`;
-        params.push(specificField);
-
+    
+        // Construisez la requête avec WHERE basé sur specificField
+        const query = `UPDATE ${table} SET ${updateFields} WHERE ${String(specificField)} = ?;`;
+        params.push(resource.data[specificField as string]);
+    
         return { query, params };
     }
+    
 
     public static generateDeleteQuery(table: string, specificField: string): { query: string; params: any[] } {
         if (!this.validateTable(table)) {
