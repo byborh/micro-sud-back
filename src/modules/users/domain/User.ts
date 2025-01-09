@@ -11,6 +11,8 @@ export class User implements UserContract {
     public telnumber?: string | null;
     public salt: string;
 
+    public data: Record<string, any>;
+
     constructor(id: string, email: string, password: string, salt: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string) {
         this.id = id;
         this.firstname = firstname;

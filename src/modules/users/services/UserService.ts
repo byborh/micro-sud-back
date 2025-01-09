@@ -78,28 +78,6 @@ export class UserService {
         const userVerif: UserDTO | null = await this.getUserByEmail(user.getEmail());
         if(userVerif) return null;
 
-        // Declare variables
-        let existingUser: UserDTO | null = null;
-        let userId: string;
-
-
-    
-        // Initialize IdGenerator
-        const idGenerator = IdGenerator.getInstance();
-    
-        // Make sure that ID is unique
-        do {
-            userId = idGenerator.generateId(16); // Generate a unique ID of 16 characters
-    
-            // Verify if this id exist
-            existingUser = await this.getUserById(userId);
-    
-        } while (existingUser !== null);
-    
-        console.log(`Generated ID: ${userId}`);
-
-        // Assign id to user
-        user.setId(userId);
 
         // Password management
         const passwordManager = PasswordManager.getInstance();
@@ -114,7 +92,7 @@ export class UserService {
         console.log('Salt:', salt);
 
         // Verification
-        const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
+        const isValid : boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
         console.log('Mot de passe valide:', isValid);
 
         // Assign hashed password to user
@@ -124,7 +102,7 @@ export class UserService {
         
 
         const cleanedUser: User = new User(
-            user.getId(),
+            "", // ID will be generated automatically
             user.getEmail(),
             user.getPassword(),
             user.getSalt(),
@@ -136,13 +114,15 @@ export class UserService {
 
         console.log(cleanedUser);
 
-        // Create user from repository
-        const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
+        const foundationUser: Foundation<User> = {data: cleanedUser};
+
+        // Call FoundationService to create a user
+        const createdUser: Foundation<User> = await this.foundationService.createResource<User>( ETable.USERS, foundationUser, 16, [foundationUser.data.getEmail() as keyof User]);
         
         // User didn't created
         if(!createdUser) return null;
 
-        return UserMapper.toDTO(createdUser);
+        return UserMapper.toDTO(createdUser.data);
     }
 
     // Modify user

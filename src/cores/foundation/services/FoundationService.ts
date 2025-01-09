@@ -2,10 +2,20 @@ import { TFoundation } from "../contracts/TFoundation";
 import { Foundation } from "../domain/Foundation";
 import { FoundationRepositoryMySQL } from "../repositories/FoundationRepositoryMySQL";
 import { ETable } from "../contracts/ETable";
+import { IdGenerator } from "@core/cryptography/idGenerator";
 
 export class FoundationService {
     private foundationRepository: FoundationRepositoryMySQL;
     constructor(foundationRepository: FoundationRepositoryMySQL) {this.foundationRepository = foundationRepository;}
+
+    // Utils
+    private validateRequiredFields<T extends TFoundation>(resource: Foundation<T>, fields: (keyof Foundation<T>)[]): void {
+        for (const field of fields) {
+            if (!resource[field]) {
+                throw new Error(`Field '${String(field)}' is required.`);
+            }
+        }
+    }    
 
 
     async getResourceByField<T extends TFoundation>(field: string, table: ETable, value: string): Promise<Foundation<T> | null> {
@@ -54,26 +64,71 @@ export class FoundationService {
      }
     
 
-    async createResource<T extends TFoundation>(table: ETable, resource: Foundation<T>): Promise<Foundation<T> | null> {
+
+    async createResource<T extends TFoundation>(table: ETable, resource: Foundation<T>, lengthId: number, fieldToVerify?: keyof T[],): Promise<Foundation<T> | null> {
         try {
-            // Verify if table is provided
-            if(!table || !Object.values(ETable).includes(table)) {
-                throw new Error("Table is required or invalid table name.");
-            };
+             // Verify if table is provided
+            if (!Object.values(ETable).includes(table)) {
+                throw new Error(`Invalid table name provided: ${table}`);
+            }
+     
+            // Verify if fieldToVerify (important unique field !!) is provided
+            if (fieldToVerify) {
+                const isRequiredField = this.validateRequiredFields<T>(resource, fieldToVerify);
+    
+                const existingResource = await this.getResourceByField<T>(
+                    String(fieldToVerify),
+                    table,
+                    fieldValue.toString()
+                );
+    
+                if (existingResource) {
+                    console.warn("Resource already exists:", existingResource);
+                    return null;
+                }
+            }
 
-            // Call FoundationRepositoryMySQL to find resources
-            const createdResource: Foundation<T> = await this.foundationRepository.createResource<T>(table, resource);
 
-            // If no resource is created, return null
-            if(!createdResource) return null;
+            // Declare variables
+            let resourceId: string;
+            let existingResource: Foundation<T> | null;
+            
+            // Initialize IdGenerator
+            const idGenerator = IdGenerator.getInstance();
+        
+            // Make sure that ID is unique
+            do {
+                resourceId = idGenerator.generateId(lengthId); // Generate a unique ID of 16 characters
+        
+                // Verify if this id exist
+                existingResource = await this.getResourceByField<T>("id", table, resourceId);
+        
+            } while (existingResource !== null);
+        
+            console.log(`Generated ID: ${resourceId}, for table: ${table}`);
 
-            // Return the resource
-            return createdResource;            
+            // Assign id to user
+            resource.data.setId(resourceId);
+
+
+            // Création de la ressource via le repository
+            const createdResource = await this.foundationRepository.createResource<T>(table, resource);
+    
+            if (!createdResource) {
+                console.error("Failed to create resource in repository.");
+                return null;
+            }
+    
+            console.log("Resource created successfully in foundation repository:", createdResource);
+    
+            return createdResource;
         } catch (error) {
             console.error("Error creating resource in FoundationService:", error);
-            throw new Error("Failed to create resource.");
+            throw new Error(`Failed to create resource: ${error}`);
         }
     }
+     
+    
     
 
     async modifyResource<T extends TFoundation>(table: ETable,resource: Foundation<T>, field: string): Promise<Foundation<T> | null> { 
