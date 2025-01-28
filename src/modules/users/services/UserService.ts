@@ -1,14 +1,10 @@
 import {User} from "../domain/User";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
-import {UserMapper} from "../mapper/UserMapper";
-import {UserDTO} from "../dto/UserDTO";
-import {IdGenerator} from "@core/cryptography/idGenerator";
 import {DatabaseFactory} from "@db/DatabaseFactory";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
 import {FoundationService} from "@core/foundation/services/FoundationService";
 import {ETable} from "@core/foundation/contracts/ETable";
 import {Foundation} from "@core/foundation/domain/Foundation";
-import {TFoundation} from "@core/foundation/contracts/TFoundation";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -23,58 +19,58 @@ export class UserService {
     }
 
     // Get a user by ID
-    public async getUserById(userId: string): Promise<UserDTO | null> {
+    public async getUserById(userId: string): Promise<User | null> {
         // Find the user by ID from the Foundation Service
         const user: Foundation<User> = await this.foundationService.getResourceByField<User>("id", ETable.USERS, userId);
 
         // If the user is not found, return null
         if(!user) return null;
 
-        const userDTO: UserDTO = UserMapper.toDTO(user.data as User) as User;
+        const localUser: User = user.data as User;
 
         // ONLY FOR TEST / FOR ADMIN
-        userDTO.password = user.data.getPassword();
-        userDTO.salt = user.data.getSalt();
+        localUser.password = user.data.getPassword();
+        localUser.salt = user.data.getSalt();
 
-        console.log("User found in getUserById Service :", userDTO);
+        console.log("User found in getUserById Service :", localUser);
 
         // Return the user in DTO format
-        return userDTO;
+        return localUser;
     }
 
     // Get a user by Email
-    public async getUserByEmail(email: string): Promise<UserDTO | null> {
+    public async getUserByEmail(email: string): Promise<User | null> {
         // Find the user by email from the Foundation Service
         const user: Foundation<User> = await this.foundationService.getResourceByField<User>("email", ETable.USERS, email);
 
         // If the user is not found, return null
         if(!user) return null;
 
-        const userDTO: UserDTO = UserMapper.toDTO(user.data as User) as User;
+        const localUser: User = user.data as User;
 
         // ONLY FOR TEST / FOR ADMIN
-        userDTO.password = user.data.getPassword();
-        userDTO.salt = user.data.getSalt();
+        localUser.password = user.data.getPassword();
+        localUser.salt = user.data.getSalt();
 
-        console.log("User found in getUserByEmail Service :", userDTO);
+        console.log("User found in getUserByEmail Service :", localUser);
 
         // Return the user in DTO format
-        return userDTO;
+        return localUser;
     }
 
     // Get all users
-    public async getUsers(): Promise<Array<UserDTO> | null> {
+    public async getUsers(): Promise<Array<User> | null> {
         const users: Foundation<User>[] = await this.foundationService.getAllResources<User>(ETable.USERS);
 
         // If users don't found, return null
         if(!users) {return null;}
 
         // Return all users in DTO format
-        return users.map(user => UserMapper.toDTO(user.data));
+        return users.map(user => user.data as User);
     }
     
     // Create user
-    public async createUser(user: User): Promise<UserDTO | null> {
+    public async createUser(user: User): Promise<User | null> {
 
         // Password management
         const passwordManager = PasswordManager.getInstance();
@@ -96,17 +92,17 @@ export class UserService {
         user.setPassword(hashedPassword);
         user.setSalt(salt);
 
-
-        const cleanedUser: Foundation<User> = new User(
-            "", // id will be generated automatically in Foundation Service
-            user.getEmail(),
-            user.getPassword(),
-            user.getSalt(),
-            user.getFirstname() || null,
-            user.getLastname() || null,
-            user.getPseudo() || null,
-            user.getTelnumber() || null
-        ) as unknown as Foundation<User>;
+        const cleanedUser : Foundation<User>= new User({
+            id: user.getId(),
+            email: user.getEmail(),
+            password: user.getPassword(),
+            salt: user.getSalt(),
+            firstname: user.getFirstname() || null,
+            lastname: user.getLastname() || null,
+            pseudo: user.getPseudo() || null,
+            telnumber: user.getTelnumber() || null
+        }) as User as Foundation<User>;
+        
 
         console.log(cleanedUser);
 
@@ -117,16 +113,16 @@ export class UserService {
         // User didn't created
         if(!createdUser) return null;
 
-        return UserMapper.toDTO(createdUser.data);
+        return createdUser.data as User;
     }
 
     // Modify user
-    public async modifyUser(user: User): Promise<UserDTO | null> {
+    public async modifyUser(user: User): Promise<User | null> {
         console.log("User to modify in service before all functions:", user);
 
 
         // Verify if this user exist
-        const exUser: UserDTO | null = await this.getUserById(user.getId()) as User;
+        const exUser: User | null = await this.getUserById(user.getId()) as User;
         if(!exUser) {
             console.error("User not found:", exUser);
             throw new Error("User not found.");
@@ -134,22 +130,23 @@ export class UserService {
 
         console.log("exUser:", exUser);
 
-        const existingUser: User = UserMapper.toEntity(exUser);
+        const existingUser: User = exUser;
         existingUser.setPassword(exUser.password);
         existingUser.setSalt(exUser.salt);
 
         console.log("existingUser:", existingUser);
 
-        const modifiedUser: User = new User(
-            user.getId(), // Can't be changed
-            user.getEmail(),
-            user.getPassword(), // Can be null
-            user.getFirstname(), // Can be null
-            user.getLastname(), // Can be null
-            user.getPseudo(), // Can be null
-            user.getTelnumber(), // Can be null
-            user.getSalt()
-        );
+
+        const modifiedUser = new User({
+            id: user.getId(),
+            email: user.getEmail(),
+            password: user.getPassword(),
+            salt: user.getSalt(),
+            firstname: user.getFirstname(),
+            lastname: user.getLastname(),
+            pseudo: user.getPseudo(),
+            telnumber: user.getTelnumber()
+        });
 
 
         // Verify if email n password are not "null"
@@ -207,10 +204,10 @@ export class UserService {
         // User didn't modified
         if(!finalUser) return null;
 
-        return UserMapper.toDTO(finalUser);
+        return finalUser as User;
     }
 
-    public async modifyUser1(user: User): Promise<UserDTO | null> {
+    public async modifyUser1(user: User): Promise<User | null> {
         try {
             console.log("User to modify in service:", user);
     
@@ -248,7 +245,7 @@ export class UserService {
     
             if (!modifiedUser) return null;
     
-            return UserMapper.toDTO(modifiedUser.data);
+            return modifiedUser.data as User;
         } catch (error) {
             console.error("Error modifying user:", error);
             throw error;
@@ -258,9 +255,9 @@ export class UserService {
     
     // Delete user
     public async deleteUser(userId: string): Promise<boolean> {
-        const user: UserDTO | null = await this.getUserById(userId); // Find the user by ID
+        const user: User | null = await this.getUserById(userId); // Find the user by ID
         if(!user) {return false;} // User not found
         // Delete the user
-        return this.userRepository.deleteUser(UserMapper.toEntity(user));
+        return this.userRepository.deleteUser(user as User);
     }
 }

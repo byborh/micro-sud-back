@@ -1,5 +1,5 @@
 // Import des modules
-import { UserDTO } from "../dto/UserDTO"
+import { UserDTO } from "../dto/UserDTO.ts.exemple"
 import { User } from "../domain/User"
 
 export class UserMapper {

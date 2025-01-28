@@ -49,6 +49,16 @@ recréer la méthode modifyUser. elle est pourrie - OK
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 
+Supprimer TOUS. et de remettre le TypeORM !
+
+
+
+
+
+
+
+
+
 concevoir une abstraction générique pour les endpoints
 
 faire passer tous mon code par chatgpt pour corriger les erreurs et d'éviter des failles de sécurité
@@ -83,6 +93,8 @@ faire pareil avec des requêtes mongodb
 faire pareil avec des requêtes redis
 
 Sécuriser les endpoints avec plus de couches
+
+créer des scripts !!! pour faciliter la tâche
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 

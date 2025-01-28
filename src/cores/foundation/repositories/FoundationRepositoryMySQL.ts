@@ -1,7 +1,6 @@
 import { IDatabase } from "@db/contract/IDatabase";
 import { Foundation } from "../domain/Foundation";
 import { TFoundation } from "../contracts/TFoundation";
-import { DynamicSQLQuery } from "../utils/DynamicSQLQuery";
 import { ResultSetHeader } from "mysql2";
 
 export class FoundationRepositoryMySQL {
