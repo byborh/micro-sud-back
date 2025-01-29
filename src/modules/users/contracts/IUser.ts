@@ -8,4 +8,6 @@ export interface UserContract {
     password: string;
     salt: string;
     telnumber?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

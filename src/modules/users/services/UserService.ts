@@ -2,16 +2,13 @@ import {User} from "../domain/User";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
 import {DatabaseFactory} from "@db/DatabaseFactory";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
+import _ from "lodash";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
 
     constructor(userRepository: UserRepositoryMySQL) {
-        // Creation dynamicly of the database
-        const database = DatabaseFactory.createDatabase("mysql", null);
-
-        // Creation of the repository injecting the database
-        this.userRepository = new UserRepositoryMySQL(database);
+        this.userRepository = userRepository;
     }
 
     // Get a user by ID
@@ -26,20 +23,13 @@ export class UserService {
             const user: User = await this.userRepository.findUserById(userId);
 
             // If no user is found, return null
-            if (!user) return null;
+            if (!user) {
+                throw new Error("User not found.");
+            }
 
             // ONLY FOR TEST / FOR ADMIN
-            // Assuming getPassword and getSalt are methods on the User model
-            const localUser: User = {
-                ...user,
-                password: user.getPassword(),
-                salt: user.getSalt()
-            };
-
-            console.log("User found in getUserById Service :", localUser);
-
             // Return the user
-            return localUser;
+            return user;
         } catch (error) {
             console.error("Error finding user in UserService:", error);
             throw new Error("Failed to find user.");
@@ -58,20 +48,13 @@ export class UserService {
             const user: User = await this.userRepository.findUserByEmail(email);
 
             // If no user is found, return null
-            if (!user) return null;
+            if (!user) {
+                throw new Error("User not found.");
+            }
 
             // ONLY FOR TEST / FOR ADMIN
-            // Assuming getPassword and getSalt are methods on the User model
-            const localUser: User = {
-                ...user,
-                password: user.getPassword(),
-                salt: user.getSalt()
-            };
-
-            console.log("User found in getUserByEmail Service :", localUser);
-
             // Return the user
-            return localUser;
+            return user;
         } catch (error) {
             console.error("Error finding user by email in UserService:", error);
             throw new Error("Failed to find user by email.");
@@ -98,6 +81,12 @@ export class UserService {
     // Create user
     public async createUser(user: User): Promise<User | null> {
         try {
+            const localUser: User | null = await this.getUserByEmail(user.getEmail());
+            if (localUser) {
+                console.error("User already exists:", localUser);
+                throw new Error("User already exists.");
+            }
+
             // Password management
             const passwordManager = PasswordManager.getInstance();
 
@@ -120,18 +109,13 @@ export class UserService {
 
             // HOW ID IS GENERATED ??
 
-            // Generate a unique ID for the user
-            // const idGenerator = IdGenerator.getInstance();
-            // const userId: string = idGenerator.generateId(16); // Generate a unique ID of 16 characters
-
-            // Assign the generated ID to the user
-            // user.setId(userId);
-
             // Create user from repository
             const createdUser: User | null = await this.userRepository.createUser(user);
 
             // User didn't created
-            if (!createdUser) return null;
+            if (!createdUser) {
+                throw new Error("User didn't created...")
+            }
 
             return createdUser;
         } catch (error) {
@@ -207,6 +191,82 @@ export class UserService {
         }
     }
     
+
+    public async modifyUser2(user: User): Promise<User | null> {
+        try {
+            console.log("User to modify in service before processing:", user);
+
+            // Verify if user exist
+            const existingUser: User | null = await this.getUserById(user.getId());
+            if (!existingUser) {
+                throw new Error("User not found.");
+            }
+
+            // Is different ?
+            const newUserData = {
+                email: user.getEmail(),
+                firstname: user.getFirstname(),
+                lastname: user.getLastname(),
+                pseudo: user.getPseudo(),
+                telnumber: user.getTelnumber()
+            };
+
+            const existingUserData = {
+                email: existingUser.getEmail(),
+                firstname: existingUser.getFirstname(),
+                lastname: existingUser.getLastname(),
+                pseudo: existingUser.getPseudo(),
+                telnumber: existingUser.getTelnumber()
+            };
+
+            let hasChanges = !_.isEqual(newUserData, existingUserData);
+
+            // if changer, Verify if password changed
+            const passwordManager = PasswordManager.getInstance();
+            const isPasswordValid: boolean = passwordManager.verifyPassword(
+                user.getPassword(), 
+                existingUser.getSalt(), 
+                existingUser.getPassword()
+            );
+
+            if (!isPasswordValid) {
+                hasChanges = true;
+                // Génération d'un nouveau hash uniquement si le mot de passe change
+                const newSalt = passwordManager.generateSalt();
+                const hashedPassword = passwordManager.hashPassword(user.getPassword(), newSalt);
+                user.setSalt(newSalt);
+                user.setPassword(hashedPassword);
+            }
+
+            // Si aucun changement, on ne fait rien
+            if (!hasChanges) {
+                throw new Error("No changes detected.");
+            }
+
+            console.log("User to modify in service after processing:", user);
+
+            // Mise à jour dans la base de données
+            const updatedUser: User | null = await this.userRepository.modifyUser(user);
+
+            if (!updatedUser) return null;
+
+            // Retourne un DTO sans les données sensibles
+            // return {
+            //     id: updatedUser.getId(),
+            //     email: updatedUser.getEmail(),
+            //     firstname: updatedUser.getFirstname(),
+            //     lastname: updatedUser.getLastname(),
+            //     pseudo: updatedUser.getPseudo(),
+            //     telnumber: updatedUser.getTelnumber()
+            // };
+            return updatedUser;
+        } catch (error) {
+            console.error("Error modifying user in UserService:", error);
+            throw new Error("Failed to modify user.");
+        }
+    }
+
+
     // Delete user
     public async deleteUser(userId: string): Promise<boolean> {
         try {

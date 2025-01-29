@@ -1,140 +1,129 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/UserService";
-import { UserDTO } from "../dto/UserDTO";
-import { UserMapper } from "../mapper/UserMapper";
 import { User } from "../domain/User";
 
 export class UserController {
-    // Service
     private userService: UserService;
 
-    // Constructor
-    constructor(userService: UserService) {this.userService = userService;}
+    constructor(userService: UserService) {
+        this.userService = userService;
+    }
 
     // Get a user by ID
-    public async getUserById(req: Request, res: Response): Promise<void> {
+    public async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Verify permissions ...
-
-
-            // Get the user from the service
             const userDto = await this.userService.getUserById(req.params.id);
-
-            // If the user is not found, return an error
-            if(!userDto) {
-                res.status(404).json({error: "User not found"});
+            if (!userDto) {
+                res.status(404).json({ error: "User not found" });
                 return;
             }
-
-            // Return the user
             res.status(200).json(userDto);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({error: "Internal server error"});
+            next(error);
         }
     }
 
     // Get all users
-    public async getAllUsers(req: Request, res: Response): Promise<void> {
-        // Verify permissions ...
-
+    public async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Get all users from the service
-            const users: Array<UserDTO> = await this.userService.getUsers();
-
-            if(!users) {
-                res.status(404).json({error: "Users not found"});
+            const users = await this.userService.getUsers();
+            if (!users || users.length === 0) {
+                res.status(404).json({ error: "No users found" });
                 return;
             }
-
-            // Return the users
             res.status(200).json(users);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({error: "Internal server error"});
+            next(error);
         }
     }
 
-    // Create user
-    public async createUser(req: Request, res: Response): Promise<void> {
-        // Verify permissions ...
-
+    // Create a user
+    public async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Change the type of user
-            const userDTO: UserDTO = req.body as User;
-            const userEntity: User = UserMapper.toEntity(userDTO as User);
+            const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
 
-            if (!userEntity.getEmail || !userEntity.getPassword) {
+            if (!email || !password) {
                 res.status(400).json({ error: "Email and password are required." });
                 return;
             }
 
-            // Use the service to create the user
-            const user: UserDTO = await this.userService.createUser(userEntity);
-
-            if(!user) {
-                res.status(404).json({error: "User didn't created"});
-                return;
-            }
-
-            res.status(201).json(user);
-            return;
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({error: "Internal server error", cause: error});
-        }
-    }
-
-    // Modify user
-    public async modifyUser(req: Request, res: Response): Promise<void> {
-        // Verify permissions ...
-
-        try {
-            // Change the type of user
-            const userDTO: UserDTO = req.body as User;
-            const userEntity: User = UserMapper.toEntity(userDTO as User);
-            userEntity.setId(req.params.id);
-
-            if (!userEntity.getEmail || !userEntity.getPassword) {
-                res.status(400).json({ error: "Email and password are required." });
-                return null;
-            }
-
-            console.log("User to modify in controller:", userEntity);
-
-            // Use the service to modify the user
-            const user: UserDTO = await this.userService.modifyUser(userEntity);
-
-            if(!user) {
-                res.status(404).json({error: "User didn't modified"});
-                return null;
-            }
-
-            res.status(201).json(user);
-            return null;
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({error: "Internal server error"});
-        }
-    }
-
-    // Delete user
-    public async deleteUser(req: Request, res: Response): Promise<void> {
-        // Verify permissions ...
-
-        try {
-            const deletedOrNot: boolean = await this.userService.deleteUser(req.params.id);
+            const user = new User({
+                id: req.params.id,
+                email,
+                password,
+                salt: "", // À gérer correctement
+                firstname,
+                lastname,
+                pseudo,
+                telnumber,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
             
-            if(!deletedOrNot) {
-                res.status(404).json({error: "User didn't deleted"});
+            const createdUser = await this.userService.createUser(user);
+
+            if (!createdUser) {
+                res.status(400).json({ error: "User could not be created." });
                 return;
             }
 
-            res.status(201).json(deletedOrNot);
-            return;
+            res.status(201).json(createdUser);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({error: "Internal server error"});
+            next(error);
+        }
+    }
+
+    // Modify a user
+    public async modifyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
+    
+            if (!email || !password) {
+                res.status(400).json({ error: "Email and password are required." });
+                return;
+            }
+    
+            const user = new User({
+                id: req.params.id,
+                email,
+                password,
+                salt: "", // À gérer correctement
+                firstname,
+                lastname,
+                pseudo,
+                telnumber,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            
+    
+            console.log("User to modify in controller:", user);
+    
+            const updatedUser = await this.userService.modifyUser(user);
+    
+            if (!updatedUser) {
+                res.status(404).json({ error: "User could not be modified." });
+                return;
+            }
+    
+            res.status(200).json(updatedUser);
+        } catch (error) {
+            next(error);
+        }
+    }
+    
+
+    // Delete a user
+    public async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const isDeleted = await this.userService.deleteUser(req.params.id);
+            if (!isDeleted) {
+                res.status(404).json({ error: "User could not be deleted." });
+                return;
+            }
+            res.status(200).json({ message: "User deleted successfully." });
+        } catch (error) {
+            next(error);
         }
     }
 }
