@@ -193,19 +193,14 @@ export class UserRepositoryMySQL implements IUserRepository {
         }
     }
     
-    async deleteUser(user: User): Promise<boolean> {
+    async deleteUser(userId: string): Promise<boolean> {
         try {
             const query: string = `
             -- Delete user
             DELETE FROM users WHERE id = ?`;
 
             // Delete the user from the database
-            const result: [ResultSetHeader, any] = await this.db.query<any>(
-                query,
-                [
-                    user.getId()
-                ]
-            )
+            const result: [ResultSetHeader, any] = await this.db.query<any>(query, [userId])
             
             // Return true if the user is deleted, false otherwise
             return !result ? false : true;

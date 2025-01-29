@@ -118,12 +118,14 @@ export class UserService {
             user.setPassword(hashedPassword);
             user.setSalt(salt);
 
+            // HOW ID IS GENERATED ??
+
             // Generate a unique ID for the user
-            const idGenerator = IdGenerator.getInstance();
-            const userId: string = idGenerator.generateId(16); // Generate a unique ID of 16 characters
+            // const idGenerator = IdGenerator.getInstance();
+            // const userId: string = idGenerator.generateId(16); // Generate a unique ID of 16 characters
 
             // Assign the generated ID to the user
-            user.setId(userId);
+            // user.setId(userId);
 
             // Create user from repository
             const createdUser: User | null = await this.userRepository.createUser(user);
