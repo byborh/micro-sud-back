@@ -1,0 +1,58 @@
+Cahier des Charges Fonctionnel – MVP de Datte
+
+1. Présentation du Projet
+
+Nom du projet : Datte
+Description : Datte est une plateforme backend générique et extensible permettant aux développeurs d’intégrer facilement des fonctionnalités essentielles pour des applications web variées (e-commerce, gestion de contenu, prise de rendez-vous, gestion de projets, etc.).
+
+2. Objectifs du MVP
+
+Fournir un backend modulaire respectant les principes SOLID.
+
+Offrir des modules prêts à l’emploi pour la gestion des utilisateurs, des rôles, des permissions, des produits.
+
+Assurer une extensibilité maximale sans modifier le code existant.
+
+3. Utilisateurs Cibles
+
+Développeurs cherchant une solution backend générique et adaptable.
+
+Entreprises voulant une infrastructure backend rapide à déployer.
+
+Startups souhaitant lancer rapidement un produit avec des fonctionnalités standards.
+
+4. Fonctionnalités Essentielles (MVP)
+
+4.1 Gestion des utilisateurs et rôles
+
+Création, modification et suppression de comptes utilisateurs.
+
+Système de rôles (admin, manager, acheteur, etc.).
+
+Authentification sécurisée (JWT, OAuth2).
+
+4.2 Gestion des produits et services
+
+Création, modification et suppression de produits/services.
+
+Catégorisation et gestion des stocks.
+
+4.3 Extensibilité et API
+
+API REST permettant d’interagir avec chaque module.
+
+Documentation Swagger/OpenAPI.
+
+5. Contraintes Techniques
+
+Développement en Node.js.
+
+Base de données MySQL, MongoDB ou Redis.
+
+6. Livrables du MVP
+
+Backend opérationnel avec API documentée.
+
+Modules fonctionnels validés par des tests unitaires.
+
+Documentation technique et guide d’intégration.
