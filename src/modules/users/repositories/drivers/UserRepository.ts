@@ -1,42 +1,17 @@
 import { User } from "../../domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
 
-// LE CODE N'EST PAS ADAPTÉ...
-
 export class UserRepository implements IUserRepository {
 
     // Une Fausse base de données
     // A MODIFIER
     // Il faut utiliser un service de base de données (MySQL, MongoDB, etc.)
     private users: User[] = [
-        // Liste des utilisateurs avec des paramètres nommés
-        new User({
-            id: "RuigsFkjS1owzGCa",
-            firstname: "John",
-            lastname: "Doe",
-            pseudo: "johndoe",
-            email: "XfV8I@example.com",
-            password: "password1",
-            telnumber: "123-456-7890",
-            salt: "some-salt"
-        }),
-        new User({
-            id: "RuigsFkjS1owzGCb",
-            firstname: "Emilia",
-            lastname: "Clarke",
-            pseudo: "khalisia",
-            email: "beauty@got.com",
-            password: "johnSnowILoveU",
-            telnumber: "321-656-7001",
-            salt: "some-salt"
-        }),
-        new User({
-            id: "RuigsFkjS1owzGCc",
-            email: "eminem@example.com",
-            password: "slimshady",
-            salt: "some-salt"
-        })
-    ];
+        // Liste des utilisateurs
+        new User("RuigsFkjS1owzGCa", "John", "Doe", "johndoe", "XfV8I@example.com", "password1", "123-456-7890"),
+        new User("RuigsFkjS1owzGCb", "Emilia", "Clarke", "khalisia", "beauty@got.com", "johnSnowILoveU", "321-656-7001"),
+        new User("RuigsFkjS1owzGCc", "eminem@example.com", "slimshady", "")
+    ]
 
     // Find a user by field
     public async findUserByField<K extends keyof User>(field: K, value: User[K]): Promise<User | null> {

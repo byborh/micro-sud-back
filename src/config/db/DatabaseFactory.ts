@@ -1,10 +1,10 @@
 import { IDatabase } from "./contract/IDatabase";
 import { MySQLDatabase } from "./drivers/MySQLDatabase";
 import { RedisDatabase } from "./drivers/RedisDatabase";
-import { TDatabase } from "./drivers/TDatabase";
+import { DatabaseType } from "./drivers/DatabaseType";
 
 export class DatabaseFactory {
-    static createDatabase(type: TDatabase, config: any): IDatabase {
+    static createDatabase(type: DatabaseType, config: any): IDatabase {
         switch(type) {
             case "mysql":
                 return new MySQLDatabase();

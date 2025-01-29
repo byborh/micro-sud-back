@@ -6,8 +6,6 @@ export class Permission implements PermissionContract {
     resource: string;
     description: string;
 
-    public data: Record<string, any>;
-
     constructor(id: string, action: string, resource: string, description: string) {
         this.id = id;
         this.action = action;

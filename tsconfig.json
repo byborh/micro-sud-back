@@ -19,8 +19,6 @@
         "@db/*": ["src/config/db/*"]
       },
       "strictNullChecks": false, // Il faut le renlever plus tard, car ça dit : null = undefined
-      "experimentalDecorators": true,
-      "emitDecoratorMetadata": true
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]

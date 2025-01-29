@@ -17,8 +17,7 @@ import { randomBytes, createHash } from 'crypto';
 export class IdGenerator {
   private static instance: IdGenerator;
 
-  private constructor() {
-  }
+  private constructor() {}
 
   public static getInstance(): IdGenerator {
     if (!IdGenerator.instance) {

@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
+import { UserDTO } from "../dto/UserDTO";
+import { UserMapper } from "../mapper/UserMapper";
 import { User } from "../domain/User";
 
 export class UserController {
@@ -38,7 +40,7 @@ export class UserController {
 
         try {
             // Get all users from the service
-            const users: Array<User> = await this.userService.getUsers();
+            const users: Array<UserDTO> = await this.userService.getUsers();
 
             if(!users) {
                 res.status(404).json({error: "Users not found"});
@@ -59,8 +61,8 @@ export class UserController {
 
         try {
             // Change the type of user
-            const localUser: User = req.body as User;
-            const userEntity: User = localUser as User;
+            const userDTO: UserDTO = req.body as User;
+            const userEntity: User = UserMapper.toEntity(userDTO as User);
 
             if (!userEntity.getEmail || !userEntity.getPassword) {
                 res.status(400).json({ error: "Email and password are required." });
@@ -68,7 +70,7 @@ export class UserController {
             }
 
             // Use the service to create the user
-            const user: User = await this.userService.createUser(userEntity);
+            const user: UserDTO = await this.userService.createUser(userEntity);
 
             if(!user) {
                 res.status(404).json({error: "User didn't created"});
@@ -89,8 +91,8 @@ export class UserController {
 
         try {
             // Change the type of user
-            const localUser: User = req.body as User;
-            const userEntity: User = localUser as User;
+            const userDTO: UserDTO = req.body as User;
+            const userEntity: User = UserMapper.toEntity(userDTO as User);
             userEntity.setId(req.params.id);
 
             if (!userEntity.getEmail || !userEntity.getPassword) {
@@ -101,7 +103,7 @@ export class UserController {
             console.log("User to modify in controller:", userEntity);
 
             // Use the service to modify the user
-            const user: User = await this.userService.modifyUser(userEntity);
+            const user: UserDTO = await this.userService.modifyUser(userEntity);
 
             if(!user) {
                 res.status(404).json({error: "User didn't modified"});
