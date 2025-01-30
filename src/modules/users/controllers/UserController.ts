@@ -3,11 +3,7 @@ import { UserService } from "../services/UserService";
 import { User } from "../domain/User";
 
 export class UserController {
-    private userService: UserService;
-
-    constructor(userService: UserService) {
-        this.userService = userService;
-    }
+    constructor(private readonly userService: UserService) {}
 
     // Get a user by ID
     public async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {

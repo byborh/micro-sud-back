@@ -5,12 +5,13 @@ import { UserMapper } from "../mapper/UserMapper";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
 import _ from "lodash";
+import { DataSource } from "typeorm";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
 
-    constructor(userRepository: UserRepositoryMySQL) {
-        this.userRepository = userRepository;
+    constructor(dataSource: DataSource) {
+        this.userRepository = new UserRepositoryMySQL(dataSource);
     }
 
     // Get a user by ID

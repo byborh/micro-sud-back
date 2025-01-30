@@ -10,13 +10,13 @@ export class User implements UserContract {
     // @ObjectIdColumn()
     // _id: ObjectId;
 
-    @Column({ default: null })
+    @Column({ nullable: true })
     firstname?: string | null;
 
-    @Column({ default: null })
+    @Column({ nullable: true })
     lastname?: string | null;
 
-    @Column({ default: null })
+    @Column({ nullable: true })
     pseudo?: string | null;
 
     @Column({ unique: true })
@@ -26,7 +26,7 @@ export class User implements UserContract {
     @Column()
     password: string;
 
-    @Column({ default: null })
+    @Column({ nullable: true })
     telnumber?: string | null;
 
     @Column()
@@ -38,7 +38,7 @@ export class User implements UserContract {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column("json", { default: null })
+    @Column("json", { nullable: true })
     data: JSON | null;
 
     /*

@@ -1,9 +1,12 @@
 import { User } from "@modules/users/domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
-import { EntityRepository, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 
-@EntityRepository(User)
 export class UserRepositoryMySQL extends Repository<User> implements IUserRepository {
+    constructor(private dataSource: DataSource) {
+        super(User, dataSource.createEntityManager());
+    }
+    
     async findUserByField(field: string, value: string): Promise<User | null> {
         try {
             // Validate field
