@@ -1,10 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
 import { UserContract } from '../contracts/IUser';
 
 @Entity()
 export class User implements UserContract {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn()
     id: string;
+
+    // For MongoDB
+    // @ObjectIdColumn()
+    // _id: ObjectId;
 
     @Column({ default: null })
     firstname?: string | null;

@@ -1,6 +1,8 @@
+import { IdGenerator } from "@core/idGenerator";
 import {User} from "../domain/User";
+import { UserDTO } from "../dto/UserDTO";
+import { UserMapper } from "../mapper/UserMapper";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
-import {DatabaseFactory} from "@db/DatabaseFactory";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
 import _ from "lodash";
 
@@ -12,7 +14,7 @@ export class UserService {
     }
 
     // Get a user by ID
-    public async getUserById(userId: string): Promise<User | null> {
+    public async getUserById(userId: string): Promise<UserDTO | null> {
         try {
             // Verify if userId is provided
             if (!userId) {
@@ -20,16 +22,18 @@ export class UserService {
             }
 
             // Call UserRepository to find a user by ID
-            const user: User = await this.userRepository.findUserById(userId);
+            const userEntity: User = await this.userRepository.findUserById(userId);
 
             // If no user is found, return null
-            if (!user) {
+            if (!userEntity) {
                 throw new Error("User not found.");
             }
 
-            // ONLY FOR TEST / FOR ADMIN
+            // Transform the entity to the dto
+            const userDTO: UserDTO = UserMapper.toDTO(userEntity);
+
             // Return the user
-            return user;
+            return userDTO;
         } catch (error) {
             console.error("Error finding user in UserService:", error);
             throw new Error("Failed to find user.");
@@ -37,7 +41,7 @@ export class UserService {
     }
 
     // Get a user by Email
-    public async getUserByEmail(email: string): Promise<User | null> {
+    public async getUserByEmail(email: string): Promise<UserDTO | null> {
         try {
             // Verify if email is provided
             if (!email) {
@@ -45,16 +49,18 @@ export class UserService {
             }
 
             // Call UserRepository to find a user by email
-            const user: User = await this.userRepository.findUserByEmail(email);
+            const userEntity: User = await this.userRepository.findUserByEmail(email);
 
             // If no user is found, return null
-            if (!user) {
+            if (!userEntity) {
                 throw new Error("User not found.");
             }
 
-            // ONLY FOR TEST / FOR ADMIN
+            // Transform the entity to the dto
+            const userDTO: UserDTO = UserMapper.toDTO(userEntity);
+
             // Return the user
-            return user;
+            return userDTO;
         } catch (error) {
             console.error("Error finding user by email in UserService:", error);
             throw new Error("Failed to find user by email.");
@@ -62,16 +68,16 @@ export class UserService {
     }
 
     // Get all users
-    public async getUsers(): Promise<Array<User> | null> {
+    public async getUsers(): Promise<Array<UserDTO> | null> {
         try {
             // Call UserRepository to find all users
-            const users: User[] = await this.userRepository.getAllUsers();
+            const usersEntity: User[] = await this.userRepository.getAllUsers();
 
             // If no users are found, return null
-            if (!users) return null;
+            if (!usersEntity) return null;
 
-            // Return all users
-            return users;
+            // Return all users in DTO format
+            return usersEntity.map(userEntity => UserMapper.toDTO(userEntity));
         } catch (error) {
             console.error("Error finding users in UserService:", error);
             throw new Error("Failed to find users.");
@@ -79,13 +85,34 @@ export class UserService {
     }
     
     // Create user
-    public async createUser(user: User): Promise<User | null> {
+    public async createUser(user: User): Promise<UserDTO | null> {
         try {
-            const localUser: User | null = await this.getUserByEmail(user.getEmail());
+            // Verify if user exists
+            const localUser: UserDTO | null = await this.getUserByEmail(user.getEmail());
             if (localUser) {
                 console.error("User already exists:", localUser);
                 throw new Error("User already exists.");
             }
+            
+
+            // Initialize IdGenerator
+            const idGenerator = IdGenerator.getInstance();
+            let userId: string;
+            let existingUser: UserDTO | null = null;
+        
+            // Make sure that ID is unique
+            do {
+                userId = idGenerator.generateId(16); // Generate a unique ID of 16 characters
+        
+                // Verify if this id exist
+                existingUser = await this.getUserById(userId);
+        
+            } while (existingUser !== null);
+        
+            console.log(`Generated ID: ${userId}`);
+
+            // Assign ID to user
+            user.setId(userId);
 
             // Password management
             const passwordManager = PasswordManager.getInstance();
@@ -96,18 +123,18 @@ export class UserService {
             // Creation of hashed password
             const hashedPassword: string = passwordManager.hashPassword(user.getPassword(), salt);
 
+            // A SUPPRIMER AVANT LA PROD !!!
+            console.log('Password:', user.getPassword());
             console.log('Hash:', hashedPassword);
             console.log('Salt:', salt);
 
-            // Verification
+            // Verification of password
             const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
             console.log('Mot de passe valide:', isValid);
 
             // Assign hashed password to user
             user.setPassword(hashedPassword);
             user.setSalt(salt);
-
-            // HOW ID IS GENERATED ??
 
             // Create user from repository
             const createdUser: User | null = await this.userRepository.createUser(user);
@@ -125,84 +152,20 @@ export class UserService {
     }
 
     // Modify user
-    public async modifyUser(user: User): Promise<User | null> {
-        try {
-            console.log("User to modify in service before all functions:", user);
-
-            // Verify if this user exists
-            const existingUser: User | null = await this.getUserById(user.getId());
-            if (!existingUser) {
-                console.error("User not found:", existingUser);
-                throw new Error("User not found.");
-            }
-
-            console.log("Existing user:", existingUser);
-
-            // Verify if email and password are not null
-            if (user.getEmail() === null && user.getPassword() === null) {
-                console.error("Email or password can't be null:", user);
-                throw new Error("Email or password can't be null.");
-            }
-
-            // Compare and verify if user was changed somewhere
-            let hasChanges: boolean = false;
-            if (user.getEmail() !== existingUser.getEmail()) hasChanges = true;
-            if (user.getFirstname() !== existingUser.getFirstname()) hasChanges = true;
-            if (user.getLastname() !== existingUser.getLastname()) hasChanges = true;
-            if (user.getPseudo() !== existingUser.getPseudo()) hasChanges = true;
-            if (user.getTelnumber() !== existingUser.getTelnumber()) hasChanges = true;
-
-            // Verify if password was changed
-            const passwordManager = PasswordManager.getInstance();
-            const isPasswordValid: boolean = passwordManager.verifyPassword(user.getPassword(), existingUser.getSalt(), existingUser.getPassword());
-            console.log('Mot de passe valide:', isPasswordValid);
-
-            if (!isPasswordValid) hasChanges = true;
-
-            if (!hasChanges) {
-                console.error("User is not different. The same user like before:", user);
-                throw new Error("User is not different. The same user like before.");
-            }
-
-            // If password was changed, generate new salt and hash
-            if (user.getPassword() !== existingUser.getPassword()) {
-                const salt: string = passwordManager.generateSalt();
-                const hashedPassword: string = passwordManager.hashPassword(user.getPassword(), salt);
-
-                user.setSalt(salt);
-                user.setPassword(hashedPassword);
-
-                console.log('New Hash:', hashedPassword);
-                console.log('New Salt:', salt);
-            }
-
-            console.log("User to modify in service after all functions:", user);
-
-            // Modify existing user
-            const finalUser: User | null = await this.userRepository.modifyUser(user);
-
-            // User didn't modify
-            if (!finalUser) return null;
-
-            return finalUser;
-        } catch (error) {
-            console.error("Error modifying user in UserService:", error);
-            throw new Error("Failed to modify user.");
-        }
-    }
-    
-
-    public async modifyUser2(user: User): Promise<User | null> {
+    public async modifyUser(user: User): Promise<UserDTO | null> {
         try {
             console.log("User to modify in service before processing:", user);
 
-            // Verify if user exist
-            const existingUser: User | null = await this.getUserById(user.getId());
-            if (!existingUser) {
+            // Vérifier si l'utilisateur existe
+            const existingUserDTO: UserDTO | null = await this.getUserById(user.getId());
+            if (!existingUserDTO) {
                 throw new Error("User not found.");
             }
 
-            // Is different ?
+            // Convertir le DTO en entité User
+            const existingUser = UserMapper.toEntity(existingUserDTO);
+
+            // Comparer les données hors mot de passe
             const newUserData = {
                 email: user.getEmail(),
                 firstname: user.getFirstname(),
@@ -221,11 +184,11 @@ export class UserService {
 
             let hasChanges = !_.isEqual(newUserData, existingUserData);
 
-            // if changer, Verify if password changed
+            // Vérifier si le mot de passe a changé
             const passwordManager = PasswordManager.getInstance();
             const isPasswordValid: boolean = passwordManager.verifyPassword(
-                user.getPassword(), 
-                existingUser.getSalt(), 
+                user.getPassword(),
+                existingUser.getSalt(),
                 existingUser.getPassword()
             );
 
@@ -250,16 +213,8 @@ export class UserService {
 
             if (!updatedUser) return null;
 
-            // Retourne un DTO sans les données sensibles
-            // return {
-            //     id: updatedUser.getId(),
-            //     email: updatedUser.getEmail(),
-            //     firstname: updatedUser.getFirstname(),
-            //     lastname: updatedUser.getLastname(),
-            //     pseudo: updatedUser.getPseudo(),
-            //     telnumber: updatedUser.getTelnumber()
-            // };
-            return updatedUser;
+            // Retourner un DTO sans les données sensibles
+            return UserMapper.toDTO(updatedUser);
         } catch (error) {
             console.error("Error modifying user in UserService:", error);
             throw new Error("Failed to modify user.");
@@ -276,7 +231,7 @@ export class UserService {
             }
 
             // Find the user by ID
-            const user: User | null = await this.getUserById(userId);
+            const user: UserDTO | null = await this.getUserById(userId);
             if (!user) {
                 console.error("User not found:", userId);
                 return false;
