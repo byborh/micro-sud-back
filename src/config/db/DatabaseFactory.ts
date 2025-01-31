@@ -1,13 +1,16 @@
 import { IDatabase } from "./contract/IDatabase";
-import { MySQLDatabase } from "./drivers/MySQLDatabase";
+import { AppDataSource } from "./drivers/AppDataSource";
 import { RedisDatabase } from "./drivers/RedisDatabase";
 import { DatabaseType } from "./drivers/DatabaseType";
 
 export class DatabaseFactory {
-    static createDatabase(type: DatabaseType, config: any): IDatabase {
+    static async createDatabase(type: DatabaseType, config: any) {
         switch(type) {
             case "mysql":
-                return new MySQLDatabase();
+                if(!AppDataSource.isInitialized) {
+                    await AppDataSource.initialize();
+                }
+                return AppDataSource;
             case "redis":
                 return new RedisDatabase(config);
             default:

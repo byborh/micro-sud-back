@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PasswordManager = void 0;
 const crypto_1 = require("crypto");
-const idGenerator_1 = require("./idGenerator");
+const idGenerator_1 = require("../idGenerator");
 // Gère les mots de passe
 // PasswordManager: Secure password management
 class PasswordManager {

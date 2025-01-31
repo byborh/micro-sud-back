@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
 import { UserContract } from '../contracts/IUser';
 
-@Entity()
+@Entity("users")
 export class User implements UserContract {
     @PrimaryColumn()
     id: string;
@@ -61,12 +61,14 @@ export class User implements UserContract {
         if (params) {
             if (!params.id) throw new Error("ID is required");
             if (!params.email || !params.email.includes('@')) throw new Error("Invalid email");
-            if (!params.password || params.password.length < 8) throw new Error("Password must be at least 8 characters");
+
+            // Verify the password ONLY at creation
+            if (params.password && params.password.length < 8) throw new Error("Password must be at least 8 characters");
     
             this.id = params.id;
             this.email = params.email;
-            this.password = params.password;
-            this.salt = params.salt;
+            this.password = params.password || "";
+            this.salt = params.salt || "";
             this.firstname = params.firstname || null;
             this.lastname = params.lastname || null;
             this.pseudo = params.pseudo || null;

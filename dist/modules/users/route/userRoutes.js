@@ -10,11 +10,11 @@ const validateAttributeMiddleware_1 = require("@middlewares/validateAttributeMid
 const lengthRequirementMiddleware_1 = require("@middlewares/lengthRequirementMiddleware");
 const userRoutes = (userController) => {
     const router = express_1.default.Router();
-    router.get('/:id', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('params', 'id', 'Id missing or invalid in request params.'), (req, res) => userController.getUserById(req, res));
-    router.get('/', (req, res) => userController.getAllUsers(req, res));
-    router.post('/', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('body', 'email', 'Email missing or invalid in request body'), (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('body', 'password', 'Password missing or invalid in request body'), (0, lengthRequirementMiddleware_1.lengthRequirementMiddleware)(8, 'password'), (0, lengthRequirementMiddleware_1.lengthRequirementMiddleware)(3, 'email'), (req, res) => userController.createUser(req, res));
-    router.patch('/:id', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('params', 'id', 'Id missing or invalid in request params.'), (req, res) => userController.modifyUser(req, res));
-    router.delete('/:id', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('params', 'id', 'Id missing or invalid in request params.'), (req, res) => userController.deleteUser(req, res));
+    router.get('/:id', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('params', 'id', 'Id missing or invalid in request params.'), (req, res, next) => userController.getUserById(req, res, next));
+    router.get('/', (req, res, next) => userController.getAllUsers(req, res, next));
+    router.post('/', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('body', 'email', 'Email missing or invalid in request body'), (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('body', 'password', 'Password missing or invalid in request body'), (0, lengthRequirementMiddleware_1.lengthRequirementMiddleware)(8, 'password'), (0, lengthRequirementMiddleware_1.lengthRequirementMiddleware)(3, 'email'), (req, res, next) => userController.createUser(req, res, next));
+    router.patch('/:id', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('params', 'id', 'Id missing or invalid in request params.'), (req, res, next) => userController.modifyUser(req, res, next));
+    router.delete('/:id', (0, validateAttributeMiddleware_1.validateAttributeMiddleware)('params', 'id', 'Id missing or invalid in request params.'), (req, res, next) => userController.deleteUser(req, res, next));
     return router;
 };
 exports.userRoutes = userRoutes;

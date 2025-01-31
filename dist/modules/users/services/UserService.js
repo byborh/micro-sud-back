@@ -8,213 +8,220 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
-const User_1 = require("../domain/User");
-const UserRepositoryMySQL_1 = require("../repositories/drivers/UserRepositoryMySQL");
+const idGenerator_1 = require("@core/idGenerator");
 const UserMapper_1 = require("../mapper/UserMapper");
-const DatabaseFactory_1 = require("@db/DatabaseFactory");
 const PasswordManager_1 = require("@core/cryptography/PasswordManager");
-const ETable_1 = require("@core/foundation/contracts/ETable");
-const Foundation_1 = require("@core/foundation/domain/Foundation");
+const lodash_1 = __importDefault(require("lodash"));
 class UserService {
     constructor(userRepository) {
-        // Creation dynamicly of the database
-        const database = DatabaseFactory_1.DatabaseFactory.createDatabase("mysql", null);
-        // Creation of the repository injecting the database
-        this.userRepository = new UserRepositoryMySQL_1.UserRepositoryMySQL(database);
+        this.userRepository = userRepository;
     }
     // Get a user by ID
     getUserById(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Find the user by ID from the Foundation Service
-            const user = yield this.foundationService.getResourceByField("id", ETable_1.ETable.USERS, userId);
-            // If the user is not found, return null
-            if (!user)
-                return null;
-            const userDTO = UserMapper_1.UserMapper.toDTO(user.data);
-            // ONLY FOR TEST / FOR ADMIN
-            userDTO.password = user.data.getPassword();
-            userDTO.salt = user.data.getSalt();
-            console.log("User found in getUserById Service :", userDTO);
-            // Return the user in DTO format
-            return userDTO;
+            try {
+                // Verify if userId is provided
+                if (!userId) {
+                    throw new Error("User ID is required.");
+                }
+                // Call UserRepository to find a user by ID
+                const userEntity = yield this.userRepository.findUserById(userId);
+                // If no user is found, return null
+                if (!userEntity) {
+                    throw new Error("User not found.");
+                }
+                // Transform the entity to the dto
+                const userDTO = UserMapper_1.UserMapper.toDTO(userEntity);
+                // Return the user
+                return userDTO;
+            }
+            catch (error) {
+                console.error("Error finding user in UserService:", error);
+                throw new Error("Failed to find user.");
+            }
         });
     }
     // Get a user by Email
     getUserByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Find the user by email from the Foundation Service
-            const user = yield this.foundationService.getResourceByField("email", ETable_1.ETable.USERS, email);
-            // If the user is not found, return null
-            if (!user)
-                return null;
-            const userDTO = UserMapper_1.UserMapper.toDTO(user.data);
-            // ONLY FOR TEST / FOR ADMIN
-            userDTO.password = user.data.getPassword();
-            userDTO.salt = user.data.getSalt();
-            console.log("User found in getUserByEmail Service :", userDTO);
-            // Return the user in DTO format
-            return userDTO;
+            try {
+                // Verify if email is provided
+                if (!email) {
+                    throw new Error("Email is required.");
+                }
+                // Call UserRepository to find a user by email
+                const userEntity = yield this.userRepository.findUserByEmail(email);
+                // If no user is found, return null
+                if (!userEntity) {
+                    throw new Error("User not found.");
+                }
+                // Transform the entity to the dto
+                const userDTO = UserMapper_1.UserMapper.toDTO(userEntity);
+                // Return the user
+                return userDTO;
+            }
+            catch (error) {
+                console.error("Error finding user by email in UserService:", error);
+                throw new Error("Failed to find user by email.");
+            }
         });
     }
     // Get all users
     getUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            const users = yield this.foundationService.getAllResources(ETable_1.ETable.USERS);
-            // If users don't found, return null
-            if (!users) {
-                return null;
+            try {
+                // Call UserRepository to find all users
+                const usersEntity = yield this.userRepository.getAllUsers();
+                // If no users are found, return null
+                if (!usersEntity)
+                    return null;
+                // Return all users in DTO format
+                return usersEntity.map(userEntity => UserMapper_1.UserMapper.toDTO(userEntity));
             }
-            // Return all users in DTO format
-            return users.map(user => UserMapper_1.UserMapper.toDTO(user.data));
+            catch (error) {
+                console.error("Error finding users in UserService:", error);
+                throw new Error("Failed to find users.");
+            }
         });
     }
     // Create user
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Password management
-            const passwordManager = PasswordManager_1.PasswordManager.getInstance();
-            // Creation of the salt
-            const salt = passwordManager.generateSalt();
-            // Creation of hashed password
-            const hashedPassword = passwordManager.hashPassword(user.getPassword(), salt);
-            console.log('Hash:', hashedPassword);
-            console.log('Salt:', salt);
-            // Verification
-            const isValid = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
-            console.log('Mot de passe valide:', isValid);
-            // Assign hashed password to user
-            user.setPassword(hashedPassword);
-            user.setSalt(salt);
-            const cleanedUser = new User_1.User("", // id will be generated automatically in Foundation Service
-            user.getEmail(), user.getPassword(), user.getSalt(), user.getFirstname() || null, user.getLastname() || null, user.getPseudo() || null, user.getTelnumber() || null);
-            console.log(cleanedUser);
-            // Create user from repository
-            // const createdUser: User | null = await this.userRepository.createUser(cleanedUser);
-            const createdUser = yield this.foundationService.createResource(ETable_1.ETable.USERS, cleanedUser, 16, "email", user.getEmail());
-            // User didn't created
-            if (!createdUser)
-                return null;
-            return UserMapper_1.UserMapper.toDTO(createdUser.data);
+            try {
+                // Verify if user exists
+                const localUser = yield this.getUserByEmail(user.getEmail());
+                if (localUser) {
+                    console.error("User already exists:", localUser);
+                    throw new Error("User already exists.");
+                }
+                // Initialize IdGenerator
+                const idGenerator = idGenerator_1.IdGenerator.getInstance();
+                let userId;
+                let existingUser = null;
+                // Make sure that ID is unique
+                do {
+                    userId = idGenerator.generateId(16); // Generate a unique ID of 16 characters
+                    // Verify if this id exist
+                    existingUser = yield this.getUserById(userId);
+                } while (existingUser !== null);
+                console.log(`Generated ID: ${userId}`);
+                // Assign ID to user
+                user.setId(userId);
+                // Password management
+                const passwordManager = PasswordManager_1.PasswordManager.getInstance();
+                // Creation of the salt
+                const salt = passwordManager.generateSalt();
+                // Creation of hashed password
+                const hashedPassword = passwordManager.hashPassword(user.getPassword(), salt);
+                // A SUPPRIMER AVANT LA PROD !!!
+                console.log('Password:', user.getPassword());
+                console.log('Hash:', hashedPassword);
+                console.log('Salt:', salt);
+                // Verification of password
+                const isValid = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
+                console.log('Mot de passe valide:', isValid);
+                // Assign hashed password to user
+                user.setPassword(hashedPassword);
+                user.setSalt(salt);
+                // Create user from repository
+                const createdUser = yield this.userRepository.createUser(user);
+                // User didn't created
+                if (!createdUser) {
+                    throw new Error("User didn't created...");
+                }
+                return createdUser;
+            }
+            catch (error) {
+                console.error("Error creating user in UserService:", error);
+                throw new Error("Failed to create user.");
+            }
         });
     }
     // Modify user
     modifyUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("User to modify in service before all functions:", user);
-            // Verify if this user exist
-            const exUser = yield this.getUserById(user.getId());
-            if (!exUser) {
-                console.error("User not found:", exUser);
-                throw new Error("User not found.");
-            }
-            console.log("exUser:", exUser);
-            const existingUser = UserMapper_1.UserMapper.toEntity(exUser);
-            existingUser.setPassword(exUser.password);
-            existingUser.setSalt(exUser.salt);
-            console.log("existingUser:", existingUser);
-            const modifiedUser = new User_1.User(user.getId(), // Can't be changed
-            user.getEmail(), user.getPassword(), // Can be null
-            user.getFirstname(), // Can be null
-            user.getLastname(), // Can be null
-            user.getPseudo(), // Can be null
-            user.getTelnumber(), // Can be null
-            user.getSalt());
-            // Verify if email n password are not "null"
-            if (modifiedUser.getEmail === null && modifiedUser.getPassword() === null) {
-                console.error("Email or password can't be null:", modifiedUser);
-                throw new Error("Email or password can't be null.");
-            }
-            // Compare n Verify if user was changed somewhere
-            let hasChanges = false;
-            if (modifiedUser.getEmail() !== existingUser.getEmail())
-                hasChanges = true;
-            if (modifiedUser.getFirstname() !== existingUser.getFirstname())
-                hasChanges = true;
-            if (modifiedUser.getLastname() !== existingUser.getLastname())
-                hasChanges = true;
-            if (modifiedUser.getPseudo() !== existingUser.getPseudo())
-                hasChanges = true;
-            if (modifiedUser.getTelnumber() !== existingUser.getTelnumber())
-                hasChanges = true;
-            // Verify if password was changed
-            // Password management
-            const passwordManager = PasswordManager_1.PasswordManager.getInstance();
-            console.log("modifiedUser:", modifiedUser);
-            // Verification
-            const isPasswordValid = passwordManager.verifyPassword(modifiedUser.getPassword(), existingUser.getSalt(), existingUser.getPassword());
-            console.log('Mot de passe valide:', isPasswordValid);
-            if (!isPasswordValid)
-                hasChanges = true;
-            if (hasChanges) {
-                console.error("User is not different. The same user like before:", modifiedUser);
-                throw new Error("User is not different. The same user like before.");
-            }
-            // Creation of the salt
-            const salt = passwordManager.generateSalt();
-            // Creation of hashed password
-            const hashedPassword = passwordManager.hashPassword(modifiedUser.getPassword(), salt);
-            console.log('Hash:', hashedPassword);
-            console.log('Salt:', salt);
-            modifiedUser.setSalt(salt);
-            modifiedUser.setPassword(hashedPassword);
-            console.log("User to modify in service after all functions:", modifiedUser);
-            // Modify existing user
-            const finalUser = yield this.userRepository.modifyUser(modifiedUser);
-            // User didn't modified
-            if (!finalUser)
-                return null;
-            return UserMapper_1.UserMapper.toDTO(finalUser);
-        });
-    }
-    modifyUser1(user) {
-        return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("User to modify in service:", user);
-                // Vérifiez si les champs critiques ne sont pas null
-                if (!user.getEmail() || !user.getPassword()) {
-                    throw new Error("Email and password cannot be null.");
+                console.log("User to modify in service before processing:", user);
+                // Vérifier si l'utilisateur existe
+                const existingUserDTO = yield this.getUserById(user.getId());
+                if (!existingUserDTO) {
+                    throw new Error("User not found.");
                 }
-                // Gestion des mots de passe
-                const passwordManager = PasswordManager_1.PasswordManager.getInstance();
-                const salt = passwordManager.generateSalt();
-                const hashedPassword = passwordManager.hashPassword(user.getPassword(), salt);
-                user.setSalt(salt);
-                user.setPassword(hashedPassword);
-                console.log("User with updated password and salt:", user);
-                // Prépare les champs à mettre à jour
-                const updatedFields = {
+                // Convertir le DTO en entité User
+                const existingUser = UserMapper_1.UserMapper.toEntity(existingUserDTO);
+                // Comparer les données hors mot de passe
+                const newUserData = {
                     email: user.getEmail(),
                     firstname: user.getFirstname(),
                     lastname: user.getLastname(),
                     pseudo: user.getPseudo(),
-                    telnumber: user.getTelnumber(),
-                    password: user.getPassword(),
-                    salt: user.getSalt(),
+                    telnumber: user.getTelnumber()
                 };
-                // Utilise `modifyUser` pour appliquer les changements
-                const modifiedUser = yield this.foundationService.modifyResource(ETable_1.ETable.USERS, new Foundation_1.Foundation(user), // Crée un objet Foundation<User>
-                updatedFields);
-                if (!modifiedUser)
+                const existingUserData = {
+                    email: existingUser.getEmail(),
+                    firstname: existingUser.getFirstname(),
+                    lastname: existingUser.getLastname(),
+                    pseudo: existingUser.getPseudo(),
+                    telnumber: existingUser.getTelnumber()
+                };
+                let hasChanges = !lodash_1.default.isEqual(newUserData, existingUserData);
+                // Vérifier si le mot de passe a changé
+                const passwordManager = PasswordManager_1.PasswordManager.getInstance();
+                const isPasswordValid = passwordManager.verifyPassword(user.getPassword(), existingUser.getSalt(), existingUser.getPassword());
+                if (!isPasswordValid) {
+                    hasChanges = true;
+                    // Génération d'un nouveau hash uniquement si le mot de passe change
+                    const newSalt = passwordManager.generateSalt();
+                    const hashedPassword = passwordManager.hashPassword(user.getPassword(), newSalt);
+                    user.setSalt(newSalt);
+                    user.setPassword(hashedPassword);
+                }
+                // Si aucun changement, on ne fait rien
+                if (!hasChanges) {
+                    throw new Error("No changes detected.");
+                }
+                console.log("User to modify in service after processing:", user);
+                // Mise à jour dans la base de données
+                const updatedUser = yield this.userRepository.modifyUser(user);
+                if (!updatedUser)
                     return null;
-                return UserMapper_1.UserMapper.toDTO(modifiedUser.data);
+                // Retourner un DTO sans les données sensibles
+                return UserMapper_1.UserMapper.toDTO(updatedUser);
             }
             catch (error) {
-                console.error("Error modifying user:", error);
-                throw error;
+                console.error("Error modifying user in UserService:", error);
+                throw new Error("Failed to modify user.");
             }
         });
     }
     // Delete user
     deleteUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield this.getUserById(userId); // Find the user by ID
-            if (!user) {
-                return false;
-            } // User not found
-            // Delete the user
-            return this.userRepository.deleteUser(UserMapper_1.UserMapper.toEntity(user));
+            try {
+                // Verify if userId is provided
+                if (!userId) {
+                    throw new Error("User ID is required.");
+                }
+                // Find the user by ID
+                const user = yield this.getUserById(userId);
+                if (!user) {
+                    console.error("User not found:", userId);
+                    return false;
+                }
+                // Delete the user
+                const isDeleted = yield this.userRepository.deleteUser(userId);
+                // Return true if the user is deleted, false otherwise
+                return isDeleted;
+            }
+            catch (error) {
+                console.error("Error deleting user in UserService:", error);
+                throw new Error("Failed to delete user.");
+            }
         });
     }
 }

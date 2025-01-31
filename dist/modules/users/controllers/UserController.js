@@ -10,123 +10,123 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
-const UserMapper_1 = require("../mapper/UserMapper");
+const User_1 = require("../domain/User");
 class UserController {
-    // Constructor
-    constructor(userService) { this.userService = userService; }
+    constructor(userService) {
+        this.userService = userService;
+    }
     // Get a user by ID
-    getUserById(req, res) {
+    getUserById(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // Verify permissions ...
-                // Get the user from the service
                 const userDto = yield this.userService.getUserById(req.params.id);
-                // If the user is not found, return an error
                 if (!userDto) {
                     res.status(404).json({ error: "User not found" });
                     return;
                 }
-                // Return the user
                 res.status(200).json(userDto);
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({ error: "Internal server error" });
+                next(error);
             }
         });
     }
     // Get all users
-    getAllUsers(req, res) {
+    getAllUsers(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Verify permissions ...
             try {
-                // Get all users from the service
                 const users = yield this.userService.getUsers();
-                if (!users) {
-                    res.status(404).json({ error: "Users not found" });
+                if (!users || users.length === 0) {
+                    res.status(404).json({ error: "No users found" });
                     return;
                 }
-                // Return the users
                 res.status(200).json(users);
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({ error: "Internal server error" });
+                next(error);
             }
         });
     }
-    // Create user
-    createUser(req, res) {
+    // Create a user
+    createUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Verify permissions ...
             try {
-                // Change the type of user
-                const userDTO = req.body;
-                const userEntity = UserMapper_1.UserMapper.toEntity(userDTO);
-                if (!userEntity.getEmail || !userEntity.getPassword) {
+                const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
+                if (!email || !password) {
                     res.status(400).json({ error: "Email and password are required." });
                     return;
                 }
-                // Use the service to create the user
-                const user = yield this.userService.createUser(userEntity);
-                if (!user) {
-                    res.status(404).json({ error: "User didn't created" });
+                const user = new User_1.User({
+                    id: req.params.id,
+                    email,
+                    password,
+                    salt: "", // À gérer correctement
+                    firstname,
+                    lastname,
+                    pseudo,
+                    telnumber,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+                const createdUser = yield this.userService.createUser(user);
+                if (!createdUser) {
+                    res.status(400).json({ error: "User could not be created." });
                     return;
                 }
-                res.status(201).json(user);
-                return;
+                res.status(201).json(createdUser);
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({ error: "Internal server error", cause: error });
+                next(error);
             }
         });
     }
-    // Modify user
-    modifyUser(req, res) {
+    // Modify a user
+    modifyUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Verify permissions ...
             try {
-                // Change the type of user
-                const userDTO = req.body;
-                const userEntity = UserMapper_1.UserMapper.toEntity(userDTO);
-                userEntity.setId(req.params.id);
-                if (!userEntity.getEmail || !userEntity.getPassword) {
+                const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
+                if (!email || !password) {
                     res.status(400).json({ error: "Email and password are required." });
-                    return null;
+                    return;
                 }
-                console.log("User to modify in controller:", userEntity);
-                // Use the service to modify the user
-                const user = yield this.userService.modifyUser(userEntity);
-                if (!user) {
-                    res.status(404).json({ error: "User didn't modified" });
-                    return null;
+                const user = new User_1.User({
+                    id: req.params.id,
+                    email,
+                    password,
+                    salt: "", // À gérer correctement
+                    firstname,
+                    lastname,
+                    pseudo,
+                    telnumber,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+                console.log("User to modify in controller:", user);
+                const updatedUser = yield this.userService.modifyUser(user);
+                if (!updatedUser) {
+                    res.status(404).json({ error: "User could not be modified." });
+                    return;
                 }
-                res.status(201).json(user);
-                return null;
+                res.status(200).json(updatedUser);
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({ error: "Internal server error" });
+                next(error);
             }
         });
     }
-    // Delete user
-    deleteUser(req, res) {
+    // Delete a user
+    deleteUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Verify permissions ...
             try {
-                const deletedOrNot = yield this.userService.deleteUser(req.params.id);
-                if (!deletedOrNot) {
-                    res.status(404).json({ error: "User didn't deleted" });
+                const isDeleted = yield this.userService.deleteUser(req.params.id);
+                if (!isDeleted) {
+                    res.status(404).json({ error: "User could not be deleted." });
                     return;
                 }
-                res.status(201).json(deletedOrNot);
-                return;
+                res.status(200).json({ message: "User deleted successfully." });
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({ error: "Internal server error" });
+                next(error);
             }
         });
     }

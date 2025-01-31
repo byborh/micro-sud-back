@@ -18,8 +18,8 @@ class PermissionController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
             }
-            catch (error) {
-                console.error("Internal server error. Cannot get permission by id", error);
+            catch (e) {
+                console.error("Internal server error. Cannot get permission by id", e);
                 throw new Error("Internal server error");
             }
         });
@@ -28,8 +28,8 @@ class PermissionController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
             }
-            catch (error) {
-                console.error("Internal server error. Cannot get permissions", error);
+            catch (e) {
+                console.error("Internal server error. Cannot get permissions", e);
                 throw new Error("Internal server error");
             }
         });
@@ -38,8 +38,8 @@ class PermissionController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
             }
-            catch (error) {
-                console.error("Internal server error. Cannot create permission", error);
+            catch (e) {
+                console.error("Internal server error. Cannot create permission", e);
                 throw new Error("Internal server error");
             }
         });
@@ -48,8 +48,8 @@ class PermissionController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
             }
-            catch (error) {
-                console.error("Internal server error. Cannot modify permission", error);
+            catch (e) {
+                console.error("Internal server error. Cannot modify permission", e);
                 throw new Error("Internal server error");
             }
         });
@@ -58,8 +58,8 @@ class PermissionController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
             }
-            catch (error) {
-                console.error("Internal server error. Cannot delete permission", error);
+            catch (e) {
+                console.error("Internal server error. Cannot delete permission", e);
                 throw new Error("Internal server error");
             }
         });

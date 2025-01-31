@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/UserService";
 import { User } from "../domain/User";
+import { UserDTO } from "../dto/UserDTO";
 
 export class UserController {
     constructor(private readonly userService: UserService) {}
@@ -43,8 +44,10 @@ export class UserController {
                 return;
             }
 
+            const userId: string = await this.userService.generateUserId();
+
             const user = new User({
-                id: req.params.id,
+                id: userId,
                 email,
                 password,
                 salt: "", // À gérer correctement
@@ -73,29 +76,32 @@ export class UserController {
     public async modifyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
-    
-            if (!email || !password) {
-                res.status(400).json({ error: "Email and password are required." });
+
+            // Verify if id is provided
+            if (!req.params.id) {
+                res.status(400).json({ error: "User id is required." });
                 return;
             }
     
-            const user = new User({
-                id: req.params.id,
-                email,
-                password,
-                salt: "", // À gérer correctement
-                firstname,
-                lastname,
-                pseudo,
-                telnumber,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            });
+            // const user = new User({
+            //     id: req.params.id,
+            //     email,
+            //     password,
+            //     salt: existingUser.salt, // À gérer correctement
+            //     firstname,
+            //     lastname,
+            //     pseudo,
+            //     telnumber,
+            //     createdAt: existingUser.createdAt,
+            //     updatedAt: new Date(),
+            // });
             
     
-            console.log("User to modify in controller:", user);
+            // console.log("User to modify in controller:", user);
     
-            const updatedUser = await this.userService.modifyUser(user);
+            const updatedUser = await this.userService.modifyUser(req.params.id, {
+                email, password, firstname, lastname, pseudo, telnumber
+            });
     
             if (!updatedUser) {
                 res.status(404).json({ error: "User could not be modified." });

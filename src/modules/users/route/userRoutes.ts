@@ -1,5 +1,5 @@
 // src/modules/users/routes/userRoutes.ts
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
 import { lengthRequirementMiddleware } from '@middlewares/lengthRequirementMiddleware';
@@ -9,27 +9,27 @@ export const userRoutes = (userController: UserController): express.Router => {
 
   router.get('/:id', 
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-    (req: Request, res: Response) => userController.getUserById(req, res)
+    (req: Request, res: Response, next: NextFunction) => userController.getUserById(req, res, next)
   );
 
-  router.get('/', (req: Request, res: Response) => userController.getAllUsers(req, res));
+  router.get('/', (req: Request, res: Response, next: NextFunction) => userController.getAllUsers(req, res,  next));
 
   router.post('/',
     validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),
     validateAttributeMiddleware('body', 'password', 'Password missing or invalid in request body'),
     lengthRequirementMiddleware(8, 'password'),
     lengthRequirementMiddleware(3, 'email'),
-    (req: Request, res: Response) => userController.createUser(req, res)
+    (req: Request, res: Response, next: NextFunction) => userController.createUser(req, res, next)
   );
 
   router.patch('/:id',
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-    (req: Request, res: Response) => userController.modifyUser(req, res)
+    (req: Request, res: Response, next: NextFunction) => userController.modifyUser(req, res, next)
   );
 
   router.delete('/:id',
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-    (req: Request, res: Response) => userController.deleteUser(req, res)
+    (req: Request, res: Response, next: NextFunction) => userController.deleteUser(req, res, next)
   );
 
   return router;

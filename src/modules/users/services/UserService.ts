@@ -5,13 +5,22 @@ import { UserMapper } from "../mapper/UserMapper";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
 import _ from "lodash";
-import { DataSource } from "typeorm";
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
 
-    constructor(dataSource: DataSource) {
-        this.userRepository = new UserRepositoryMySQL(dataSource);
+    constructor(userRepository: UserRepositoryMySQL) {
+        this.userRepository = userRepository;
+    }
+
+    public async generateUserId(): Promise<string> {
+        // Generate a unique ID
+        const idGenerator = IdGenerator.getInstance();
+        const userId: string = idGenerator.generateId(16);
+    
+        console.log(`Generated ID: ${userId}`);    
+        
+        return userId;
     }
 
     // Get a user by ID
@@ -89,31 +98,11 @@ export class UserService {
     public async createUser(user: User): Promise<UserDTO | null> {
         try {
             // Verify if user exists
-            const localUser: UserDTO | null = await this.getUserByEmail(user.getEmail());
+            const localUser: UserDTO | null = await this.userRepository.findUserByEmail(user.getEmail());
             if (localUser) {
                 console.error("User already exists:", localUser);
                 throw new Error("User already exists.");
             }
-            
-
-            // Initialize IdGenerator
-            const idGenerator = IdGenerator.getInstance();
-            let userId: string;
-            let existingUser: UserDTO | null = null;
-        
-            // Make sure that ID is unique
-            do {
-                userId = idGenerator.generateId(16); // Generate a unique ID of 16 characters
-        
-                // Verify if this id exist
-                existingUser = await this.getUserById(userId);
-        
-            } while (existingUser !== null);
-        
-            console.log(`Generated ID: ${userId}`);
-
-            // Assign ID to user
-            user.setId(userId);
 
             // Password management
             const passwordManager = PasswordManager.getInstance();
@@ -153,53 +142,70 @@ export class UserService {
     }
 
     // Modify user
-    public async modifyUser(user: User): Promise<UserDTO | null> {
+    public async modifyUser(userId: string, data: Partial<User>): Promise<UserDTO | null> {
         try {
-            console.log("User to modify in service before processing:", user);
+            console.log("User to modify in service before processing:", data);
 
-            // Vérifier si l'utilisateur existe
-            const existingUserDTO: UserDTO | null = await this.getUserById(user.getId());
+            // Verify if user exists
+            const existingUserDTO: UserDTO | null = await this.getUserById(userId);
             if (!existingUserDTO) {
                 throw new Error("User not found.");
             }
 
-            // Convertir le DTO en entité User
-            const existingUser = UserMapper.toEntity(existingUserDTO);
+            // From DTO to Entity
+            const existingUser: User = await UserMapper.toEntity(existingUserDTO);
 
-            // Comparer les données hors mot de passe
-            const newUserData = {
-                email: user.getEmail(),
-                firstname: user.getFirstname(),
-                lastname: user.getLastname(),
-                pseudo: user.getPseudo(),
-                telnumber: user.getTelnumber()
-            };
+            let hasChanges: boolean = false;
 
-            const existingUserData = {
-                email: existingUser.getEmail(),
-                firstname: existingUser.getFirstname(),
-                lastname: existingUser.getLastname(),
-                pseudo: existingUser.getPseudo(),
-                telnumber: existingUser.getTelnumber()
-            };
-
-            let hasChanges = !_.isEqual(newUserData, existingUserData);
-
-            // Vérifier si le mot de passe a changé
-            const passwordManager = PasswordManager.getInstance();
-            const isPasswordValid: boolean = passwordManager.verifyPassword(
-                user.getPassword(),
-                existingUser.getSalt(),
-                existingUser.getPassword()
-            );
-
-            if (!isPasswordValid) {
+            // Update datas in entity
+            if(data.email || data.email !== existingUser.getEmail()) {
+                existingUser.setEmail(data.email);
                 hasChanges = true;
-                // Génération d'un nouveau hash uniquement si le mot de passe change
-                const newSalt = passwordManager.generateSalt();
-                const hashedPassword = passwordManager.hashPassword(user.getPassword(), newSalt);
-                user.setSalt(newSalt);
-                user.setPassword(hashedPassword);
+            }
+
+            if (data.firstname && data.firstname !== existingUser.getFirstname()) {
+                existingUser.setFirstname(data.firstname);
+                hasChanges = true;
+            }
+    
+            if (data.lastname && data.lastname !== existingUser.getLastname()) {
+                existingUser.setLastname(data.lastname);
+                hasChanges = true;
+            }
+    
+            if (data.pseudo && data.pseudo !== existingUser.getPseudo()) {
+                existingUser.setPseudo(data.pseudo);
+                hasChanges = true;
+            }
+
+            if (data.telnumber && data.telnumber !== existingUser.getTelnumber()) {
+                existingUser.setTelnumber(data.telnumber);
+                hasChanges = true;
+            }
+
+            
+
+
+
+            // Verify if new password is provided
+            if(data.password) {
+                // Verify if password is changed
+                const passwordManager = PasswordManager.getInstance();
+                const isPasswordValid: boolean = passwordManager.verifyPassword(
+                    data.password,
+                    existingUser.getSalt(), // '' - vide
+                    existingUser.getPassword()
+                );
+
+                // if password is changed
+                if (!isPasswordValid) {
+                    hasChanges = true;
+                    // Generation of new hash and salt
+                    const newSalt = passwordManager.generateSalt();
+                    const hashedPassword = passwordManager.hashPassword(data.password, newSalt);
+                    existingUser.setSalt(newSalt); // '' - vide
+                    existingUser.setPassword(hashedPassword);
+                }
             }
 
             // Si aucun changement, on ne fait rien
@@ -207,10 +213,10 @@ export class UserService {
                 throw new Error("No changes detected.");
             }
 
-            console.log("User to modify in service after processing:", user);
+            console.log("User to modify in service after processing:", existingUser);
 
             // Mise à jour dans la base de données
-            const updatedUser: User | null = await this.userRepository.modifyUser(user);
+            const updatedUser: User | null = await this.userRepository.modifyUser(existingUser);
 
             if (!updatedUser) return null;
 

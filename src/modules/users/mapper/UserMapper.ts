@@ -2,15 +2,24 @@
 import { UserDTO } from "../dto/UserDTO";
 import { User } from "../domain/User";
 import { UserContract } from "../contracts/IUser";
+import { Repository } from "typeorm";
+import { AppDataSource } from "@db/drivers/AppDataSource";
 
 export class UserMapper {
-    // Transfirm the dto to the entity
-    static toEntity(dto: UserDTO): User {
+    private static repository: Repository<User> = AppDataSource.getRepository(User);
+
+    // Transform the dto to the entity
+    static async toEntity(dto: UserDTO): Promise<User> {
+        // Get existing user from the database
+        const existingUser: User | null = await this.repository.findOne({ where: { id: dto.id } });
+
+        if (!existingUser) throw new Error("User not found.");
+
         return new User({
             id: dto.id,
             email: dto.email,
-            password: '', // Void
-            salt: '', // Void
+            password: existingUser.password, // Let password unchanged
+            salt: existingUser.salt, // Let salt unchanged
             firstname: dto.firstname || null,
             lastname: dto.lastname || null,
             pseudo: dto.pseudo || null,
@@ -19,6 +28,7 @@ export class UserMapper {
             updatedAt: dto.updatedAt
         } as UserContract);
     }
+
 
     // Transform the entity to the dto
     static toDTO(user: User): UserDTO {

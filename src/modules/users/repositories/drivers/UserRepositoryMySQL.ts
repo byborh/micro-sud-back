@@ -1,127 +1,101 @@
 import { User } from "@modules/users/domain/User";
 import { IUserRepository } from "../contract/IUserRepository";
 import { DataSource, Repository } from "typeorm";
+import { AppDataSource } from "@db/drivers/AppDataSource";
 
-export class UserRepositoryMySQL extends Repository<User> implements IUserRepository {
-    constructor(private dataSource: DataSource) {
-        super(User, dataSource.createEntityManager());
+export class UserRepositoryMySQL implements IUserRepository {
+    private repository: Repository<User>;
+
+    constructor() {
+        this.repository = AppDataSource.getRepository(User);
     }
     
     async findUserByField(field: string, value: string): Promise<User | null> {
-        try {
-            // Validate field
-            const allowedFields = ['id', 'email', 'firstname', 'lastname', 'pseudo', 'telnumber', 'createdAt', 'updatedAt'];
-            if(!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
+        // Validate field
+        const allowedFields = ['id', 'email', 'firstname', 'lastname', 'pseudo', 'telnumber', 'createdAt', 'updatedAt'];
+        if(!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
 
-            // List of users finded by field
-            const row = await this.findOne({where: {[field]: value}});
-    
-            // Validate rows
-            if (!row) {
-                console.error("No user found for field:", field, "with value:", value);
-                return null;
-            };
+        // List of users finded by field
+        const row = await this.repository.findOne({where: {[field]: value}});
 
-            const user = Array.isArray(row) ? row[0] : row
+        // Validate rows
+        if (!row) {
+            console.log("No user found for field:", field, "with value:", value);
+            return null;
+        };
 
-            console.log("User found:", user);
+        const user = Array.isArray(row) ? row[0] : row
 
-            // Verify if all required fields are present
-            if (!user.id || !user.email || !user.password) {
-                console.error("Invalid user data:", user);
-                throw new Error("User data is incomplete.");
-            }
-    
-            // Map the result to a User instance
-            return user;
-        } catch (error) {
-            console.error("Error finding user by field:", error);
-            throw new Error("Failed to find user by field.");
+        console.log("User found:", user);
+
+        // Verify if all required fields are present
+        if (!user.id || !user.email || !user.password) {
+            console.error("Invalid user data:", user);
+            throw new Error("User data is incomplete.");
         }
+
+        // Map the result to a User instance
+        return user || null;
     }
     
     async findUserById(userId: string): Promise<User | null> {
-        try {
-            if(!userId) return null;
-            console.log("User to find by id in repository:", this.findUserByField('id', userId));
-            return await this.findUserByField('id', userId);
-        } catch (error) {
-            console.error("Error finding user by id:", error);
-            throw new Error("Failed to find user by id.");
-        }
+        if(!userId) return null;
+        return await this.findUserByField('id', userId) || null;
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
-        try {
-            if(!email) return null;
-            return await this.findUserByField('email', email);
-        } catch (error) {
-            console.error("Error finding user by email:", error);
-            throw new Error("Failed to find user by email.");
-        }
+        if(!email) return null;
+        return await this.findUserByField('email', email) || null;
     }
 
     async getAllUsers(): Promise<User[]> {
-        try {
-            // Fetch all users from the database
-            const [rawResult]: User[] = await this.find();
-            const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
+        // Fetch all users from the database
+        const [rawResult]: User[] = await this.repository.find();
+        const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
 
-            // Verify if rows are an array or a single object
-            const rowsArray = Array.isArray(rows) ? rows : [rows]; // if single object, insert in an array
-    
-            if (rowsArray.length === 0) {
-                console.error("No users found in the database.");
-                return [];
-            }
-    
-            // Utiliser le UserMapper pour mapper chaque ligne en une entité User
-            return rowsArray.map(row => row);
-        } catch (error) {
-            console.error("Error getting users:", error);
-            throw new Error("Failed to get users.");
+        // Verify if rows are an array or a single object
+        const rowsArray = Array.isArray(rows) ? rows : [rows]; // if single object, insert in an array
+
+        if (rowsArray.length === 0) {
+            console.log("No users found in the database.");
+            return [];
         }
+
+        // Utiliser le UserMapper pour mapper chaque ligne en une entité User
+        return rowsArray.map(row => row) || [];
     }    
 
     async createUser(user: User): Promise<User | null> {
-        try {
-            // Insert the user in the database
-            const result: User = this.create(user);
+        // Insert the user in the database
+        const result = await this.repository.save(user);
 
-            // If the user is not created, return null
-            if (!result) return null;
-        
-            // Return the user
-            return this.findUserById(user.getId());
-        } catch (error) {
-            console.error("Error creating user:", error,);
-            throw new Error("Failed to create user");
-        }
+        // If the user is not created, return null
+        if (!result) return null;
+    
+        // Return the user
+        return this.findUserById(user.getId()) || null;
     }
 
     async modifyUser(user: User): Promise<User | null> {
-        try {
-            const result = await this.insert(user);
+        // Be sur that user exists
+        const existingUser: User = await this.repository.findOne({ where: { id: user.getId() } })
+        if(!existingUser) return null;
 
-            if (!result) return null;
-            
-            return this.findUserById(user.getId());
-        } catch (error) {
-            console.error("Error modifying user:", error);
-            throw new Error("Failed to modify user.");
-        }
+        // Merge user data with existing user data
+        this.repository.merge(existingUser, user);
+
+        // Save the modified user
+        const result = await this.repository.save(existingUser);
+        
+        // Return the user
+        return this.findUserById(user.getId()) || null;
     }
     
     async deleteUser(userId: string): Promise<boolean> {
-        try {
-            const result = await this.delete(userId);
-            
-            // Return true if the user is deleted, false otherwise
-            return !result ? false : true;
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            throw new Error("Failed to delete user.");
-        }
+        const result = await this.repository.delete(userId);
+        
+        // Return true if the user is deleted, false otherwise
+        return !result ? false : true;
     }
    
 }
