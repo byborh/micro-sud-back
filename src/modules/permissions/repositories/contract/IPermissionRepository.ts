@@ -1,4 +1,4 @@
-import { Permission } from "@modules/permission/domain/Permission";
+import { Permission } from "@modules/permissions/entity/Permission.entity";
 
 export interface IPermissionRepository {
     getPermissionByField(field: string, value: string): Promise<Permission | null>;

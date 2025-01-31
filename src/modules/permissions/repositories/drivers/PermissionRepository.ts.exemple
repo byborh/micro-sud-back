@@ -1,14 +1,12 @@
-import { Permission } from "@modules/permission/domain/Permission";
+import { Permission } from "@modules/permissions/entity/Permission.entity";
 import { IPermissionRepository } from "../contract/IPermissionRepository";
-import { IDatabase } from "@db/contract/IDatabase";
 
-export class PermissionRepositoryMySQL implements IPermissionRepository {
-    private db: IDatabase;
-
-    constructor(db: IDatabase) {
-        // Injection of database
-        this.db = db;
-    }
+export class PermissionRepository implements IPermissionRepository {
+    private permissions: Permission[] = [
+        new Permission('perm1', 'CREATE', 'user', 'Permet de créer un nouvel utilisateur'),
+        new Permission('perm2', 'READ', 'message', 'Permit de lire les messages existants'),
+        new Permission('perm3', 'UPDATE', 'video', 'Autorise la mise à jour des … publiques')
+    ];
 
     async getPermissionByField(field: string, value: string): Promise<Permission | null> { return null; }
 

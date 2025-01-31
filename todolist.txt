@@ -47,17 +47,17 @@ recréer la méthode modifyUser. elle est pourrie - OK
 
 ça supprime le mdp si la requête n'a pas de mdp. ça ne doit pas le supprimer - OK
 
+faire des logs plus parlant - OK
+
+l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément - OK
+
+créer des logs pour chaque C_UD des utilisateurs - OK
+
+stocker les requêtes SQL dans un fichier séparé (peut être : json) et de faire appel à ce fichier quand on en a besoin. comme ça, les gens n'ont qu'à modifier le fichier - NON OK
+
 ------------------------------------------------------------------------------------------------------------------------------------------
 
-faire des logs plus parlant
-
-l'endpoint getAllUsers ne fonctionne pas correctement. ça get que le premier élément
-
-ne pas oublier de retourner le mdp aussi pour toutes les requêtes get
-
 créer des exceptions si nécessaire
-
-créer des logs pour chaque C_UD des utilisateurs
 
 créer des tokens pour l'autorisation des utilisateurs / gérer les droits
 
@@ -71,8 +71,6 @@ import { UserController } from "@modules/users/controllers/UserController";
 créer la bdd mongodb et vérifier si elle fonctionne correctement
 
 créer la bdd redis et vérifier si elle fonctionne correctement
-
-stocker les requêtes SQL dans un fichier séparé (peut être : json) et de faire appel à ce fichier quand on en a besoin. comme ça, les gens n'ont qu'à modifier le fichier
 
 faire pareil avec des requêtes mongodb
 
@@ -104,3 +102,29 @@ exemple d'utilisateurs :
   "telnumber": "555-5678"
 }
   
+
+
+📌 1️⃣ User (/users)
+POST /users → Créer un utilisateur
+GET /users → Récupérer tous les utilisateurs
+GET /users/:id → Récupérer un utilisateur par ID
+PATCH /users/:id → Mettre à jour un utilisateur
+DELETE /users/:id → Supprimer un utilisateur
+📌 2️⃣ Role (/roles)
+POST /roles → Créer un rôle
+GET /roles → Récupérer tous les rôles
+GET /roles/:id → Récupérer un rôle par ID
+PATCH /roles/:id → Mettre à jour un rôle
+DELETE /roles/:id → Supprimer un rôle
+📌 3️⃣ Permission (/permissions)
+POST /permissions → Créer une permission
+GET /permissions → Récupérer toutes les permissions
+GET /permissions/:id → Récupérer une permission par ID
+PATCH /permissions/:id → Mettre à jour une permission
+DELETE /permissions/:id → Supprimer une permission
+📌 4️⃣ UserRole (/users/:userId/roles)
+POST /users/:userId/roles/:roleId → Attribuer un rôle à un utilisateur
+DELETE /users/:userId/roles/:roleId → Retirer un rôle d’un utilisateur
+📌 5️⃣ RolePermission (/roles/:roleId/permissions)
+POST /roles/:roleId/permissions/:permissionId → Associer une permission à un rôle
+DELETE /roles/:roleId/permissions/:permissionId → Retirer une permission d’un rôle

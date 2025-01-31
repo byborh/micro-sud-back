@@ -1,10 +1,31 @@
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PermissionContract } from "../contracts/IPermission";
 
+@Entity("permissions")
 export class Permission implements PermissionContract {
+    @PrimaryColumn()
     id: string;
+    @Column()
     action: string;
+    @Column()
     resource: string;
+    @Column()
     description: string;
+
+    /*
+    ----------------------------------------------------------------------------------
+        Add liaisons here with other Entities
+        Ex :
+            - @OneToMany
+                entityName: EntityName
+            - @OneToMany
+                entityName: EntityName
+            - @ManyToMany
+                entityName: EntityName
+            - @ManyToMany
+                entityName: EntityName
+    ----------------------------------------------------------------------------------
+    */
 
     constructor(id: string, action: string, resource: string, description: string) {
         this.id = id;

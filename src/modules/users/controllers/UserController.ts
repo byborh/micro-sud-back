@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/UserService";
-import { User } from "../domain/User";
+import { User } from "../entity/User.entity";
 import { UserDTO } from "../dto/UserDTO";
+import { IdGenerator } from "@core/idGenerator";
 
 export class UserController {
     constructor(private readonly userService: UserService) {}
@@ -44,7 +45,8 @@ export class UserController {
                 return;
             }
 
-            const userId: string = await this.userService.generateUserId();
+            const idGenerator = IdGenerator.getInstance();
+            const userId: string = idGenerator.generateId(16);
 
             const user = new User({
                 id: userId,
@@ -82,22 +84,6 @@ export class UserController {
                 res.status(400).json({ error: "User id is required." });
                 return;
             }
-    
-            // const user = new User({
-            //     id: req.params.id,
-            //     email,
-            //     password,
-            //     salt: existingUser.salt, // À gérer correctement
-            //     firstname,
-            //     lastname,
-            //     pseudo,
-            //     telnumber,
-            //     createdAt: existingUser.createdAt,
-            //     updatedAt: new Date(),
-            // });
-            
-    
-            // console.log("User to modify in controller:", user);
     
             const updatedUser = await this.userService.modifyUser(req.params.id, {
                 email, password, firstname, lastname, pseudo, telnumber

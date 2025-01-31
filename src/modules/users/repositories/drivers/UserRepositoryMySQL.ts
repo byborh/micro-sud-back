@@ -1,15 +1,13 @@
-import { User } from "@modules/users/domain/User";
+import { User } from "@modules/users/entity/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
-import { DataSource, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { AppDataSource } from "@db/drivers/AppDataSource";
 
 export class UserRepositoryMySQL implements IUserRepository {
     private repository: Repository<User>;
 
-    constructor() {
-        this.repository = AppDataSource.getRepository(User);
-    }
-    
+    constructor() {this.repository = AppDataSource.getRepository(User);}
+
     async findUserByField(field: string, value: string): Promise<User | null> {
         // Validate field
         const allowedFields = ['id', 'email', 'firstname', 'lastname', 'pseudo', 'telnumber', 'createdAt', 'updatedAt'];

@@ -12,7 +12,7 @@ export const userRoutes = (userController: UserController): express.Router => {
     (req: Request, res: Response, next: NextFunction) => userController.getUserById(req, res, next)
   );
 
-  router.get('/', (req: Request, res: Response, next: NextFunction) => userController.getAllUsers(req, res,  next));
+  router.get('/', (req: Request, res: Response, next: NextFunction) => userController.getAllUsers(req, res, next));
 
   router.post('/',
     validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),

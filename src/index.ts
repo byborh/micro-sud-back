@@ -1,6 +1,7 @@
 // src/index.ts
 import express from 'express';
-import { createUserModule } from './modules/users'; // Le module utilisateur
+import { createUserModule } from './modules/users';
+import { createPermissionModule } from './modules/permissions';
 import { errorHandler } from '@middlewares/errorHandler';
 import { initDatabase } from '@db/drivers/AppDataSource';
 
@@ -12,7 +13,7 @@ app.use(express.json());
 
 // Add the user module
 app.use('/api/v0.0.1/users', createUserModule());
-
+app.use('/api/v0.0.1/permissions', createPermissionModule());
 // Add other modules HERE
 
 

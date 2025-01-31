@@ -1,5 +1,5 @@
 import { IdGenerator } from "@core/idGenerator";
-import {User} from "../domain/User";
+import {User} from "../entity/User.entity";
 import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
@@ -11,16 +11,6 @@ export class UserService {
 
     constructor(userRepository: UserRepositoryMySQL) {
         this.userRepository = userRepository;
-    }
-
-    public async generateUserId(): Promise<string> {
-        // Generate a unique ID
-        const idGenerator = IdGenerator.getInstance();
-        const userId: string = idGenerator.generateId(16);
-    
-        console.log(`Generated ID: ${userId}`);    
-        
-        return userId;
     }
 
     // Get a user by ID
@@ -183,10 +173,6 @@ export class UserService {
                 hasChanges = true;
             }
 
-            
-
-
-
             // Verify if new password is provided
             if(data.password) {
                 // Verify if password is changed
@@ -214,6 +200,9 @@ export class UserService {
             }
 
             console.log("User to modify in service after processing:", existingUser);
+
+            // Log for updating user
+            existingUser.setUpdatedAt(new Date());
 
             // Mise à jour dans la base de données
             const updatedUser: User | null = await this.userRepository.modifyUser(existingUser);

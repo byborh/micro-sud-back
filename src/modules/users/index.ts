@@ -1,4 +1,3 @@
-// src/modules/users/index.ts
 import express from 'express';
 import { UserController } from './controllers/UserController';
 import { UserService } from './services/UserService';

@@ -1,6 +1,6 @@
 // Import des modules
 import { UserDTO } from "../dto/UserDTO";
-import { User } from "../domain/User";
+import { User } from "../entity/User.entity";
 import { UserContract } from "../contracts/IUser";
 import { Repository } from "typeorm";
 import { AppDataSource } from "@db/drivers/AppDataSource";
