@@ -4,7 +4,7 @@ import { UserController } from '../controllers/UserController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
 import { lengthRequirementMiddleware } from '@middlewares/lengthRequirementMiddleware';
 
-export const userRoutes = (userController: UserController): express.Router => {
+export const UserRoutes = (userController: UserController): express.Router => {
   const router = express.Router();
 
   router.get('/:id', 
