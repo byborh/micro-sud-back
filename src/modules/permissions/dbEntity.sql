@@ -1,7 +1,7 @@
 -- Create permissions table
--- A CHANGER
 CREATE TABLE permissions (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    resource VARCHAR(50) NOT NULL,
     description TEXT
 );
