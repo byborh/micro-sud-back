@@ -53,7 +53,7 @@ export class RoleService {
     public async createRole(role: Role): Promise<Role | null> {
         try {
             // Check if the role already exists based on name and resource
-            const existingRole: Role | null = await this.roleRepository.getRoleById(role.getId());
+            const existingRole: Role | null = await this.roleRepository.getRoleByName(role.getName());
             if (existingRole) {
                 console.error("Role already exists:", existingRole);
                 throw new Error("Role already exists.");

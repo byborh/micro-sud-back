@@ -53,7 +53,7 @@ export class PermissionService {
     public async createPermission(permission: Permission): Promise<Permission | null> {
         try {
             // Check if the permission already exists based on action and resource
-            const existingPermission: Permission | null = await this.permissionRepository.getPermissionById(permission.getId());
+            const existingPermission: Permission | null = await this.permissionRepository.getPermissionByMultipleFields(["action", "resource"], [permission.getAction(), permission.getResource()]);
             if (existingPermission) {
                 console.error("Permission already exists:", existingPermission);
                 throw new Error("Permission already exists.");

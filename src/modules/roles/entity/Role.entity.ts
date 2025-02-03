@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { RoleContract } from "../contracts/IRole";
+import { UserRoles } from "@modules/userRoles/entity/UserRoles.entity";
 
 @Entity("roles")
 export class Role implements RoleContract {
@@ -10,20 +11,11 @@ export class Role implements RoleContract {
     @Column()
     description: string;
 
-    /*
-    ----------------------------------------------------------------------------------
-        Add liaisons here with other Entities
-        Ex :
-            - @OneToMany
-                entityName: EntityName
-            - @OneToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-    ----------------------------------------------------------------------------------
-    */
+    @OneToMany(() => UserRoles, userRole => userRole.role) // ADD Cascade
+    userRoles: UserRoles[];
+
+    // @OneToMany(() => RolePermission, rolePermission => rolePermission.role)
+    // rolePermissions: RolePermission[];
 
     constructor(id: string, name: string, description: string) {
         this.id = id;

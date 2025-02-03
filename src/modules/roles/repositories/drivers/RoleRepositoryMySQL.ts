@@ -40,6 +40,11 @@ export class RoleRepositoryMySQL implements IRoleRepository {
         return await this.getRoleByField('id', roleId) || null;
     }
 
+    async getRoleByName(name: string): Promise<Role | null> {
+        if (!name) return null;
+        return await this.getRoleByField('name', name) || null;
+    }
+
     async getRoles(): Promise<Role[]> {
         // Fetch all roles from the database
         const rawResult: Role[] = await this.repository.find();

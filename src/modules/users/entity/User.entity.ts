@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from "typeorm";
 import { UserContract } from '../contracts/IUser';
+import { UserRoles } from "@modules/userRoles/entity/UserRoles.entity";
 
 @Entity("users")
 export class User implements UserContract {
@@ -40,6 +41,10 @@ export class User implements UserContract {
 
     @Column("json", { nullable: true })
     data: JSON | null;
+
+    // à commprendre plus concretement
+    @OneToMany(() => UserRoles, userRole => userRole.user)
+    userRoles: UserRoles[];
 
     /*
     ----------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 -- Create roles table
 CREATE TABLE roles (
-    id SERIAL PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description TEXT
 );

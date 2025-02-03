@@ -40,6 +40,36 @@ export class PermissionRepositoryMySQL implements IPermissionRepository {
         return await this.getPermissionByField('id', permissionId) || null;
     }
 
+    /**
+     * Retrieves a permission from the database based on multiple fields and their corresponding values.
+     * This method is useful when you need to find a permission using a combination of fields (e.g., action and resource, or description).
+     * 
+     * @param fields - An array of field names (e.g., ['CREATE', 'user']) to search by.
+     * @param values - An array of values (e.g., ['DELETE', 'blog']) corresponding to the fields.
+     * 
+     * @returns A Promise that resolves to the found Permission object if a match is found, or null if no permission matches the conditions.
+     * 
+     * @example useage :
+     * const permission = await getPermissionByMultipleFields(['CREATE', 'user'], ['DELETE', 'blog']);
+     * 
+     * @throws This method does not throw errors directly, but the underlying repository might throw errors
+     * if there are issues with the database connection or query execution.
+     */
+    async getPermissionByMultipleFields(fields: string[], values: string[]): Promise<Permission | null> {
+        // Validate fields
+        if (fields.length !== values.length || fields.length === 0 || values.length === 0) return null;
+
+        const conditions: any = {};
+
+        // Build conditions
+        fields.forEach((field, index) => {
+            conditions[field] = values[index];
+        })
+
+        // Find permission
+        return await this.repository.findOne({where: conditions}) || null;
+    }
+
     async getPermissions(): Promise<Permission[]> {
         // Fetch all permissions from the database
         const rawResult: Permission[] = await this.repository.find();
