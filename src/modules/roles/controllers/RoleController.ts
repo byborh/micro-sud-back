@@ -4,51 +4,47 @@ import { Role } from "../entity/Role.entity";
 import { IdGenerator } from "@core/idGenerator";
 
 export class RoleController {
-    private permissionService: RoleService;
+    constructor(private readonly roleService: RoleService) {}
 
-    constructor(permissionService: RoleService) {
-        this.permissionService = permissionService;
-    }
-
-    // Get a permission by ID
+    // Get a role by ID
     public async getRoleById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Retrieve permission by ID using RoleService
-            const permission = await this.permissionService.getRoleById(req.params.id);
+            // Retrieve role by ID using RoleService
+            const role = await this.roleService.getRoleById(req.params.id);
             
-            // If no permission is found, return 404
-            if (!permission) {
+            // If no role is found, return 404
+            if (!role) {
                 res.status(404).json({ error: "Role not found" });
                 return;
             }
 
-            // Return the permission data
-            res.status(200).json(permission);
+            // Return the role data
+            res.status(200).json(role);
         } catch (error) {
             next(error);
         }
     }
 
-    // Get all permissions
+    // Get all roles
     public async getAllRoles(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Retrieve all permissions using RoleService
-            const permissions = await this.permissionService.getRoles();
+            // Retrieve all roles using RoleService
+            const roles = await this.roleService.getRoles();
 
-            // If no permissions are found, return 404
-            if (!permissions || permissions.length === 0) {
-                res.status(404).json({ error: "No permissions found" });
+            // If no roles are found, return 404
+            if (!roles || roles.length === 0) {
+                res.status(404).json({ error: "No roles found" });
                 return;
             }
 
-            // Return all permissions data
-            res.status(200).json(permissions);
+            // Return all roles data
+            res.status(200).json(roles);
         } catch (error) {
             next(error);
         }
     }
 
-    // Create a permission
+    // Create a role
     public async createRole(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { name, description } = req.body;
@@ -60,13 +56,13 @@ export class RoleController {
             }
 
             const idGenerator = IdGenerator.getInstance();
-            const permissionId: string = idGenerator.generateId(16);
+            const roleId: string = idGenerator.generateId(16);
 
-            // Create new permission instance
-            const permission = new Role(permissionId, name, description,);
+            // Create new role instance
+            const role = new Role(roleId, name, description,);
 
-            // Create permission using RoleService
-            const createdRole = await this.permissionService.createRole(permission);
+            // Create role using RoleService
+            const createdRole = await this.roleService.createRole(role);
 
             // If creation fails, return 400
             if (!createdRole) {
@@ -74,26 +70,26 @@ export class RoleController {
                 return;
             }
 
-            // Return the created permission data
+            // Return the created role data
             res.status(201).json(createdRole);
         } catch (error) {
             next(error);
         }
     }
 
-    // Modify a permission
+    // Modify a role
     public async modifyRole(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { name, description } = req.body;
 
-            // Check if permission ID is provided
+            // Check if role ID is provided
             if (!req.params.id) {
                 res.status(400).json({ error: "Role ID is required." });
                 return;
             }
 
-            // Modify permission using RoleService
-            const updatedRole = await this.permissionService.modifyRole(req.params.id, {
+            // Modify role using RoleService
+            const updatedRole = await this.roleService.modifyRole(req.params.id, {
                 name, description
             });
 
@@ -103,18 +99,18 @@ export class RoleController {
                 return;
             }
 
-            // Return the updated permission data
+            // Return the updated role data
             res.status(200).json(updatedRole);
         } catch (error) {
             next(error);
         }
     }
 
-    // Delete a permission
+    // Delete a role
     public async deleteRole(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Delete permission using RoleService
-            const isDeleted = await this.permissionService.deleteRole(req.params.id);
+            // Delete role using RoleService
+            const isDeleted = await this.roleService.deleteRole(req.params.id);
 
             // If deletion fails, return 404
             if (!isDeleted) {

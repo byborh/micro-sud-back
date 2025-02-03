@@ -42,18 +42,18 @@ export class RoleRepositoryMySQL implements IRoleRepository {
 
     async getRoles(): Promise<Role[]> {
         // Fetch all roles from the database
-        const [rawResult]: Role[] = await this.repository.find();
-        const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
-
-        // Verify if rows are an array or a single object
-        const rowsArray = Array.isArray(rows) ? rows : [rows];
-
+        const rawResult: Role[] = await this.repository.find();
+    
+        // Verify if rawResult is an array or a single object
+        const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
+    
         if (rowsArray.length === 0) {
             console.log("No roles found in the database.");
             return [];
         }
-
-        return rowsArray.map(row => row) || [];
+    
+        // Return the array of roles
+        return rowsArray;
     }
 
     async createRole(role: Role): Promise<Role | null> {

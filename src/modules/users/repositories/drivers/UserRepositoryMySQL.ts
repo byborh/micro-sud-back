@@ -48,20 +48,19 @@ export class UserRepositoryMySQL implements IUserRepository {
 
     async getAllUsers(): Promise<User[]> {
         // Fetch all users from the database
-        const [rawResult]: User[] = await this.repository.find();
-        const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
-
-        // Verify if rows are an array or a single object
-        const rowsArray = Array.isArray(rows) ? rows : [rows]; // if single object, insert in an array
-
+        const rawResult: User[] = await this.repository.find();
+    
+        // Verify if rawResult is an array or a single object
+        const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
+    
         if (rowsArray.length === 0) {
             console.log("No users found in the database.");
             return [];
         }
-
-        // Utiliser le UserMapper pour mapper chaque ligne en une entité User
-        return rowsArray.map(row => row) || [];
-    }    
+    
+        // Return the array of users
+        return rowsArray;
+    }  
 
     async createUser(user: User): Promise<User | null> {
         // Insert the user in the database

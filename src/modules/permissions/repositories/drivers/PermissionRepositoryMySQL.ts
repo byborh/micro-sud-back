@@ -27,7 +27,7 @@ export class PermissionRepositoryMySQL implements IPermissionRepository {
         console.log("Permission found:", permission);
 
         // Verify if all required fields are present
-        if (!permission.id || !permission.name) {
+        if (!permission.id || !permission.action || !permission.resource) {
             console.error("Invalid permission data:", permission);
             throw new Error("Permission data is incomplete.");
         }
@@ -42,18 +42,17 @@ export class PermissionRepositoryMySQL implements IPermissionRepository {
 
     async getPermissions(): Promise<Permission[]> {
         // Fetch all permissions from the database
-        const [rawResult]: Permission[] = await this.repository.find();
-        const rows = Array.isArray(rawResult) ? rawResult : [rawResult];
-
-        // Verify if rows are an array or a single object
-        const rowsArray = Array.isArray(rows) ? rows : [rows];
-
+        const rawResult: Permission[] = await this.repository.find();
+    
+        // Verify if rawResult is an array or a single object
+        const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
+    
         if (rowsArray.length === 0) {
             console.log("No permissions found in the database.");
             return [];
         }
-
-        return rowsArray.map(row => row) || [];
+    
+        return rowsArray;
     }
 
     async createPermission(permission: Permission): Promise<Permission | null> {
