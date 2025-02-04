@@ -124,3 +124,49 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+INSERT INTO permissions (id, action, resource, description) VALUES
+('mN3bV7cX2zQ1wE4r', 'READ', 'USERS', 'Lire la liste des utilisateurs'),
+('pL6oK9jI8hG7tF5d', 'CREATE', 'USERS', 'Créer un utilisateur'),
+('aQ5sW8eR1tZ4vC9m', 'UPDATE', 'USERS', 'Mettre à jour un utilisateur'),
+('eW3rT6yU8iK2lO7p', 'DELETE', 'USERS', 'Supprimer un utilisateur'),
+('hK7jG5fD4sA2lK9o', 'READ', 'ROLES', 'Lire les rôles'),
+('rT9yU8iO3pL2qW4e', 'MANAGE', 'ROLES', 'Gérer les rôles'),
+('xZ1cV5bN7mM8kL2j', 'READ', 'PERMISSIONS', 'Lire les permissions'),
+('dS8fG2hJ4kL9oP3q', 'MANAGE', 'PERMISSIONS', 'Gérer les permissions'),
+('nM3bV7cX2zQ1wE4r', 'ACCESS', 'PRIVATE_DATA', 'Accéder aux données privées'),
+('oL6pK9jI8hG7tF5d', 'MANAGE', 'SETTINGS', 'Gérer les paramètres');
+
+
+INSERT INTO roles (id, name, description) VALUES
+('qA5sW8eR1tZ4vC9m', 'ADMIN', 'Accès total à toutes les ressources'),
+('wE3rT6yU8iK2lO7p', 'MANAGER', 'Gère les utilisateurs et les permissions avec certaines restrictions'),
+('kH7jG5fD4sA2lK9o', 'USER', 'Accès limité aux ressources personnelles'),
+('tR9yU8iO3pL2qW4e', 'GUEST', 'Accès uniquement aux endpoints publics');
+
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'ADMIN';
+
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM roles r, permissions p 
+WHERE r.name = 'MANAGER' 
+AND p.action IN ('READ', 'CREATE', 'UPDATE') 
+AND p.resource IN ('USERS', 'ROLES', 'PERMISSIONS');
+
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM roles r, permissions p 
+WHERE r.name = 'USER' 
+AND p.action IN ('READ', 'ACCESS') 
+AND p.resource IN ('USERS', 'PRIVATE_DATA');
+
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM roles r, permissions p 
+WHERE r.name = 'GUEST' 
+AND p.resource = 'USERS' 
+AND p.action = 'READ';
+
+
