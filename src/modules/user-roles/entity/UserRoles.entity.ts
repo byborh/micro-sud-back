@@ -3,21 +3,19 @@ import { UserRolesContract } from "../contracts/IUserRoles";
 import { User } from "@modules/users/entity/User.entity";
 import { Role } from "@modules/roles/entity/Role.entity";
 
-@Entity("userRoles")
+@Entity("user_role")
 export class UserRoles implements UserRolesContract {
-    @PrimaryColumn({type: 'varchar', length: 255})
+    @PrimaryColumn({ type: 'varchar', length: 255 })
     user_id: string;
 
-    @PrimaryColumn({type: 'varchar', length: 255})
+    @PrimaryColumn({ type: 'varchar', length: 255 })
     role_id: string;
 
-    // ADD CASCADE
-    @ManyToMany(() => User, user => user.userRoles)
-    @JoinColumn({name: 'user_id'})
+    @ManyToOne(() => User, user => user.userRoles, { onDelete: 'CASCADE', orphanedRowAction: 'delete' }) 
+    @JoinColumn({ name: 'user_id' })
     user: User;
 
-    // Relation Many-to-One avec Role
-    @ManyToOne(() => Role, role => role.userRoles)
+    @ManyToOne(() => Role, role => role.userRoles, { onDelete: 'CASCADE', orphanedRowAction: 'delete' }) 
     @JoinColumn({ name: 'role_id' })
     role: Role;
 

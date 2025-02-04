@@ -124,7 +124,10 @@ export class UserService {
                 throw new Error("User didn't created...")
             }
 
-            return createdUser;
+            // Entity to DTO
+            const userDTO: UserDTO = UserMapper.toDTO(createdUser);
+
+            return userDTO;
         } catch (error) {
             console.error("Error creating user in UserService:", error);
             throw new Error("Failed to create user.");
@@ -134,25 +137,24 @@ export class UserService {
     // Modify user
     public async modifyUser(userId: string, data: Partial<User>): Promise<UserDTO | null> {
         try {
-            console.log("User to modify in service before processing:", data);
-
-            // Verify if user exists
+            // Vérification de l'existence de l'utilisateur
             const existingUserDTO: UserDTO | null = await this.getUserById(userId);
             if (!existingUserDTO) {
                 throw new Error("User not found.");
             }
-
-            // From DTO to Entity
+    
+            // Mapping du DTO vers l'entité
             const existingUser: User = await UserMapper.toEntity(existingUserDTO);
-
+    
+            // Variable pour suivre les modifications
             let hasChanges: boolean = false;
-
-            // Update datas in entity
-            if(data.email || data.email !== existingUser.getEmail()) {
+    
+            // Comparaison des champs et mise à jour si nécessaire
+            if (data.email && data.email !== existingUser.getEmail()) {
                 existingUser.setEmail(data.email);
                 hasChanges = true;
             }
-
+    
             if (data.firstname && data.firstname !== existingUser.getFirstname()) {
                 existingUser.setFirstname(data.firstname);
                 hasChanges = true;
@@ -167,55 +169,54 @@ export class UserService {
                 existingUser.setPseudo(data.pseudo);
                 hasChanges = true;
             }
-
+    
             if (data.telnumber && data.telnumber !== existingUser.getTelnumber()) {
                 existingUser.setTelnumber(data.telnumber);
                 hasChanges = true;
             }
-
-            // Verify if new password is provided
-            if(data.password) {
-                // Verify if password is changed
+    
+            // Vérification du mot de passe (changer uniquement s'il est modifié)
+            if (data.password) {
                 const passwordManager = PasswordManager.getInstance();
                 const isPasswordValid: boolean = passwordManager.verifyPassword(
                     data.password,
-                    existingUser.getSalt(), // '' - vide
+                    existingUser.getSalt(),
                     existingUser.getPassword()
                 );
-
-                // if password is changed
+    
+                // Si le mot de passe est différent
                 if (!isPasswordValid) {
-                    hasChanges = true;
-                    // Generation of new hash and salt
                     const newSalt = passwordManager.generateSalt();
                     const hashedPassword = passwordManager.hashPassword(data.password, newSalt);
-                    existingUser.setSalt(newSalt); // '' - vide
+                    existingUser.setSalt(newSalt);
                     existingUser.setPassword(hashedPassword);
+                    hasChanges = true;
                 }
             }
-
-            // Si aucun changement, on ne fait rien
+    
+            // Si aucune modification n'est détectée, ne rien faire
             if (!hasChanges) {
                 throw new Error("No changes detected.");
             }
-
-            console.log("User to modify in service after processing:", existingUser);
-
-            // Log for updating user
+    
+            // Mise à jour de la date de modification
             existingUser.setUpdatedAt(new Date());
-
+    
             // Mise à jour dans la base de données
             const updatedUser: User | null = await this.userRepository.modifyUser(existingUser);
-
-            if (!updatedUser) return null;
-
-            // Retourner un DTO sans les données sensibles
+    
+            // Si l'utilisateur n'a pas été mis à jour, retourner null
+            if (!updatedUser) {
+                throw new Error("User not updated.");
+            }
+    
+            // Retourner le DTO de l'utilisateur mis à jour sans données sensibles
             return UserMapper.toDTO(updatedUser);
         } catch (error) {
             console.error("Error modifying user in UserService:", error);
             throw new Error("Failed to modify user.");
         }
-    }
+    }    
 
 
     // Delete user

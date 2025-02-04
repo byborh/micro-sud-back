@@ -9,15 +9,15 @@ export class UserRolesService {
     }
 
     // Get a userRoles by ID
-    public async getUserRolesById(userRolesId: string): Promise<UserRoles | null> {
+    public async getUserRolesById(user_id: string, role_id: string): Promise<UserRoles | null> {
         try {
-            // Verify if userRolesId is provided
-            if (!userRolesId) {
+            // Verify if user_id and role_id is provided
+            if (!user_id ||!role_id) {
                 throw new Error("UserRoles ID is required.");
             }
 
             // Call UserRolesRepository to find a userRoles by ID
-            const userRolesEntity: UserRoles = await this.userRolesRepository.getUserRolesById(userRolesId);
+            const userRolesEntity: UserRoles = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [user_id, role_id]);
 
             // If no userRoles is found, return null
             if (!userRolesEntity) {
@@ -52,8 +52,8 @@ export class UserRolesService {
     // Create userRoles
     public async createUserRoles(userRoles: UserRoles): Promise<UserRoles | null> {
         try {
-            // Check if the userRoles already exists based on action and resource
-            const existingUserRoles: UserRoles | null = await this.userRolesRepository.getUserRolesByMultipleFields(["action", "resource"], [userRoles.getAction(), userRoles.getResource()]);
+            // Check if the userRoles already exists based on user_id and role_id
+            const existingUserRoles: UserRoles | null = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [userRoles.user_id, userRoles.role_id]);
             if (existingUserRoles) {
                 console.error("UserRoles already exists:", existingUserRoles);
                 throw new Error("UserRoles already exists.");

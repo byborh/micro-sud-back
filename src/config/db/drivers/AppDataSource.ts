@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { User } from "@modules/users/entity/User.entity";
 import { Role } from "@modules/roles/entity/Role.entity";
 import { Permission } from "@modules/permissions/entity/Permission.entity";
+import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { RolePermissions } from "@modules/role-permissions/entity/RolePermissions.entity";
 
 dotenv.config();
 
@@ -14,7 +16,7 @@ export const AppDataSource = new DataSource({
     username: process.env.MYSQL_USER || "root",
     password: process.env.MYSQL_PASSWORD || "",
     database: process.env.MYSQL_DATABASE || "datte",
-    entities: [User, Role, Permission], // ADD ALL ENTITIES
+    entities: [User, Role, Permission, UserRoles, RolePermissions], // ADD ALL ENTITIES
     synchronize: process.env.NODE_ENV !== "production", // ATTENTION
     logging: process.env.NODE_ENV === "development", // ATTENTION
 });

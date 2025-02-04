@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 import { AppDataSource } from "@db/drivers/AppDataSource";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
-import { UserRoles } from "@modules/usersRoles/entity/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 
 export class UserRolesRepositoryMySQL implements IUserRolesRepository {
     private repository: Repository<UserRoles>;

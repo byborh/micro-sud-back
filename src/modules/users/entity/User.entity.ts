@@ -1,20 +1,16 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from "typeorm";
 import { UserContract } from '../contracts/IUser';
-import { UserRoles } from "@modules/userRoles/entity/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 
 @Entity("users")
 export class User implements UserContract {
-    @PrimaryColumn()
+    @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
-    // For MongoDB
-    // @ObjectIdColumn()
-    // _id: ObjectId;
-
-    @Column({ nullable: true })
+    @Column({ nullable: true, name: "first_name" })
     firstname?: string | null;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, name: "last_name" })
     lastname?: string | null;
 
     @Column({ nullable: true })
@@ -27,23 +23,22 @@ export class User implements UserContract {
     @Column()
     password: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, name: "tel_number" })
     telnumber?: string | null;
 
     @Column()
     salt: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: "timestamp" })
     updatedAt: Date;
 
     @Column("json", { nullable: true })
     data: JSON | null;
 
-    // à commprendre plus concretement
-    @OneToMany(() => UserRoles, userRole => userRole.user)
+    @OneToMany(() => UserRoles, userRole => userRole.user, { cascade: true })
     userRoles: UserRoles[];
 
     /*

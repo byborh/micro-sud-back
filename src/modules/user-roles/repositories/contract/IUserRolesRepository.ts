@@ -1,4 +1,4 @@
-import { UserRoles } from "@modules/usersRoles/entity/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 
 export interface IUserRolesRepository {
     getUserRolesByMultipleFields(fields: string[], values: string[]): Promise<UserRoles | null>

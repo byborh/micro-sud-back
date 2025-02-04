@@ -10,7 +10,7 @@ export class UserRepositoryMySQL implements IUserRepository {
 
     async findUserByField(field: string, value: string): Promise<User | null> {
         // Validate field
-        const allowedFields = ['id', 'email', 'firstname', 'lastname', 'pseudo', 'telnumber', 'createdAt', 'updatedAt'];
+        const allowedFields = ['id', 'email', 'first_name', 'last_name', 'pseudo', 'tel_number', 'createdAt', 'updatedAt'];
         if(!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
 
         // List of users finded by field

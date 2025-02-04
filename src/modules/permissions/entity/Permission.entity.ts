@@ -1,16 +1,24 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { PermissionContract } from "../contracts/IPermission";
+import { RolePermissions } from "@modules/role-permissions/entity/RolePermissions.entity";
 
 @Entity("permissions")
 export class Permission implements PermissionContract {
     @PrimaryColumn()
     id: string;
+
     @Column()
     action: string;
+
     @Column()
     resource: string;
+
     @Column()
     description: string;
+
+    // Relation One-to-Many avec RolePermission
+    @OneToMany(() => RolePermissions, rolePermission => rolePermission.permission, { cascade: ["remove"] })
+    rolePermissions: RolePermissions[];
 
     /*
     ----------------------------------------------------------------------------------
