@@ -25,9 +25,9 @@ Startups souhaitant lancer rapidement un produit avec des fonctionnalités stand
 
 4.1 Gestion des utilisateurs et rôles
 
-Création, modification et suppression de comptes utilisateurs.
+Création, modification et suppression de comptes utilisateurs. ✅
 
-Système de rôles (admin, manager, acheteur, etc.).
+Système de rôles (admin, manager, acheteur, etc.). ✅
 
 Authentification sécurisée (JWT, OAuth2).
 

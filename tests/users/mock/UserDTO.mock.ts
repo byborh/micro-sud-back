@@ -1,6 +1,6 @@
 import { UserDTO } from "../../../src/modules/users/dto/UserDTO";
 
-export const users: { [key: string]: UserDTO } = {
+export const users: { [key: string]: any } = { // UserDTO
   'user-1': { // User with all fields
     id: 'user-1',
     firstname: 'John',

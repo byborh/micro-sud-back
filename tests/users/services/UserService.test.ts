@@ -4,14 +4,24 @@ import { MySQLDatabase } from "../../../src/config/db/drivers/MySQLDatabase";
 import { getUserDTOMock } from "../mock/UserDTO.mock";
 import { UserDTO } from "../../../src/modules/users/dto/UserDTO";
 import { User } from "../../../src/modules/users/domain/User";
+import { Repository } from "typeorm";
 
 
 describe('UserService', () => {
+    private repository: Repository<User>;
+
     let userService: UserService;
 
     beforeEach(() => {
         userService = new UserService(new UserRepositoryMySQL(new MySQLDatabase));
     });
+
+    /*
+            private repository: Repository<User>;
+
+            constructor() {this.repository = AppDataSource.getRepository(User);}
+    */
+
 
     // beforeAll(async () => {
     //     // Initialisez la connexion à la base de données
