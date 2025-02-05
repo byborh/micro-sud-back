@@ -1,6 +1,7 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { UserContract } from '../contracts/IUser';
 import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
 
 @Entity("users")
 export class User implements UserContract {
@@ -41,6 +42,13 @@ export class User implements UserContract {
     @OneToMany(() => UserRoles, userRole => userRole.user, { cascade: true })
     userRoles: UserRoles[];
 
+    @OneToOne(() => AuthToken, authToken => authToken.user, { 
+        cascade: true, 
+        onDelete: "CASCADE" // Cette option permet de supprimer l'AuthToken quand l'User est supprimé
+    })
+    @JoinColumn({ name: "auth_token_id" })
+    authToken: AuthToken;
+    
     /*
     ----------------------------------------------------------------------------------
         Add liaisons here with other Entities

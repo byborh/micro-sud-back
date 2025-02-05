@@ -7,6 +7,7 @@ import { initDatabase } from '@db/drivers/AppDataSource';
 import { createRoleModule } from '@modules/roles';
 import { createUserRolesModule } from '@modules/user-roles';
 import { createRolePermissionsModule } from '@modules/role-permissions';
+import { createAuthTokenModule } from '@modules/auth-token';
 
 const app = express();
 const port = 3000;
@@ -23,6 +24,7 @@ apiRouter.use('/permissions', createPermissionModule());
 apiRouter.use('/roles', createRoleModule());
 apiRouter.use('/userroles', createUserRolesModule());
 apiRouter.use('/rolepermissions', createRolePermissionsModule());
+apiRouter.use('/auth', createAuthTokenModule());
 // Add other modules HERE
 
 app.use('/api/v0.0.1', apiRouter);
