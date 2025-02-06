@@ -14,10 +14,10 @@ export class UserRolesController {
     public async getUserRolesById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Retrieve userRoles by ID using UserRolesService
-            const userRoles = await this.userRolesService.getUserRolesById(req.params.user_id, req.params.role_id);
+            const userRoles: UserRoles[] = await this.userRolesService.getUserRolesById(req.params.user_id, req.params.role_id);
             
             // If no userRoles is found, return 404
-            if (!userRoles) {
+            if (!userRoles || userRoles.length === 0) {
                 res.status(404).json({ error: "UserRoles not found" });
                 return;
             }
@@ -29,20 +29,20 @@ export class UserRolesController {
         }
     }
 
-    // Get all userRoless
+    // Get all userRole
     public async getAllUserRoles(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Retrieve all userRoless using UserRolesService
-            const userRoless = await this.userRolesService.getUserRoles();
+            // Retrieve all userRole using UserRolesService
+            const userRole = await this.userRolesService.getUserRoles();
 
-            // If no userRoless are found, return 404
-            if (!userRoless || userRoless.length === 0) {
-                res.status(404).json({ error: "No userRoless found" });
+            // If no userRole are found, return 404
+            if (!userRole || userRole.length === 0) {
+                res.status(404).json({ error: "No userRole found" });
                 return;
             }
 
-            // Return all userRoless data
-            res.status(200).json(userRoless);
+            // Return all userRole data
+            res.status(200).json(userRole);
         } catch (error) {
             next(error);
         }

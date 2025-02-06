@@ -18,7 +18,7 @@ export class AuthToken implements AuthTokenContract {
     createdAt: Date;
 
     @Column({ type: "timestamp" })
-    updatedAt: Date;
+    expiresAt: Date;
     
     @OneToOne(() => User, user => user.authToken)
     @JoinColumn({ name: "user_id" })
@@ -39,24 +39,24 @@ export class AuthToken implements AuthTokenContract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(id: string, user_id: string, token: string, createdAt: Date, updatedAt: Date) {
+    constructor(id: string, user_id: string, token: string, createdAt: Date, expiresAt: Date) {
         this.id = id;
         this.user_id = user_id;
         this.token = token;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.expiresAt = expiresAt;
     }
 
     public getId(): string {return this.id;}
     public getUserId(): string {return this.user_id;}
     public getToken(): string {return this.token;}
     public getCreatedAt(): Date {return this.createdAt;}
-    public getUpdatedAt(): Date {return this.updatedAt;}
+    public getExpiresAt(): Date {return this.expiresAt;}
 
     public setId(id: string): void {this.id = id;}
     public setUserId(userId: string): void {this.user_id = userId;}
     public setToken(token: string): void {this.token = token;}
     public setCreatedAt(date: Date): void {this.createdAt = date;}
-    public setUpdatedAt(date: Date): void {this.updatedAt = date;}
+    public setExpiresAt(date: Date): void {this.expiresAt = date;}
 
 }

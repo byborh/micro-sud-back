@@ -3,5 +3,5 @@ export interface AuthTokenContract {
     user_id: string
     token: string,
     createdAt: Date,
-    updatedAt: Date
+    expiresAt: Date
 }

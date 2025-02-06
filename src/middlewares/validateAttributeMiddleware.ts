@@ -9,8 +9,22 @@
 
 import { Request, Response, NextFunction } from 'express';
 
-export const validateAttributeMiddleware = (locationName: 'params' | 'body' | 'query', attributeName: string, errorMessage: string) => {
+export const validateAttributeMiddleware = (
+    locationName: 'params' | 'body' | 'query',
+    attributeName: string,
+    errorMessage: string,
+    checkToken: boolean = false // Verify the token or not
+) => {
     return (req: Request, res: Response, next: NextFunction): void => {
+
+        // Verify the token
+        if (checkToken) {
+            const token = req.headers['authorization'];
+            if (!token) {
+                res.status(401).json({ error: "Unauthorized: No token provided" });
+                return;
+            }
+        }
 
         // Check if location is valid
         if (!['params', 'body', 'query'].includes(locationName)) {

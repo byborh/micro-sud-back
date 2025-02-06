@@ -9,7 +9,7 @@ export class UserRolesService {
     }
 
     // Get a userRoles by ID
-    public async getUserRolesById(user_id: string, role_id: string): Promise<UserRoles | null> {
+    public async getUserRolesById(user_id: string, role_id: string): Promise<UserRoles[] | null> {
         try {
             // Verify if user_id and role_id is provided
             if (!user_id ||!role_id) {
@@ -17,12 +17,10 @@ export class UserRolesService {
             }
 
             // Call UserRolesRepository to find a userRoles by ID
-            const userRolesEntity: UserRoles = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [user_id, role_id]);
+            const userRolesEntity: UserRoles[] = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [user_id, role_id]);
 
             // If no userRoles is found, return null
-            if (!userRolesEntity) {
-                throw new Error("UserRoles not found.");
-            }
+            if (!userRolesEntity || userRolesEntity.length === 0) throw new Error("UserRoles not found.");
 
             // Return the userRoles
             return userRolesEntity;
@@ -53,8 +51,8 @@ export class UserRolesService {
     public async createUserRoles(userRoles: UserRoles): Promise<UserRoles | null> {
         try {
             // Check if the userRoles already exists based on user_id and role_id
-            const existingUserRoles: UserRoles | null = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [userRoles.user_id, userRoles.role_id]);
-            if (existingUserRoles) {
+            const existingUserRoles: UserRoles[] | null = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [userRoles.user_id, userRoles.role_id]);
+            if (existingUserRoles || existingUserRoles.length > 0) {
                 console.error("UserRoles already exists:", existingUserRoles);
                 throw new Error("UserRoles already exists.");
             }

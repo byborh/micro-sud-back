@@ -5,6 +5,9 @@ import { UserMapper } from "../mapper/UserMapper";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
 import _ from "lodash";
+import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
+
 
 export class UserService {
     private userRepository: UserRepositoryMySQL;
@@ -120,9 +123,11 @@ export class UserService {
             const createdUser: User | null = await this.userRepository.createUser(user);
 
             // User didn't created
-            if (!createdUser) {
-                throw new Error("User didn't created...")
-            }
+            if (!createdUser) throw new Error("User didn't created...")
+
+            // Attribute USER role
+            const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance();
+            const authToken: AuthToken | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.getId());
 
             // Entity to DTO
             const userDTO: UserDTO = UserMapper.toDTO(createdUser);
@@ -217,7 +222,6 @@ export class UserService {
             throw new Error("Failed to modify user.");
         }
     }    
-
 
     // Delete user
     public async deleteUser(userId: string): Promise<boolean> {

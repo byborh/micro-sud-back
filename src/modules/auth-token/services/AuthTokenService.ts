@@ -2,18 +2,19 @@ import { UserRepositoryMySQL } from "@modules/users/repositories/drivers/UserRep
 import { AuthToken } from "../entity/AuthToken.entity";
 import { AuthTokenRepositoryMySQL } from "../repositories/drivers/AuthTokenRepositoryMySQL";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
-import fs from "fs";
-import path from "path";
-import jwt from "jsonwebtoken";
-import { IdGenerator } from "@core/idGenerator";
+import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
+import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { CreateToken } from "@core/auth/createToken";
 
 export class AuthTokenService {
     private authTokenRepository: AuthTokenRepositoryMySQL;
     private userRepository: UserRepositoryMySQL;
+    private userRoleRepository: UserRolesRepositoryMySQL;
 
-    constructor(authTokenRepository: AuthTokenRepositoryMySQL, userRepository: UserRepositoryMySQL) {
+    constructor(authTokenRepository: AuthTokenRepositoryMySQL, userRepository: UserRepositoryMySQL, userRoleRepository: UserRolesRepositoryMySQL) {
         this.authTokenRepository = authTokenRepository;
         this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
     }
 
     // Create authToken
@@ -38,39 +39,18 @@ export class AuthTokenService {
         const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(user.getId());
         if (isAuthTokenExists) {throw new Error("User already has an AuthToken.");}
 
-        // Get the private key
-        const privateKeyPath = path.join(__dirname, "../../../../ec_private.pem");
-        const privateKey: string = fs.readFileSync(privateKeyPath, "utf8");
-
-        // Generate an ID for the token
-        const idGenerator = IdGenerator.getInstance();
-        const authTokenId: string = idGenerator.generateId(16);
-
-        // Definition of dates
-        const createdAt: Date = new Date();
-        const expiresAt: Date = new Date(createdAt.getTime() + 3600 * 1000); // Expiration dans 1h
-
         const userId: string = user.getId();
 
-        // Payload of JWT
-        const payload = {
-            sub: userId,        // ID of user
-            jti: authTokenId,  // JWT ID unique
-            iat: Math.floor(createdAt.getTime() / 1000), // Issued At
-            exp: Math.floor(expiresAt.getTime() / 1000), // Expiration
-        };
+        // Get ID of roles
+        const userRoles: UserRoles[] = await this.userRoleRepository.getUserRolesByMultipleFields(["user_id"], [userId]);
+        if (!userRoles || userRoles.length === 0) throw new Error("User does not have a role.");
 
-        // Generation of JWT signed with ES256
-        const token = jwt.sign(payload, privateKey, {
-            algorithm: "ES256",
-        });
-
-        // Stock the token ID in the database
-        const authToken = new AuthToken(authTokenId, userId, token, createdAt, expiresAt);
-
-        await this.authTokenRepository.createAuthToken(authToken);
+        const roleIds: string[] = userRoles.map(userRole => userRole.getRole_id());
     
-        return token;
+        const createToken = CreateToken.getInstance();
+        const authToken = createToken.createToken(userId, roleIds);
+
+        return authToken.getId();
     }
 
     // Récupérer un AuthToken par userId

@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { RoleContract } from "../contracts/IRole";
 import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 import { RolePermissions } from "@modules/role-permissions/entity/RolePermissions.entity";
+import { TRoleName } from "../contracts/TRoleName";
 
 @Entity("roles")
 export class Role implements RoleContract {
@@ -9,7 +10,7 @@ export class Role implements RoleContract {
     id: string;
 
     @Column({ length: 50, unique: true })
-    name: string;
+    name: TRoleName;
 
     @Column({ type: "text", nullable: true })
     description: string | null;
@@ -22,7 +23,7 @@ export class Role implements RoleContract {
     rolePermissions: RolePermissions[];
 
 
-    constructor(id: string, name: string, description: string) {
+    constructor(id: string, name: TRoleName, description: string) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -33,6 +34,6 @@ export class Role implements RoleContract {
     public getDescription(): string { return this.description; }
 
     public setId(id: string): void { this.id = id; }
-    public setName(name: string): void { this.name = name; }
+    public setName(name: TRoleName): void { this.name = name; }
     public setDescription(description: string): void { this.description = description; }
 }
