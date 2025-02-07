@@ -7,6 +7,10 @@ import {PasswordManager} from "@core/cryptography/PasswordManager";
 import _ from "lodash";
 import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
 import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
+import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
+import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
+import { RoleRepositoryMySQL } from "@modules/roles/repositories/drivers/RoleRepositoryMySQL";
+import { CreateToken } from "@core/auth/createToken";
 
 
 export class UserService {
@@ -125,13 +129,21 @@ export class UserService {
             // User didn't created
             if (!createdUser) throw new Error("User didn't created...")
 
+            // Dependencies :
+            const roleRepository = new RoleRepositoryMySQL();
+            const userRolesRepository = new UserRolesRepositoryMySQL();
+            const authTokenRepository = new AuthTokenRepositoryMySQL();
+
+            const createToken = CreateToken.getInstance(authTokenRepository);            
+
             // Attribute USER role
-            const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance();
+            const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance(roleRepository, userRolesRepository, createToken);
             const authToken: AuthToken | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.getId());
+
+            if(!authToken) throw new Error("Attribution of role or token didn't created...");
 
             // Entity to DTO
             const userDTO: UserDTO = UserMapper.toDTO(createdUser);
-
             return userDTO;
         } catch (error) {
             console.error("Error creating user in UserService:", error);

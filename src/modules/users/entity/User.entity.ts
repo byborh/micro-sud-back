@@ -42,13 +42,9 @@ export class User implements UserContract {
     @OneToMany(() => UserRoles, userRole => userRole.user, { cascade: true })
     userRoles: UserRoles[];
 
-    @OneToOne(() => AuthToken, authToken => authToken.user, { 
-        cascade: true, 
-        onDelete: "CASCADE" // Cette option permet de supprimer l'AuthToken quand l'User est supprimé
-    })
-    @JoinColumn({ name: "auth_token_id" })
+    @OneToOne(() => AuthToken, authToken => authToken.user) 
     authToken: AuthToken;
-    
+
     /*
     ----------------------------------------------------------------------------------
         Add liaisons here with other Entities

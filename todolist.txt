@@ -55,13 +55,11 @@ créer des logs pour chaque C_UD des utilisateurs - OK
 
 stocker les requêtes SQL dans un fichier séparé (peut être : json) et de faire appel à ce fichier quand on en a besoin. comme ça, les gens n'ont qu'à modifier le fichier - NON OK
 
+créer des tokens pour l'autorisation des utilisateurs / gérer les droits - OK
+
+utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs - OK
+
 ------------------------------------------------------------------------------------------------------------------------------------------
-
-créer des exceptions si nécessaire
-
-créer des tokens pour l'autorisation des utilisateurs / gérer les droits
-
-utiliser une bibliothèque dédiée comme winston ou pino pour une gestion efficace des logs
 
 Corriger les tests unitaires
 

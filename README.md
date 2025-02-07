@@ -1,143 +1,138 @@
+# 🍃 Datte : La Fondation de Demain
 
-# 🍃 Datte Project
-
-Bienvenue dans **Datte**, une application modulaire et robuste conçue pour offrir des solutions complètes et flexibles pour la gestion des utilisateurs, des rôles, des droits et des ventes. Ce projet est construit avec une architecture claire et modulaire pour assurer une scalabilité et une maintenabilité optimale.
+Bienvenue sur **Datte-MVP**, la première pierre d'une révolution (pas autant quand même, mais oui sinon) dans l'univers des API modulables !  
+Ici, vous découvrez une plateforme back-end générique et extensible, pensée pour s'adapter à une multitude de projets : gestion de contenu, e-commerce, prise de rendez-vous, et bien plus encore. Son objectif est d'arriver à être modulable pour tout type d'API.
+**Attention :** Il s'agit d'un MVP (Minimum Viable Product), une base qui pose les fondations de Datte, mais qui reste en phase d'expérimentation pour l'instant. 🚀
 
 ---
 
-## 📁 Structure du projet
+## 🚀 Pourquoi Choisir Datte-MVP ?
+
+- **Modularité Totale** : Chaque fonctionnalité est (DEVRAIT ETRE) un module indépendant, vous permettant d'ajouter, modifier ou supprimer des composants sans perturber l'ensemble.
+- **Architecture Épurée** : Conçu selon des design patterns éprouvés et en respectant rigoureusement les principes SOLID, pour un code à la fois propre, maintenable et évolutif.
+- **Technologies Modernes** : Fonctionne avec MySQL et TypeORM, garantissant une gestion efficace des données et une intégration fluide dans vos projets.
+- **Vision d'Avenir** : Ce MVP n'est que le début. Il pose la base sur laquelle Datte-Core 1 viendra ajouter des fonctionnalités innovantes.
+
+---
+
+## 🗂️ Structure du Projet
+
+L'organisation du code a été pensée pour être intuitive et évolutive :
 
 ```
 src/
-└── users/
-|    ├── controller/
-|    ├── service/
-|    └── repository/
-|    └── .../      # Autres gestions
-└── tests/
-    ├── controller/
-    |    └── .../
-    └── service/
-        └── .../
+├── modules/          # Modules fonctionnels (utilisateurs, produits, etc.)
+├── config/           # Configurations environnementales et de connexion (BDD, etc.)
+└── repositories/     # Accès aux données via MySQL et TypeORM
+...
+
 ```
 
----
-
-## 🛠️ Modules principaux - MVP (Minimum Viable Product)
-
-### 1️⃣ **Module Utilisateur et Authentification**
-- 🔐 Gestion complète des utilisateurs : inscription, connexion, déconnexion et suppression.
-- 🔑 Authentification robuste : mots de passe sécurisés, jetons JWT, authentification à deux facteurs.
-- 👤 Gestion des profils personnalisables : langues, notifications, préférences.
-- ⚙️ Rôles et permissions intégrés avec le module Rôle/Droit.
-- 🔔 Notifications de sécurité et gestion avancée des mots de passe.
+Chaque dossier a pour but de faciliter l'ajout de nouvelles fonctionnalités tout en maintenant une séparation claire des responsabilités.
 
 ---
 
-## 📐 Design Patterns appliqués pour le MVP
+## 💡 Fonctionnalités Clés du MVP
 
-- **Factory Method** : Création de rôles, utilisateurs et profils.
-- **Strategy** : Calcul des frais de livraison, gestion des réductions.
-- **Decorator** : Enrichissement des résumés de commande et gestion des profils.
-- **Observer** : Suivi des événements de commandes et alertes de sécurité.
-- **Composite** : Gestion hiérarchique des équipes.
-- **Template Method** : Processus standardisés extensibles.
+### 1️⃣ Gestion Utilisateurs & Authentification
+- **Inscription & Connexion Sécurisées** : Authentification par tokens JWT, gestion des sessions et sécurité avancée.
+- **Profils Personnalisables** : Paramétrez les préférences, notifications et langues pour une expérience utilisateur sur-mesure.
+- **Rôles & Permissions Intégrés** : Un module dédié assure une gestion fine et hiérarchisée des accès.
 
----
-
-## ⚙️ Prérequis
-
-- express 4.21
-- ts-node 10.9
-- typescript 5.7
+### 2️⃣ Intégration Technique Performante
+- **Base de Données** : Utilisation native de MySQL avec TypeORM pour une gestion relationnelle robuste.
+- **Design Patterns Appliqués** : Factory, Strategy, Observer, et bien d'autres, pour un code organisé et prêt à évoluer.
+- **Respect des Principes SOLID** : Un engagement total pour un code modulaire, facile à maintenir et à développer.
 
 ---
 
-## 🚀 Lancer le projet
+## 🔮 Prochaines Évolutions : Datte-Core 1
 
-1. **Cloner le dépôt** :
-    ```bash
-    git@gitlab.com:datte-company/datte-node.git
-    cd datte-node
-    ```
+L'aventure ne fait que commencer ! La prochaine version, **Datte-Core 1**, viendra enrichir la plateforme avec des fonctionnalités inédites :
 
-2. **Compiler et exécuter** :
-    ```bash
-    npm install
-    npm run start
-    ```
-
-3. **Accéder à l'application** :
-    - URL par défaut : [http://localhost:3000/api/v1.0.0](http://localhost:3000/api/v1.0.0)
+- **Module IA Innovant** : Des endpoints dédiés permettront bientôt d'interagir avec une intelligence artificielle, ouvrant la voie à des conversations intelligentes et automatisées 🤖.
+- **Support Multi-BDD** : Outre MySQL, vous aurez le choix d'utiliser MongoDB ou Redis dès l'installation, pour une flexibilité maximale selon vos besoins.
+- **Modules Avancés pour l'E-commerce** : Gestion complète des produits, intégrant achats, ventes, gestion des paniers, et bien plus encore, pour transformer votre projet en une solution e-commerce intégrée.
+- **Installation Personnalisée** : Un processus d'installation interactif vous permettra de choisir la base de données qui vous convient, optimisant ainsi l'usage de la plateforme dès le départ.
 
 ---
 
-## 🖥️ Endpoints principaux pour le MVP
+## 🛠️ Prérequis & Installation
 
-| Méthode | Endpoint                                | Description                                           |
-|---------|-----------------------------------------|-------------------------------------------------------|
-| **Utilisateurs**                                                                                          |
-| POST    | `/users/register`                       | Inscrire un nouvel utilisateur                        |
-| POST    | `/users/login`                          | Authentifier un utilisateur (connexion)               |
-| GET     | `/users`                                | Récupérer la liste de tous les utilisateurs           |
-| GET     | `/users/{id}`                           | Récupérer les détails d'un utilisateur spécifique     |
-| POST    | `/users`                                | Créer un nouvel utilisateur                           |
-| PUT     | `/users/{id}`                           | Mettre à jour les informations d'un utilisateur       |
-| DELETE  | `/users/{id}`                           | Supprimer un utilisateur                              |
-|---------|-----------------------------------------|-------------------------------------------------------|
-| **Adresses**                                                                                              |
-| POST    | `/address`                              | Créer une adresse                                     |
-| GET     | `/address/{id}`                         | Récupérer une adresse par ID                          |
-| PUT     | `/address/{id}`                         | Mettre à jour une adresse                             |
-| DELETE  | `/address/{id}`                         | Supprimer une adresse                                 |
-| POST    | `/users/{userId}/address`               | Associer une adresse à un utilisateur                 |
-| POST    | `/companies/{companyId}/address`        | Associer une adresse à une entreprise                 |
-|---------|-----------------------------------------|-------------------------------------------------------|
-| **Rôles et Permissions**                                                                                  |
-| GET     | `/roles`                                | Liste des rôles disponibles                           |
-| POST    | `/roles`                                | Créer un nouveau rôle                                 |
-| POST    | `/users/{userId}/roles/{roleId}`        | Assigner un rôle à un utilisateur                     |
-| DELETE  | `/users/{userId}/roles/{roleId}`        | Retirer un rôle d'un utilisateur                      |
-|---------|-----------------------------------------|-------------------------------------------------------|
-| **Genres**                                                                                                |
-| POST    | `/genders`                              | Ajouter un genre                                      |
-| GET     | `/genders/{id}`                         | Récupérer les détails d'un genre                      |
-| PUT     | `/genders/{id}`                         | Modifier un genre                                     |
-| DELETE  | `/genders/{id}`                         | Supprimer un genre                                    |
-|---------|-----------------------------------------|-------------------------------------------------------|
-| **Postes (Métiers)**                                                                                      |
-| POST    | `/positions`                            | Ajouter un poste (métier)                             |
-| GET     | `/positions`                            | Récupérer la liste des postes                         |
-| GET     | `/positions/{id}`                       | Récupérer les détails d'un poste spécifique           |
-| PUT     | `/positions/{id}`                       | Modifier un poste                                     |
-| DELETE  | `/positions/{id}`                       | Supprimer un poste                                    |
-|---------|-----------------------------------------|-------------------------------------------------------|
-| **Entreprises**                                                                                           |
-| POST    | `/companies`                            | Créer une entreprise                                  |
-| GET     | `/companies`                            | Récupérer la liste des entreprises                    |  
-| GET     | `/companies/{id}`                       | Récupérer les détails d'une entreprise                |
-| PUT     | `/companies/{id}`                       | Modifier une entreprise                               |
-| DELETE  | `/companies/{id}`                       | Supprimer une entreprise                              |
+### Prérequis
+- **Node.js** (version recommandée 14+)
+- **npm** ou **yarn**
+- **MySQL** installé et configuré
 
+### Installation
+
+1. **Clonez le dépôt :**
+   ```bash
+   git clone LIEN-DE-MON-GIT
+   cd datte-node
+   ```
+
+2. **Installez les dépendances :**
+   ```bash
+   npm install
+   ```
+
+3. **Démarrez l'application :**
+   ```bash
+   npm run datte
+   ```
+
+4. **Accédez à l'API :**  
+   Rendez-vous sur [http://localhost:3000/api/v1.0.0](http://localhost:3000/api/v1.0.0) pour explorer les endpoints.
 
 ---
 
-## 👨‍💻 Contributeurs
-- **Kazakh** - Développeur principal
-- **Kazakh** - Architecte logicielle
-- **Kazakh** - Responsable des tests
-- **Kazakh** - La personne qui se prend tout le travail
+## 📊 Aperçu des Endpoints
+
+Pour vous donner une idée, voici quelques endpoints clés disponibles dès maintenant :
+
+- **Utilisateurs :**
+  - Inscription : `/users`
+  - Connexion : `/users/login`
+
+- **Rôles & Permissions :**
+  - Gestion des rôles : `/roles`
+  - Attribution des rôles aux utilisateurs via `/users/{userId}/roles/{roleId}`
+
+*Pour une liste complète des endpoints, veuillez consulter la documentation intégrée dans le code.*
 
 ---
 
-## 📝 License
+## 🔐 Sécurisation par JWT
 
-Ce projet n'est pas sous licence MIT (MAIS BIENTÖT). Donc ne consultez pas le fichier `LICENSE` pour ne pas voir plus d'informations, qui n'existent pas.
+Pour garantir une sécurité optimale, tous nos endpoints sont protégés par des tokens JWT signés avec l'algorithme **ES256**. Voici ce que cela implique :
+
+- 🗝️ **Clé Privée** : Utilisée pour signer et générer les tokens.
+- 🔓 **Clé Publique** : Fournie dans le fichier `ec_public.pem`, elle permet de valider les signatures.
+
+> **Important :** Assurez-vous de générer ces clés à l'aide d'outils cryptographiques fiables pour garantir l'intégrité et la sécurité de l'authentification.
 
 ---
 
-## 🌟 Remerciements
+## 👥 Contributeurs
 
-Un grand merci à tous les contributeurs et testeurs pour leur aide précieuse (donc, qu'à moi pour le moment) 😘 !
+- **Kazakh** - Développeur Principal & Architecte
+- **Kazakh** - Responsable des Tests & Gestion de Projet
+- **Kazakh** - L'esprit créatif derrière Datte
 
 ---
+
+## 📜 License
+
+Ce projet est actuellement en phase de développement et n'est pas encore sous licence MIT. Les modalités d'utilisation seront définies dans une prochaine version.
+
+---
+
+## 🙏 Remerciements
+
+Un grand merci à tous les moi et les moi qui font vivre ce projet. Votre (mon) soutien et vos (mes) retours sont essentiels pour faire évoluer Datte vers de nouveaux horizons ! 💖
+
+---
+
+*Rejoignez l'aventure Datte et participez à la révolution des API modulables – ensemble, construisons le futur (ou pas... qui sait) !*
+```

@@ -9,12 +9,21 @@ export class CreateRoleAndTokenForUser {
     private static instance: CreateRoleAndTokenForUser;
     private roleRepository: RoleRepositoryMySQL;
     private userRolesRepository: UserRolesRepositoryMySQL;
+    private createToken: CreateToken;
 
-    private constructor() {}
+    private constructor(roleRepo: RoleRepositoryMySQL, userRolesRepo: UserRolesRepositoryMySQL, createToken: CreateToken) {
+        this.roleRepository = roleRepo;
+        this.userRolesRepository = userRolesRepo;
+        this.createToken = createToken;
+    }
 
-    public static getInstance(): CreateRoleAndTokenForUser {
+    public static getInstance(
+        roleRepository: RoleRepositoryMySQL,
+        userRolesRepository: UserRolesRepositoryMySQL,
+        createToken: CreateToken
+    ): CreateRoleAndTokenForUser{
         if(!CreateRoleAndTokenForUser.instance) {
-            CreateRoleAndTokenForUser.instance = new CreateRoleAndTokenForUser();
+            CreateRoleAndTokenForUser.instance = new CreateRoleAndTokenForUser(roleRepository, userRolesRepository, createToken);
         }
         return CreateRoleAndTokenForUser.instance;
     }
@@ -31,10 +40,10 @@ export class CreateRoleAndTokenForUser {
 
         // Insérer dans la bdd
         const userRolesEntity: UserRoles = await this.userRolesRepository.createUserRoles(userRoles);
+        if(!userRolesEntity) throw new Error("UserRoles didn't created correctly.")
 
         // Appeler la fonction pour créer un token
-        const createToken = CreateToken.getInstance();
-        const authToken: AuthToken = createToken.createToken(userId, [roleId]);
+        const authToken: AuthToken = await this.createToken.createToken(userId, [roleId]);
 
         return authToken;
     }

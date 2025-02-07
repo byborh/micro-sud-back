@@ -37,7 +37,12 @@ export class AuthTokenService {
 
         // Verify if user has already a token
         const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(user.getId());
-        if (isAuthTokenExists) {throw new Error("User already has an AuthToken.");}
+
+        if(isAuthTokenExists) {
+            const isAuthTokenDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(user.getId());
+
+            if(!isAuthTokenDeleted) throw new Error("Failed to delete existant AuthToken.");
+        }
 
         const userId: string = user.getId();
 
@@ -46,11 +51,26 @@ export class AuthTokenService {
         if (!userRoles || userRoles.length === 0) throw new Error("User does not have a role.");
 
         const roleIds: string[] = userRoles.map(userRole => userRole.getRole_id());
-    
-        const createToken = CreateToken.getInstance();
-        const authToken = createToken.createToken(userId, roleIds);
 
-        return authToken.getId();
+        // Dependencies
+        const authTokenRepository = new AuthTokenRepositoryMySQL();
+    
+        const createToken = CreateToken.getInstance(authTokenRepository);
+        const authToken: AuthToken = await createToken.createToken(userId, roleIds);
+
+        return authToken.getToken();
+    }
+
+    // Logout
+    public async deleteAuthToken(): Promise<boolean> {
+        // Décoder le token
+
+        // Récupérer l'id d'user
+
+        // Appeler la méthode "deleteAuthTokenByUserId"
+
+        // Retourner true ou false
+        return true;
     }
 
     // Récupérer un AuthToken par userId

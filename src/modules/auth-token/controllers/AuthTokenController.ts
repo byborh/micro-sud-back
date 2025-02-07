@@ -30,7 +30,25 @@ export class AuthTokenController {
             next(error);
         }
     }
+
+
+    // Logout
+    public async deleteAuthToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const authTokenId = (req as any).user.tokenId; // Récupéré via le middleware
     
+            const deletedToken = await this.authTokenService.deleteAuthTokenById(authTokenId);
+            if (!deletedToken) {
+                res.status(404).json({ error: "AuthToken not found or could not be deleted." });
+                return;
+            }
+    
+            res.status(200).json({ message: "Logged out successfully." });
+        } catch (error) {
+            next(error);
+        }
+    }
+
 
     // Récupérer l'AuthToken d'un utilisateur via son ID
     public async getAuthTokenByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {

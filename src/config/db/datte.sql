@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mar. 04 fév. 2025 à 14:44
+-- Généré le : ven. 07 fév. 2025 à 17:29
 -- Version du serveur : 11.3.2-MariaDB
 -- Version de PHP : 8.2.18
 
@@ -24,6 +24,31 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `auth_token`
+--
+
+DROP TABLE IF EXISTS `auth_token`;
+CREATE TABLE IF NOT EXISTS `auth_token` (
+  `id` varchar(255) NOT NULL,
+  `user_id` varchar(255) NOT NULL,
+  `token` varchar(512) NOT NULL,
+  `createdAt` timestamp NOT NULL,
+  `expiresAt` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `REL_26b580c89e141c75426f44317b` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `auth_token`
+--
+
+INSERT INTO `auth_token` (`id`, `user_id`, `token`, `createdAt`, `expiresAt`) VALUES
+('AmVLStKR6FLEp9PQ', 'WCN23fnqj1WSA4ti', 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJXQ04yM2ZucWoxV1NBNHRpIiwianRpIjoiQW1WTFN0S1I2RkxFcDlQUSIsImlhdCI6MTczODk0OTI0MywiZXhwIjoxNzM4OTUyODQzLCJyb2xlIjpbIjEyM3NXOGVSMXRaNFVTRVIiXX0.r1s3cgdygniEU_pifO0esk9QilAdsLDvHx8FvFH3WawzTJFRrkp5DvjMtIvilFWM6cgx2BIL19Ao5Z4mLJOGug', '2025-02-07 17:27:23', '2025-02-07 18:27:23'),
+('J80c50WnrZzsM9rm', 'Ttz6HOipLcc89syP', 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUdHo2SE9pcExjYzg5c3lQIiwianRpIjoiSjgwYzUwV25yWnpzTTlybSIsImlhdCI6MTczODk0OTIwMCwiZXhwIjoxNzM4OTUyODAwLCJyb2xlIjpbIjEyM3NXOGVSMXRaNFVTRVIiXX0.dFgFWUDv7ctJXE9P_7jD0YpfuLVhi4hFqd70NSu9a5cNgHeArNO6EQtszLMd4kdpZw4rG6Wsy6WX1C66BURC7A', '2025-02-07 17:26:40', '2025-02-07 18:26:40');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `permissions`
 --
 
@@ -35,6 +60,22 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `permissions`
+--
+
+INSERT INTO `permissions` (`id`, `action`, `resource`, `description`) VALUES
+('aQ5sW8eR1tZ4vC9m', 'UPDATE', 'USERS', 'Mettre à jour un utilisateur'),
+('dS8fG2hJ4kL9oP3q', 'MANAGE', 'PERMISSIONS', 'Gérer les permissions'),
+('eW3rT6yU8iK2lO7p', 'DELETE', 'USERS', 'Supprimer un utilisateur'),
+('hK7jG5fD4sA2lK9o', 'READ', 'ROLES', 'Lire les rôles'),
+('mN3bV7cX2zQ1wE4r', 'READ', 'USERS', 'Lire la liste des utilisateurs'),
+('nM3bV7cX2zQ1wE4r', 'ACCESS', 'PRIVATE_DATA', 'Accéder aux données privées'),
+('oL6pK9jI8hG7tF5d', 'MANAGE', 'SETTINGS', 'Gérer les paramètres'),
+('pL6oK9jI8hG7tF5d', 'CREATE', 'USERS', 'Créer un utilisateur'),
+('rT9yU8iO3pL2qW4e', 'MANAGE', 'ROLES', 'Gérer les rôles'),
+('xZ1cV5bN7mM8kL2j', 'READ', 'PERMISSIONS', 'Lire les permissions');
 
 -- --------------------------------------------------------
 
@@ -51,6 +92,15 @@ CREATE TABLE IF NOT EXISTS `roles` (
   UNIQUE KEY `IDX_648e3f5447f725579d7d4ffdfb` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `description`) VALUES
+('123sW8eR1tZ4USER', 'USER', 'Just a chill user'),
+('qA5sW8eR1tZ4vC9m', 'ADMIN', 'Accès total à toutes les ressources'),
+('wE3rT6yU8iK2lO7p', 'MANAGER', 'Gère les utilisateurs et les permissions avec certaines restrictions');
+
 -- --------------------------------------------------------
 
 --
@@ -64,6 +114,27 @@ CREATE TABLE IF NOT EXISTS `role_permission` (
   PRIMARY KEY (`role_id`,`permission_id`),
   KEY `FK_e3a3ba47b7ca00fd23be4ebd6cf` (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `role_permission`
+--
+
+INSERT INTO `role_permission` (`role_id`, `permission_id`) VALUES
+('qA5sW8eR1tZ4vC9m', 'aQ5sW8eR1tZ4vC9m'),
+('wE3rT6yU8iK2lO7p', 'aQ5sW8eR1tZ4vC9m'),
+('qA5sW8eR1tZ4vC9m', 'dS8fG2hJ4kL9oP3q'),
+('qA5sW8eR1tZ4vC9m', 'eW3rT6yU8iK2lO7p'),
+('qA5sW8eR1tZ4vC9m', 'hK7jG5fD4sA2lK9o'),
+('wE3rT6yU8iK2lO7p', 'hK7jG5fD4sA2lK9o'),
+('qA5sW8eR1tZ4vC9m', 'mN3bV7cX2zQ1wE4r'),
+('wE3rT6yU8iK2lO7p', 'mN3bV7cX2zQ1wE4r'),
+('qA5sW8eR1tZ4vC9m', 'nM3bV7cX2zQ1wE4r'),
+('qA5sW8eR1tZ4vC9m', 'oL6pK9jI8hG7tF5d'),
+('qA5sW8eR1tZ4vC9m', 'pL6oK9jI8hG7tF5d'),
+('wE3rT6yU8iK2lO7p', 'pL6oK9jI8hG7tF5d'),
+('qA5sW8eR1tZ4vC9m', 'rT9yU8iO3pL2qW4e'),
+('qA5sW8eR1tZ4vC9m', 'xZ1cV5bN7mM8kL2j'),
+('wE3rT6yU8iK2lO7p', 'xZ1cV5bN7mM8kL2j');
 
 -- --------------------------------------------------------
 
@@ -88,6 +159,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `users`
+--
+
+INSERT INTO `users` (`id`, `first_name`, `last_name`, `pseudo`, `email`, `password`, `salt`, `createdAt`, `updatedAt`, `tel_number`, `data`) VALUES
+('Ttz6HOipLcc89syP', NULL, NULL, NULL, 'emilia@clarke.com', 'de3cd3d7e14dd319c87fcbde3b31552152f25e5d796e54fbe2e14014a1e9ed70b2d29c7686c2958fc874744130344c3904eb18f483068e9512c4579b541388ce', 'TlawJCrqqMKWls30', '2025-02-07 17:26:40.458590', '2025-02-07 17:26:40.458590', NULL, NULL),
+('WCN23fnqj1WSA4ti', NULL, NULL, NULL, 'admin@dmin.com', 'a589b0f038c04b8927f45a672b98d147437b52578c717d4217d23199c8c81e57855b5a703aabbf63d47847a710617b17363ecbcfa86fa82bc301ea23ca7d4c6a', 'LXnP9xPT0l7cCsEi', '2025-02-07 17:27:23.025238', '2025-02-07 17:27:23.025238', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -102,23 +181,25 @@ CREATE TABLE IF NOT EXISTS `user_role` (
   KEY `FK_32a6fc2fcb019d8e3a8ace0f55f` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `user_role`
+--
 
-DROP TABLE IF EXISTS `auth_token`;
-CREATE TABLE IF NOT EXISTS `auth_token` (
-  `id` varchar(255) NOT NULL,
-  `user_id` varchar(255) NOT NULL,
-  `token` varchar(512) NOT NULL,
-  `createdAt` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
-  `updatedAt` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
-  PRIMARY KEY (`id`),
-  KEY `FK_auth_token_user` (`user_id`),
-  CONSTRAINT `FK_auth_token_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
+INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
+('Ttz6HOipLcc89syP', '123sW8eR1tZ4USER'),
+('WCN23fnqj1WSA4ti', '123sW8eR1tZ4USER'),
+('WCN23fnqj1WSA4ti', 'qA5sW8eR1tZ4vC9m'),
+('WCN23fnqj1WSA4ti', 'wE3rT6yU8iK2lO7p');
 
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `auth_token`
+--
+ALTER TABLE `auth_token`
+  ADD CONSTRAINT `FK_26b580c89e141c75426f44317bc` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `role_permission`
@@ -138,49 +219,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-INSERT INTO permissions (id, action, resource, description) VALUES
-('mN3bV7cX2zQ1wE4r', 'READ', 'USERS', 'Lire la liste des utilisateurs'),
-('pL6oK9jI8hG7tF5d', 'CREATE', 'USERS', 'Créer un utilisateur'),
-('aQ5sW8eR1tZ4vC9m', 'UPDATE', 'USERS', 'Mettre à jour un utilisateur'),
-('eW3rT6yU8iK2lO7p', 'DELETE', 'USERS', 'Supprimer un utilisateur'),
-('hK7jG5fD4sA2lK9o', 'READ', 'ROLES', 'Lire les rôles'),
-('rT9yU8iO3pL2qW4e', 'MANAGE', 'ROLES', 'Gérer les rôles'),
-('xZ1cV5bN7mM8kL2j', 'READ', 'PERMISSIONS', 'Lire les permissions'),
-('dS8fG2hJ4kL9oP3q', 'MANAGE', 'PERMISSIONS', 'Gérer les permissions'),
-('nM3bV7cX2zQ1wE4r', 'ACCESS', 'PRIVATE_DATA', 'Accéder aux données privées'),
-('oL6pK9jI8hG7tF5d', 'MANAGE', 'SETTINGS', 'Gérer les paramètres');
-
-
-INSERT INTO roles (id, name, description) VALUES
-('qA5sW8eR1tZ4vC9m', 'ADMIN', 'Accès total à toutes les ressources'),
-('wE3rT6yU8iK2lO7p', 'MANAGER', 'Gère les utilisateurs et les permissions avec certaines restrictions'),
-('kH7jG5fD4sA2lK9o', 'USER', 'Accès limité aux ressources personnelles'),
-('tR9yU8iO3pL2qW4e', 'GUEST', 'Accès uniquement aux endpoints publics');
-
-
-INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'ADMIN';
-
-
-INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM roles r, permissions p 
-WHERE r.name = 'MANAGER' 
-AND p.action IN ('READ', 'CREATE', 'UPDATE') 
-AND p.resource IN ('USERS', 'ROLES', 'PERMISSIONS');
-
-
-INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM roles r, permissions p 
-WHERE r.name = 'USER' 
-AND p.action IN ('READ', 'ACCESS') 
-AND p.resource IN ('USERS', 'PRIVATE_DATA');
-
-
-INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM roles r, permissions p 
-WHERE r.name = 'GUEST' 
-AND p.resource = 'USERS' 
-AND p.action = 'READ';
-
-

@@ -19,8 +19,8 @@ export class AuthToken implements AuthTokenContract {
 
     @Column({ type: "timestamp" })
     expiresAt: Date;
-    
-    @OneToOne(() => User, user => user.authToken)
+
+    @OneToOne(() => User, user => user.authToken, {onDelete: "CASCADE"})
     @JoinColumn({ name: "user_id" })
     user: User;
 

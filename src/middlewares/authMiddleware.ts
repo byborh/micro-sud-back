@@ -59,14 +59,21 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
                 return;
             }
 
-            const userRoles = user.userRoles.map((userRole) => userRole.role.name);
+            const userRoles: string[] = user.userRoles.map((userRole) => userRole.role.name);
 
             if (requiredRoles.length > 0 && !requiredRoles.some((role) => userRoles.includes(role))) {
                 res.status(403).json({ message: "Access denied. Insufficient permissions." });
                 return;
             }
 
-            (req as any).user = user;
+            // Attach user data to the request
+            (req as any).user = {
+                id: user.id,
+                roles: userRoles,
+                tokenId: decoded.jti,
+            };
+
+
             next();
         } catch (error) {
             next(error);

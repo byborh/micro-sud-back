@@ -6,14 +6,22 @@ import { authMiddleware } from "@middlewares/authMiddleware";
 export const AuthTokenRoutes = (authTokenController: AuthTokenController): express.Router => {
     const router = express.Router();
 
+    // Connexion
     router.post(
         "/login",
         validateAttributeMiddleware("body", "email", "Email missing or invalid in request body."),
         validateAttributeMiddleware("body", "password", "Password missing or invalid in request body."),
         (req: Request, res: Response, next: NextFunction) => authTokenController.createAuthToken(req, res, next)
     );
+
+    // Deconnexion
+    router.post(
+        "/logout",
+        authMiddleware(["ADMIN", "MANAGER", "USER"]),
+        (req: Request, res: Response, next: NextFunction) => authTokenController.deleteAuthToken(req, res, next)
+    );    
     
-    // Obtenir le token par userId
+    // Get token by user id
     router.get(
         "/tokens/user/:userId",
         authMiddleware(["ADMIN", "MANAGER"]),
@@ -21,7 +29,7 @@ export const AuthTokenRoutes = (authTokenController: AuthTokenController): expre
         (req: Request, res: Response, next: NextFunction) => authTokenController.getAuthTokenByUserId(req, res, next)
     );
     
-    // Supprimer le token par userId
+    // Delete token by user id
     router.delete(
         "/tokens/user/:userId",
         authMiddleware(["ADMIN", "MANAGER"]),
@@ -29,18 +37,18 @@ export const AuthTokenRoutes = (authTokenController: AuthTokenController): expre
         (req: Request, res: Response, next: NextFunction) => authTokenController.deleteAuthTokenByUserId(req, res, next)
     );
     
-    // Récupérer tous les tokens
+    // Get all tokens
     router.get(
         "/tokens",
         authMiddleware(["ADMIN"]),
         (req: Request, res: Response, next: NextFunction) => authTokenController.getAllAuthTokens(req, res, next)
     );
     
-    // Supprimer un token par son ID
+    // Delete token by id
     router.delete(
         "/tokens/:authTokenId",
         authMiddleware(["ADMIN"]),
-        validateAttributeMiddleware("params", "authTokenId", "authTokenId missing or invalid in request params."),
+        validateAttributeMiddleware("params", "authTokenId", "AuthTokenId missing or invalid in request params."),
         (req: Request, res: Response, next: NextFunction) => authTokenController.deleteAuthTokenById(req, res, next)
     );
     

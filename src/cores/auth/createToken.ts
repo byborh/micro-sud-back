@@ -7,18 +7,20 @@ import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drive
 
 export class CreateToken{
     private static instance: CreateToken;
-    private authTokenRepository = AuthTokenRepositoryMySQL;
+    private authTokenRepository: AuthTokenRepositoryMySQL;
 
-    constructor(authTokenRepository: AuthTokenRepositoryMySQL) {this.authTokenRepository = authTokenRepository;}
+    constructor(authTokenRepository: AuthTokenRepositoryMySQL) {
+        this.authTokenRepository = authTokenRepository;
+    }
 
-    public static getInstance(): CreateToken {
+    public static getInstance(authTokenRepository: AuthTokenRepositoryMySQL): CreateToken {
         if(!CreateToken.instance) {
-            CreateToken.instance = new CreateToken();
+            CreateToken.instance = new CreateToken(authTokenRepository);
         }
         return CreateToken.instance;
     }
 
-    public createToken(userId: string, roleIds: string[]): AuthToken | null {
+    public async createToken(userId: string, roleIds: string[]): Promise<AuthToken | null> {
         // Get the private key
         const privateKeyPath = path.join(__dirname, "../../../ec_private.pem");
         const privateKey: string = fs.readFileSync(privateKeyPath, "utf8");
@@ -49,7 +51,8 @@ export class CreateToken{
         // Stock the token ID in the database
         const authToken: AuthToken = new AuthToken(authTokenId, userId, token, createdAt, expiresAt);
 
-        const t = await this.authTokenRepository.createAuthToken(authToken);
+        const tokenCreated: AuthToken = await this.authTokenRepository.createAuthToken(authToken);
+        if(!tokenCreated) throw new Error("Failed to create token.");
 
         return authToken || null;
     }
