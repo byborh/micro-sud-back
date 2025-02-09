@@ -2,6 +2,7 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Inde
 import { UserContract } from '../contracts/IUser';
 import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
 
 @Entity("users")
 export class User implements UserContract {
@@ -44,6 +45,9 @@ export class User implements UserContract {
 
     @OneToOne(() => AuthToken, authToken => authToken.user) 
     authToken: AuthToken;
+
+    @OneToMany(() => ChatAI, chatAI => chatAI.user, { cascade: true })
+    chatAI: ChatAI[]
 
     /*
     ----------------------------------------------------------------------------------
