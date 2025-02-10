@@ -12,7 +12,7 @@ export class ChatAIService {
     constructor(chatAIRepository: ChatAIRepositoryMySQL) {this.chatAIRepository = chatAIRepository;}
 
     // Crée une requête à l'IA et stocke la réponse
-    public async submitPrompt(prompt: string): Promise<string> {
+    public async submitPrompt(userId: string, prompt: string): Promise<string> {
         try {
             const payload = {
                 prompt: prompt,
@@ -28,7 +28,7 @@ export class ChatAIService {
             const idGenerator = IdGenerator.getInstance();
             const chatAIId: string = idGenerator.generateId(16);
 
-            const chatAI = new ChatAI(chatAIId, "", prompt, combinedResponse, new Date());
+            const chatAI = new ChatAI(chatAIId, userId, prompt, combinedResponse, new Date());
 
             await this.chatAIRepository.submitPrompt(chatAI);
 

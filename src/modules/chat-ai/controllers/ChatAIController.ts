@@ -11,6 +11,9 @@ export class ChatAIController {
     public async submitPrompt(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { requestContent } = req.body;
+
+            // Get user id
+            const userId: string = (req as any).user.id;
     
             if (!requestContent || requestContent.trim() === "") {
                 res.status(400).json({ error: "Request content is required." });
@@ -18,7 +21,7 @@ export class ChatAIController {
             }
     
             // Create chatAI
-            const chat = await this.chatAIService.submitPrompt(requestContent);
+            const chat = await this.chatAIService.submitPrompt(userId, requestContent);
     
             if (!chat) {
                 res.status(400).json({ error: "Request could not be processed to the Chat AI." });
@@ -48,7 +51,7 @@ export class ChatAIController {
 
     public async getChatAIById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { chatAIId } = req.params;
+            const chatAIId = req.params.id;
             if(!chatAIId || chatAIId.trim() === "") {
                 res.status(400).json({ error: "Chat AI ID is required." });
                 return;
@@ -89,7 +92,7 @@ export class ChatAIController {
 
     public async deleteChatAIById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { chatAIId } = req.params;
+            const chatAIId = req.params.id;
             if(!chatAIId || chatAIId.trim() === "") {
                 res.status(400).json({ error: "Chat AI ID is required." });
                 return;

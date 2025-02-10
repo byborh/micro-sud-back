@@ -114,15 +114,6 @@ GET /roles → Récupérer tous les rôles
 GET /roles/:id → Récupérer un rôle par ID
 PATCH /roles/:id → Mettre à jour un rôle
 DELETE /roles/:id → Supprimer un rôle
-📌 3️⃣ Permission (/permissions)
-POST /permissions → Créer une permission
-GET /permissions → Récupérer toutes les permissions
-GET /permissions/:id → Récupérer une permission par ID
-PATCH /permissions/:id → Mettre à jour une permission
-DELETE /permissions/:id → Supprimer une permission
-📌 4️⃣ UserRole (/users/:userId/roles)
+📌 3️⃣ UserRole (/users/:userId/roles)
 POST /users/:userId/roles/:roleId → Attribuer un rôle à un utilisateur
 DELETE /users/:userId/roles/:roleId → Retirer un rôle d’un utilisateur
-📌 5️⃣ RolePermission (/roles/:roleId/permissions)
-POST /roles/:roleId/permissions/:permissionId → Associer une permission à un rôle
-DELETE /roles/:roleId/permissions/:permissionId → Retirer une permission d’un rôle

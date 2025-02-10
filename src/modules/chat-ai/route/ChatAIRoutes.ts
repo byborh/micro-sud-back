@@ -8,14 +8,14 @@ export const ChatAIRoutes = (chatAIController: ChatAIController): express.Router
 
     // Connexion
     router.post(
-        "/chatai",
+        "/",
         authMiddleware(['ADMIN', 'MANAGER', 'USER']),
         validateAttributeMiddleware("body", "requestContent", "RequestContent missing or invalid in request body."),
         (req: Request, res: Response, next: NextFunction) => chatAIController.submitPrompt(req, res, next)
     );
 
     router.get(
-        "/chatai",
+        "/",
         authMiddleware(['ADMIN']),
         (req: Request, res: Response, next: NextFunction) => chatAIController.getAllChatAIs(req, res, next)
     );

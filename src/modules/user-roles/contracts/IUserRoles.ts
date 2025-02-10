@@ -1,7 +1,7 @@
 import { Role } from "@modules/roles/entity/Role.entity";
 import { User } from "@modules/users/entity/User.entity";
 
-// Interface of the permission
+// Interface of the user roles
 export interface UserRolesContract {
   user_id: string;
   role_id: string;

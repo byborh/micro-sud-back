@@ -1,12 +1,10 @@
 // src/index.ts
 import express from 'express';
 import { createUserModule } from './modules/users';
-import { createPermissionModule } from './modules/permissions';
 import { errorHandler } from '@middlewares/errorHandler';
 import { initDatabase } from '@db/drivers/AppDataSource';
 import { createRoleModule } from '@modules/roles';
 import { createUserRolesModule } from '@modules/user-roles';
-import { createRolePermissionsModule } from '@modules/role-permissions';
 import { createAuthTokenModule } from '@modules/auth-token';
 import { createChatAIModule } from '@modules/chat-ai';
 
@@ -21,10 +19,8 @@ const apiRouter = express.Router();
 
 // Add module's here
 apiRouter.use('/users', createUserModule());
-apiRouter.use('/permissions', createPermissionModule());
 apiRouter.use('/roles', createRoleModule());
 apiRouter.use('/userroles', createUserRolesModule());
-apiRouter.use('/rolepermissions', createRolePermissionsModule());
 apiRouter.use('/auth', createAuthTokenModule());
 apiRouter.use('/chatai', createChatAIModule());
 // Add other modules HERE

@@ -46,36 +46,6 @@ INSERT INTO `auth_token` (`id`, `user_id`, `token`, `createdAt`, `expiresAt`) VA
 ('AmVLStKR6FLEp9PQ', 'WCN23fnqj1WSA4ti', 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJXQ04yM2ZucWoxV1NBNHRpIiwianRpIjoiQW1WTFN0S1I2RkxFcDlQUSIsImlhdCI6MTczODk0OTI0MywiZXhwIjoxNzM4OTUyODQzLCJyb2xlIjpbIjEyM3NXOGVSMXRaNFVTRVIiXX0.r1s3cgdygniEU_pifO0esk9QilAdsLDvHx8FvFH3WawzTJFRrkp5DvjMtIvilFWM6cgx2BIL19Ao5Z4mLJOGug', '2025-02-07 17:27:23', '2025-02-07 18:27:23'),
 ('J80c50WnrZzsM9rm', 'Ttz6HOipLcc89syP', 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUdHo2SE9pcExjYzg5c3lQIiwianRpIjoiSjgwYzUwV25yWnpzTTlybSIsImlhdCI6MTczODk0OTIwMCwiZXhwIjoxNzM4OTUyODAwLCJyb2xlIjpbIjEyM3NXOGVSMXRaNFVTRVIiXX0.dFgFWUDv7ctJXE9P_7jD0YpfuLVhi4hFqd70NSu9a5cNgHeArNO6EQtszLMd4kdpZw4rG6Wsy6WX1C66BURC7A', '2025-02-07 17:26:40', '2025-02-07 18:26:40');
 
--- --------------------------------------------------------
-
---
--- Structure de la table `permissions`
---
-
-DROP TABLE IF EXISTS `permissions`;
-CREATE TABLE IF NOT EXISTS `permissions` (
-  `id` varchar(255) NOT NULL,
-  `action` varchar(255) NOT NULL,
-  `resource` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `permissions`
---
-
-INSERT INTO `permissions` (`id`, `action`, `resource`, `description`) VALUES
-('aQ5sW8eR1tZ4vC9m', 'UPDATE', 'USERS', 'Mettre à jour un utilisateur'),
-('dS8fG2hJ4kL9oP3q', 'MANAGE', 'PERMISSIONS', 'Gérer les permissions'),
-('eW3rT6yU8iK2lO7p', 'DELETE', 'USERS', 'Supprimer un utilisateur'),
-('hK7jG5fD4sA2lK9o', 'READ', 'ROLES', 'Lire les rôles'),
-('mN3bV7cX2zQ1wE4r', 'READ', 'USERS', 'Lire la liste des utilisateurs'),
-('nM3bV7cX2zQ1wE4r', 'ACCESS', 'PRIVATE_DATA', 'Accéder aux données privées'),
-('oL6pK9jI8hG7tF5d', 'MANAGE', 'SETTINGS', 'Gérer les paramètres'),
-('pL6oK9jI8hG7tF5d', 'CREATE', 'USERS', 'Créer un utilisateur'),
-('rT9yU8iO3pL2qW4e', 'MANAGE', 'ROLES', 'Gérer les rôles'),
-('xZ1cV5bN7mM8kL2j', 'READ', 'PERMISSIONS', 'Lire les permissions');
 
 -- --------------------------------------------------------
 
@@ -101,40 +71,6 @@ INSERT INTO `roles` (`id`, `name`, `description`) VALUES
 ('qA5sW8eR1tZ4vC9m', 'ADMIN', 'Accès total à toutes les ressources'),
 ('wE3rT6yU8iK2lO7p', 'MANAGER', 'Gère les utilisateurs et les permissions avec certaines restrictions');
 
--- --------------------------------------------------------
-
---
--- Structure de la table `role_permission`
---
-
-DROP TABLE IF EXISTS `role_permission`;
-CREATE TABLE IF NOT EXISTS `role_permission` (
-  `role_id` varchar(255) NOT NULL,
-  `permission_id` varchar(255) NOT NULL,
-  PRIMARY KEY (`role_id`,`permission_id`),
-  KEY `FK_e3a3ba47b7ca00fd23be4ebd6cf` (`permission_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `role_permission`
---
-
-INSERT INTO `role_permission` (`role_id`, `permission_id`) VALUES
-('qA5sW8eR1tZ4vC9m', 'aQ5sW8eR1tZ4vC9m'),
-('wE3rT6yU8iK2lO7p', 'aQ5sW8eR1tZ4vC9m'),
-('qA5sW8eR1tZ4vC9m', 'dS8fG2hJ4kL9oP3q'),
-('qA5sW8eR1tZ4vC9m', 'eW3rT6yU8iK2lO7p'),
-('qA5sW8eR1tZ4vC9m', 'hK7jG5fD4sA2lK9o'),
-('wE3rT6yU8iK2lO7p', 'hK7jG5fD4sA2lK9o'),
-('qA5sW8eR1tZ4vC9m', 'mN3bV7cX2zQ1wE4r'),
-('wE3rT6yU8iK2lO7p', 'mN3bV7cX2zQ1wE4r'),
-('qA5sW8eR1tZ4vC9m', 'nM3bV7cX2zQ1wE4r'),
-('qA5sW8eR1tZ4vC9m', 'oL6pK9jI8hG7tF5d'),
-('qA5sW8eR1tZ4vC9m', 'pL6oK9jI8hG7tF5d'),
-('wE3rT6yU8iK2lO7p', 'pL6oK9jI8hG7tF5d'),
-('qA5sW8eR1tZ4vC9m', 'rT9yU8iO3pL2qW4e'),
-('qA5sW8eR1tZ4vC9m', 'xZ1cV5bN7mM8kL2j'),
-('wE3rT6yU8iK2lO7p', 'xZ1cV5bN7mM8kL2j');
 
 -- --------------------------------------------------------
 
@@ -202,13 +138,6 @@ ALTER TABLE `auth_token`
   ADD CONSTRAINT `FK_26b580c89e141c75426f44317bc` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
--- Contraintes pour la table `role_permission`
---
-ALTER TABLE `role_permission`
-  ADD CONSTRAINT `FK_3d0a7155eafd75ddba5a7013368` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_e3a3ba47b7ca00fd23be4ebd6cf` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
-
---
 -- Contraintes pour la table `user_role`
 --
 ALTER TABLE `user_role`
@@ -223,11 +152,12 @@ COMMIT;
 
 
 DROP TABLE IF EXISTS `chat_ai`;
+
 CREATE TABLE IF NOT EXISTS `chat_ai` (
   `id` varchar(255) NOT NULL,
   `user_id` varchar(255) NOT NULL,
   `requestContent` varchar(1024) NOT NULL,
-  `responseContent` timestamp(6) NOT NULL,
+  `responseContent` varchar(1024) NOT NULL,
   `createdAt` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_user_chatAI` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE

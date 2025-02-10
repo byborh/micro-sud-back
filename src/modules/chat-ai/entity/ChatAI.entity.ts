@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { ChatAIContract } from "../contracts/IChatAI";
 import { User } from "@modules/users/entity/User.entity";
 
@@ -14,13 +14,13 @@ export class ChatAI implements ChatAIContract {
     @Column({ type: "varchar", length: 1024 })
     requestContent: string;
 
-    @Column({ type: "timestamp" })
+    @Column({ type: "varchar", length: 8192})
     responseContent: string;
 
     @Column({ type: "timestamp" })
     createdAt: Date;
 
-    @OneToOne(() => User, user => user.chatAI, { onDelete: 'CASCADE', orphanedRowAction: 'delete' })
+    @ManyToOne(() => User, user => user.chatAI, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "user_id" })
     user: User;
 
