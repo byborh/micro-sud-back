@@ -7,6 +7,7 @@ import { Permission } from "@modules/permissions/entity/Permission.entity";
 import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 import { RolePermissions } from "@modules/role-permissions/entity/RolePermissions.entity";
 import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ export const AppDataSource = new DataSource({
     username: process.env.MYSQL_USER || "root",
     password: process.env.MYSQL_PASSWORD || "",
     database: process.env.MYSQL_DATABASE || "datte",
-    entities: [User, Role, Permission, UserRoles, RolePermissions, AuthToken], // ADD ALL ENTITIES
+    entities: [User, Role, Permission, UserRoles, RolePermissions, AuthToken, ChatAI], // ADD ALL ENTITIES
     synchronize: process.env.NODE_ENV !== "production", // ATTENTION
     logging: process.env.NODE_ENV === "development", // ATTENTION
 });

@@ -4,5 +4,4 @@ export interface ChatAIContract {
     requestContent: string,
     responseContent: string,
     createdAt: Date,
-    lastInteractionAt: Date
 }

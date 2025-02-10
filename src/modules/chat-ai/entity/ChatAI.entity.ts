@@ -3,7 +3,7 @@ import { ChatAIContract } from "../contracts/IChatAI";
 import { User } from "@modules/users/entity/User.entity";
 
 
-@Entity("auth_token")
+@Entity("chat_ai")
 export class ChatAI implements ChatAIContract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
@@ -19,9 +19,6 @@ export class ChatAI implements ChatAIContract {
 
     @Column({ type: "timestamp" })
     createdAt: Date;
-
-    @Column({ type: "timestamp" })
-    lastInteractionAt: Date;
 
     @OneToOne(() => User, user => user.chatAI, { onDelete: 'CASCADE', orphanedRowAction: 'delete' })
     @JoinColumn({ name: "user_id" })
@@ -42,13 +39,12 @@ export class ChatAI implements ChatAIContract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(id: string, user_id: string, requestContent: string, responseContent: string, createdAt: Date, lastInteractionAt: Date) {
+    constructor(id: string, user_id: string, requestContent: string, responseContent: string, createdAt: Date) {
         this.id = id;
         this.user_id = user_id;
         this.requestContent = requestContent;
         this.responseContent = responseContent;
         this.createdAt = createdAt;
-        this.lastInteractionAt = lastInteractionAt;
     }
 
     public getId(): string {return this.id;}
@@ -56,7 +52,6 @@ export class ChatAI implements ChatAIContract {
     public getRequestContent(): string {return this.requestContent;}
     public getResponseContent(): string {return this.responseContent;}
     public getCreatedAt(): Date {return this.createdAt;}
-    public getLastInteractionAt(): Date {return this.lastInteractionAt;}
 
 
     public setId(id: string): void {this.id = id;}
@@ -64,5 +59,4 @@ export class ChatAI implements ChatAIContract {
     public setRequestContent(requestContent: string): void {this.requestContent = requestContent;}
     public setResponseContent(responseContent: string): void {this.responseContent = responseContent;}
     public setCreatedAt(createdAt: Date): void {this.createdAt = createdAt;}
-    public setLastInteractionAt(lastInteractionAt: Date): void {this.lastInteractionAt = lastInteractionAt;}
 }

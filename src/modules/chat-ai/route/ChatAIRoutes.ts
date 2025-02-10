@@ -8,10 +8,39 @@ export const ChatAIRoutes = (chatAIController: ChatAIController): express.Router
 
     // Connexion
     router.post(
-        "/login",
-        validateAttributeMiddleware("body", "email", "Email missing or invalid in request body."),
-        validateAttributeMiddleware("body", "password", "Password missing or invalid in request body."),
+        "/chatai",
+        authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+        validateAttributeMiddleware("body", "requestContent", "RequestContent missing or invalid in request body."),
         (req: Request, res: Response, next: NextFunction) => chatAIController.submitPrompt(req, res, next)
     );
+
+    router.get(
+        "/chatai",
+        authMiddleware(['ADMIN']),
+        (req: Request, res: Response, next: NextFunction) => chatAIController.getAllChatAIs(req, res, next)
+    );
+
+    router.get(
+        "/:id",
+        authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+        validateAttributeMiddleware("params", "id", "Id missing or invalid in request params."),
+        (req: Request, res: Response, next: NextFunction) => chatAIController.getChatAIById(req, res, next)
+    );
+
+
+    router.get(
+        "/user/:userId",
+        authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+        validateAttributeMiddleware("params", "userId", "UserId missing or invalid in request params."),
+        (req: Request, res: Response, next: NextFunction) => chatAIController.getChatAIsByUserId(req, res, next)
+    )
+
+    router.delete(
+        "/:id",
+        authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+        validateAttributeMiddleware("params", "id", "Id missing or invalid in request params."),
+        (req: Request, res: Response, next: NextFunction) => chatAIController.deleteChatAIById(req, res, next)
+    )
+
     return router;
 };
