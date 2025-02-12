@@ -3,13 +3,25 @@ import { UserDTO } from "../dto/UserDTO";
 import { User } from "../entity/User.entity";
 import { UserContract } from "../contracts/IUser";
 import { Repository } from "typeorm";
-import { AppDataSource } from "@db/drivers/AppDataSource";
+import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { getDatabase } from "@db/DatabaseClient";
 
 export class UserMapper {
-    private static repository: Repository<User> = AppDataSource.getRepository(User);
+    private static repository: Repository<User>;
+
+    // Initialize the repository
+    private static async initRepository() {
+        if(!this.repository) {
+            const myDB = await getDatabase();
+            this.repository = (myDB as MySQLDatabase).getDataSoure().getRepository(User);
+        }
+    }
 
     // Transform the dto to the entity
     static async toEntity(dto: UserDTO): Promise<User> {
+        // Be sur that the repository is initialized
+        await this.initRepository();
+        
         // Get existing user from the database
         const existingUser: User | null = await this.repository.findOne({ where: { id: dto.id } });
 

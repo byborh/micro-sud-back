@@ -1,24 +1,21 @@
-import { IdGenerator } from "@core/idGenerator";
 import {User} from "../entity/User.entity";
 import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
 import {UserRepositoryMySQL} from "../repositories/drivers/UserRepositoryMySQL";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
-import _ from "lodash";
 import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
 import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
 import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
 import { RoleRepositoryMySQL } from "@modules/roles/repositories/drivers/RoleRepositoryMySQL";
 import { CreateToken } from "@core/auth/createToken";
+import { getDatabase } from "@db/DatabaseClient";
+import _ from "lodash";
 
 
 export class UserService {
-    private userRepository: UserRepositoryMySQL;
 
-    constructor(userRepository: UserRepositoryMySQL) {
-        this.userRepository = userRepository;
-    }
+    constructor(private userRepository: UserRepositoryMySQL) {}
 
     // Get a user by ID
     public async getUserById(userId: string): Promise<UserDTO | null> {
@@ -110,14 +107,8 @@ export class UserService {
             // Creation of hashed password
             const hashedPassword: string = passwordManager.hashPassword(user.getPassword(), salt);
 
-            // A SUPPRIMER AVANT LA PROD !!!
-            console.log('Password:', user.getPassword());
-            console.log('Hash:', hashedPassword);
-            console.log('Salt:', salt);
-
             // Verification of password
             const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
-            console.log('Mot de passe valide:', isValid);
 
             // Assign hashed password to user
             user.setPassword(hashedPassword);
@@ -129,10 +120,13 @@ export class UserService {
             // User didn't created
             if (!createdUser) throw new Error("User didn't created...")
 
+            // Initialize the Database
+            const myDB = await getDatabase();
+
             // Dependencies :
-            const roleRepository = new RoleRepositoryMySQL();
-            const userRolesRepository = new UserRolesRepositoryMySQL();
-            const authTokenRepository = new AuthTokenRepositoryMySQL();
+            const roleRepository = new RoleRepositoryMySQL(myDB);
+            const userRolesRepository = new UserRolesRepositoryMySQL(myDB);
+            const authTokenRepository = new AuthTokenRepositoryMySQL(myDB);
 
             const createToken = CreateToken.getInstance(authTokenRepository);            
 

@@ -1,20 +1,19 @@
 import { IDatabase } from "./contract/IDatabase";
-import { AppDataSource } from "./drivers/AppDataSource";
-import { RedisDatabase } from "./drivers/RedisDatabase";
-import { DatabaseType } from "./drivers/DatabaseType";
+import { MySQLDatabase } from "./drivers/mysql.datasource";
+import { RedisDatabase } from "./drivers/redis.datasource";
 
 export class DatabaseFactory {
-    static async createDatabase(type: DatabaseType, config: any) {
-        switch(type) {
+    static createDatabase(type: "mysql" | "redis"): IDatabase {
+        switch (type) {
             case "mysql":
-                if(!AppDataSource.isInitialized) {
-                    await AppDataSource.initialize();
-                }
-                return AppDataSource;
+                return new MySQLDatabase();
             case "redis":
-                return new RedisDatabase(config);
+                return new RedisDatabase();
+
+            // Add more cases for other database types that you want to support
+            
             default:
-                throw new Error("Invalid database type");
+                throw new Error(`Unsupported database type: ${type}`);
         }
     }
 }

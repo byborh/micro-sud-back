@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { AppDataSource } from '@db/drivers/AppDataSource';
 import fs from 'fs';
 import path from 'path';
 import { User } from '@modules/users/entity/User.entity';
+import { getDatabase } from '@db/DatabaseClient';
+import { Repository } from 'typeorm';
+import { MySQLDatabase } from '@db/drivers/mysql.datasource';
 
 const publicKeyPath = path.join(__dirname, '../../ec_public.pem');
 const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
@@ -47,8 +49,11 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
                 return;
             }
 
+            // Initialize database
+            const myDB = await getDatabase();
+            const userRepository: Repository<User> = (myDB as MySQLDatabase).getDataSoure().getRepository(User);
+
             // Verify if user exists
-            const userRepository = AppDataSource.getRepository(User);
             const user = await userRepository.findOne({
                 where: { id: decoded.sub },
                 relations: ['userRoles', 'userRoles.role'], // Fetch user roles

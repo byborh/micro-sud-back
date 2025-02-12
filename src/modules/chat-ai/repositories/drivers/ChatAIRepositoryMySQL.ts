@@ -1,13 +1,15 @@
 import { IChatAIRepository } from "../contract/IChatAIRepository";
 import { Repository } from "typeorm";
-import { AppDataSource } from "@db/drivers/AppDataSource";
 import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
+import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { IDatabase } from "@db/contract/IDatabase";
 
 export class ChatAIRepositoryMySQL implements IChatAIRepository {
     private repository: Repository<ChatAI>;
 
-    constructor() {
-        this.repository = AppDataSource.getRepository(ChatAI);
+    constructor(private db: IDatabase) {
+        const dataSource = db as MySQLDatabase;
+        this.repository = dataSource.getDataSoure().getRepository(ChatAI);
     }
 
     async submitPrompt(chatAI: ChatAI): Promise<ChatAI> {

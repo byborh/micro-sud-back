@@ -1,12 +1,16 @@
 import { Role } from "@modules/roles/entity/Role.entity";
 import { IRoleRepository } from "../contract/IRoleRepository";
 import { Repository } from "typeorm";
-import { AppDataSource } from "@db/drivers/AppDataSource";
+import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { IDatabase } from "@db/contract/IDatabase";
 
 export class RoleRepositoryMySQL implements IRoleRepository {
     private repository: Repository<Role>;
 
-    constructor() { this.repository = AppDataSource.getRepository(Role); }
+    constructor(private db: IDatabase) {
+        const dataSource = db as MySQLDatabase;
+        this.repository = dataSource.getDataSoure().getRepository(Role);
+    }
 
     async getRoleByField(field: string, value: string): Promise<Role | null> {
         // Validate field
@@ -17,14 +21,9 @@ export class RoleRepositoryMySQL implements IRoleRepository {
         const row = await this.repository.findOne({ where: { [field]: value } });
 
         // Validate rows
-        if (!row) {
-            console.log("No role found for field:", field, "with value:", value);
-            return null;
-        }
+        if (!row) return null;
 
         const role = Array.isArray(row) ? row[0] : row;
-
-        console.log("Role found:", role);
 
         // Verify if all required fields are present
         if (!role.id || !role.name) {
@@ -52,10 +51,7 @@ export class RoleRepositoryMySQL implements IRoleRepository {
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
     
-        if (rowsArray.length === 0) {
-            console.log("No roles found in the database.");
-            return [];
-        }
+        if (rowsArray.length === 0) return [];
     
         // Return the array of roles
         return rowsArray;

@@ -1,12 +1,16 @@
 import { User } from "@modules/users/entity/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
 import { Repository } from "typeorm";
-import { AppDataSource } from "@db/drivers/AppDataSource";
+import { IDatabase } from "@db/contract/IDatabase";
+import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 
 export class UserRepositoryMySQL implements IUserRepository {
     private repository: Repository<User>;
 
-    constructor() {this.repository = AppDataSource.getRepository(User);}
+    constructor(private db: IDatabase) {
+        const dataSource = db as MySQLDatabase;
+        this.repository = dataSource.getDataSoure().getRepository(User);
+    }
 
     async findUserByField(field: string, value: string): Promise<User | null> {
         // Validate field
@@ -17,14 +21,9 @@ export class UserRepositoryMySQL implements IUserRepository {
         const row = await this.repository.findOne({where: {[field]: value}});
 
         // Validate rows
-        if (!row) {
-            console.log("No user found for field:", field, "with value:", value);
-            return null;
-        };
+        if (!row) return null;
 
         const user = Array.isArray(row) ? row[0] : row
-
-        console.log("User found:", user);
 
         // Verify if all required fields are present
         if (!user.id || !user.email || !user.password) {
@@ -83,10 +82,7 @@ export class UserRepositoryMySQL implements IUserRepository {
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
     
-        if (rowsArray.length === 0) {
-            console.log("No users found in the database.");
-            return [];
-        }
+        if (rowsArray.length === 0) return [];
     
         // Return the array of users
         return rowsArray;

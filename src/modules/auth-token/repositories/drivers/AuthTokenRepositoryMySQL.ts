@@ -1,13 +1,15 @@
 import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
 import { IAuthTokenRepository } from "../contract/IAuthTokenRepository";
 import { Repository } from "typeorm";
-import { AppDataSource } from "@db/drivers/AppDataSource";
+import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { IDatabase } from "@db/contract/IDatabase";
 
 export class AuthTokenRepositoryMySQL implements IAuthTokenRepository {
     private repository: Repository<AuthToken>;
 
-    constructor() {
-        this.repository = AppDataSource.getRepository(AuthToken);
+    constructor(private db: IDatabase) {
+        const dataSource = db as MySQLDatabase;
+        this.repository = dataSource.getDataSoure().getRepository(AuthToken);
     }
 
     async createAuthToken(authToken: AuthToken): Promise<AuthToken> {

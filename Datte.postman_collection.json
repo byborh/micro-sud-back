@@ -25,7 +25,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/users/Ttz6HOipLcc89syP",
+							"raw": "http://localhost:3000/api/v0.0.2/users/Ttz6HOipLcc89syP",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -33,7 +33,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"users",
 								"Ttz6HOipLcc89syP"
 							]
@@ -109,7 +109,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/users",
+							"raw": "http://localhost:3000/api/v0.0.2/users",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -117,7 +117,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"users"
 							]
 						}
@@ -139,7 +139,7 @@
 							"raw": "{\n  \"email\": \"admin@dmin.com\",\n  \"password\": \"admin@dmin\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/users",
+							"raw": "http://localhost:3000/api/v0.0.2/users",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -147,7 +147,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"users"
 							]
 						}
@@ -179,7 +179,7 @@
 							"raw": "{\n  \"email\": \"emilia@clarke.com\",\n  \"password\": \"Je t'aime <333\",\n  \"firstname\": \"Emilia\",\n  \"lastname\": \"Clarke\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/users/nvk2OqLCcjK3ba3K",
+							"raw": "http://localhost:3000/api/v0.0.2/users/nvk2OqLCcjK3ba3K",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -187,7 +187,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"users",
 								"nvk2OqLCcjK3ba3K"
 							]
@@ -211,7 +211,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/users/aYHGGtBYg9XHniAR",
+							"raw": "http://localhost:3000/api/v0.0.2/users/aYHGGtBYg9XHniAR",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -219,7 +219,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"users",
 								"aYHGGtBYg9XHniAR"
 							]
@@ -248,7 +248,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/roles/nvk2OqLCcjK3ba3K",
+							"raw": "http://localhost:3000/api/v0.0.2/roles/nvk2OqLCcjK3ba3K",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -256,7 +256,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"roles",
 								"nvk2OqLCcjK3ba3K"
 							]
@@ -280,7 +280,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/roles",
+							"raw": "http://localhost:3000/api/v0.0.2/roles",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -288,7 +288,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"roles"
 							]
 						}
@@ -310,7 +310,7 @@
 							"raw": "{\n    \"name\": \"DEVELOPER\",\n    \"description\": \"Cette description permet de supprimer un utilisateur\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/roles",
+							"raw": "http://localhost:3000/api/v0.0.2/roles",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -318,7 +318,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"roles"
 							]
 						}
@@ -350,7 +350,7 @@
 							"raw": "{\n    \"name\": \"DEVELOPER\",\n    \"description\": \"Cette description permet de supprimer un utilisateur\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/roles/nvk2OqLCcjK3ba3K",
+							"raw": "http://localhost:3000/api/v0.0.2/roles/nvk2OqLCcjK3ba3K",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -358,7 +358,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"roles",
 								"nvk2OqLCcjK3ba3K"
 							]
@@ -382,7 +382,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/roles/nvk2OqLCcjK3ba3K",
+							"raw": "http://localhost:3000/api/v0.0.2/roles/nvk2OqLCcjK3ba3K",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -390,7 +390,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"roles",
 								"nvk2OqLCcjK3ba3K"
 							]
@@ -419,7 +419,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/userroles/nvk2OqLCcjK3ba3K",
+							"raw": "http://localhost:3000/api/v0.0.2/userroles/nvk2OqLCcjK3ba3K",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -427,7 +427,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"userroles",
 								"nvk2OqLCcjK3ba3K"
 							]
@@ -451,7 +451,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/userroles",
+							"raw": "http://localhost:3000/api/v0.0.2/userroles",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -459,7 +459,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"userroles"
 							]
 						}
@@ -481,7 +481,7 @@
 							"raw": "{\n    \"user_id\": \"aYHGGtBYg9XHniAR\",\n    \"role_id\": \"tR9yU8iO3pL2qW4e\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/userroles",
+							"raw": "http://localhost:3000/api/v0.0.2/userroles",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -489,7 +489,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"userroles"
 							]
 						}
@@ -526,7 +526,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/auth/login",
+							"raw": "http://localhost:3000/api/v0.0.2/auth/login",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -534,7 +534,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"auth",
 								"login"
 							]
@@ -567,7 +567,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/auth/logout",
+							"raw": "http://localhost:3000/api/v0.0.2/auth/logout",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -575,7 +575,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"auth",
 								"logout"
 							]
@@ -608,7 +608,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/auth/tokens/aYHGGtBYg9XHniAR",
+							"raw": "http://localhost:3000/api/v0.0.2/auth/tokens/aYHGGtBYg9XHniAR",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -616,7 +616,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"auth",
 								"tokens",
 								"aYHGGtBYg9XHniAR"
@@ -650,7 +650,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/auth/tokens/user/aYHGGtBYg9XHniAR",
+							"raw": "http://localhost:3000/api/v0.0.2/auth/tokens/user/aYHGGtBYg9XHniAR",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -658,7 +658,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"auth",
 								"tokens",
 								"user",
@@ -696,7 +696,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/auth/tokens",
+							"raw": "http://localhost:3000/api/v0.0.2/auth/tokens",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -704,7 +704,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"auth",
 								"tokens"
 							]
@@ -740,7 +740,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/auth/tokens",
+							"raw": "http://localhost:3000/api/v0.0.2/auth/tokens",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -748,7 +748,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"auth",
 								"tokens"
 							]
@@ -786,7 +786,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/chatai",
+							"raw": "http://localhost:3000/api/v0.0.2/chatai",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -794,7 +794,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"chatai"
 							]
 						}
@@ -829,7 +829,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/chatai",
+							"raw": "http://localhost:3000/api/v0.0.2/chatai",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -837,7 +837,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"chatai"
 							]
 						}
@@ -872,7 +872,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/chatai/6WqCNdasmoOaicUq",
+							"raw": "http://localhost:3000/api/v0.0.2/chatai/6WqCNdasmoOaicUq",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -880,7 +880,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"chatai",
 								"6WqCNdasmoOaicUq"
 							]
@@ -916,7 +916,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/chatai/user/WCN23fnqj1WSA4ti",
+							"raw": "http://localhost:3000/api/v0.0.2/chatai/user/WCN23fnqj1WSA4ti",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -924,7 +924,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"chatai",
 								"user",
 								"WCN23fnqj1WSA4ti"
@@ -958,7 +958,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/v0.0.1/chatai/6WqCNdasmoOaicUq",
+							"raw": "http://localhost:3000/api/v0.0.2/chatai/6WqCNdasmoOaicUq",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -966,7 +966,7 @@
 							"port": "3000",
 							"path": [
 								"api",
-								"v0.0.1",
+								"v0.0.2",
 								"chatai",
 								"6WqCNdasmoOaicUq"
 							]

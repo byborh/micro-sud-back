@@ -1,12 +1,17 @@
 import { Repository } from "typeorm";
-import { AppDataSource } from "@db/drivers/AppDataSource";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
 import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { IDatabase } from "@db/contract/IDatabase";
 
 export class UserRolesRepositoryMySQL implements IUserRolesRepository {
     private repository: Repository<UserRoles>;
 
-    constructor() { this.repository = AppDataSource.getRepository(UserRoles); }
+    constructor(private db: IDatabase) {
+        const dataSource = db as MySQLDatabase;
+        this.repository = dataSource.getDataSoure().getRepository(UserRoles);
+    }
+
 
     async getUserRolesByMultipleFields(fields: string[], values: string[]): Promise<UserRoles[] | null> {
         // Validate fields
@@ -25,10 +30,7 @@ export class UserRolesRepositoryMySQL implements IUserRolesRepository {
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
 
-        if (rowsArray.length === 0) {
-            console.log("No userRoles found in the database.");
-            return [];
-        }
+        if (rowsArray.length === 0) return [];
 
         // Return the array of userRoles
         return rowsArray;
@@ -41,10 +43,7 @@ export class UserRolesRepositoryMySQL implements IUserRolesRepository {
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
     
-        if (rowsArray.length === 0) {
-            console.log("No userRoles found in the database.");
-            return [];
-        }
+        if (rowsArray.length === 0) return [];
     
         return rowsArray;
     }

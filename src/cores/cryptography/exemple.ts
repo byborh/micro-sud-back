@@ -20,8 +20,8 @@ keyManager.generateKey('hmacKey');
 const salt = passwordManager.generateSalt();
 const hashedPassword = passwordManager.hashPassword('MySecurePassword!', salt);
 
-console.log('Salt:', salt);
-console.log('Hashed Password:', hashedPassword);
+// console.log('Salt:', salt);
+// console.log('Hashed Password:', hashedPassword);
 
-const isValid = passwordManager.verifyPassword('MySecurePassword!', salt, hashedPassword);
-console.log('Password is valid:', isValid);
+// const isValid = passwordManager.verifyPassword('MySecurePassword!', salt, hashedPassword);
+// console.log('Password is valid:', isValid);

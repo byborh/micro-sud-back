@@ -5,6 +5,7 @@ import { PasswordManager } from "@core/cryptography/PasswordManager";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
 import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
 import { CreateToken } from "@core/auth/createToken";
+import { getDatabase } from "@db/DatabaseClient";
 
 export class AuthTokenService {
     private authTokenRepository: AuthTokenRepositoryMySQL;
@@ -52,8 +53,10 @@ export class AuthTokenService {
 
         const roleIds: string[] = userRoles.map(userRole => userRole.getRole_id());
 
+        const myDB = await getDatabase();
+
         // Dependencies
-        const authTokenRepository = new AuthTokenRepositoryMySQL();
+        const authTokenRepository = new AuthTokenRepositoryMySQL(myDB);
     
         const createToken = CreateToken.getInstance(authTokenRepository);
         const authToken: AuthToken = await createToken.createToken(userId, roleIds);

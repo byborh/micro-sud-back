@@ -3,9 +3,12 @@ import { RoleController } from './controllers/RoleController';
 import { RoleService } from './services/RoleService';
 import { roleRoutes } from './route/RoleRoutes';
 import { RoleRepositoryMySQL } from './repositories/drivers/RoleRepositoryMySQL';
+import { getDatabase } from '@db/DatabaseClient';
 
-export const createRoleModule = (): express.Router => {
-  const roleRepositoryMySQL = new RoleRepositoryMySQL();
+export const createRoleModule = async (): Promise<express.Router> => {
+  const myDB = await getDatabase();
+  
+  const roleRepositoryMySQL = new RoleRepositoryMySQL(myDB);
   const roleService = new RoleService(roleRepositoryMySQL);
   const roleController = new RoleController(roleService);
 

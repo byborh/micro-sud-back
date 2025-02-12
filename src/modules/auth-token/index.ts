@@ -5,13 +5,16 @@ import { AuthTokenRepositoryMySQL } from './repositories/drivers/AuthTokenReposi
 import { AuthTokenRoutes } from './route/AuthTokenRoutes';
 import { UserRepositoryMySQL } from '@modules/users/repositories/drivers/UserRepositoryMySQL';
 import { UserRolesRepositoryMySQL } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL';
+import { getDatabase } from '@db/DatabaseClient';
 
-export const createAuthTokenModule = (): express.Router => {
-  const authTokenRepositoryMySQL = new AuthTokenRepositoryMySQL();
+export const createAuthTokenModule = async (): Promise<express.Router> => {
+  const myDB = await getDatabase();
+
+  const authTokenRepositoryMySQL = new AuthTokenRepositoryMySQL(myDB);
 
   // User / User-Role repositories in AuthToken module
-  const userRepositoryMySQL = new UserRepositoryMySQL();
-  const userRolesRepositoryMySQL = new UserRolesRepositoryMySQL();
+  const userRepositoryMySQL = new UserRepositoryMySQL(myDB);
+  const userRolesRepositoryMySQL = new UserRolesRepositoryMySQL(myDB);
 
   const authTokenService = new AuthTokenService(authTokenRepositoryMySQL, userRepositoryMySQL, userRolesRepositoryMySQL);
   const authTokenController = new AuthTokenController(authTokenService);
