@@ -1,4 +1,4 @@
-import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { IAuthTokenRepository } from "../contract/IAuthTokenRepository";
 import { Repository } from "typeorm";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";

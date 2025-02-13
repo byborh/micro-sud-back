@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { ChatAI } from "../entity/ChatAI.entity";
+import { ChatAI } from "../entity/typeorm/ChatAI.entity";
 import { IdGenerator } from "@core/idGenerator";
 import { ChatAIRepositoryMySQL } from "../repositories/drivers/ChatAIRepositoryMySQL";
 const axios = require('axios');

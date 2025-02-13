@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { AuthTokenContract } from "../contracts/IAuthToken";
-import { User } from "@modules/users/entity/User.entity";
+import { AuthTokenContract } from "../../contracts/IAuthToken";
+import { User } from "@modules/users/entity/typeorm/User.entity";
 
 
 @Entity("auth_token")

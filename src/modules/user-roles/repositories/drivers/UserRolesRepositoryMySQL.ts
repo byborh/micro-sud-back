@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
-import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 

@@ -1,5 +1,5 @@
-import { Role } from "@modules/roles/entity/Role.entity";
-import { User } from "@modules/users/entity/User.entity";
+import { Role } from "@modules/roles/entity/typeorm/Role.entity";
+import { User } from "@modules/users/entity/typeorm/User.entity";
 
 // Interface of the user roles
 export interface UserRolesContract {

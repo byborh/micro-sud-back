@@ -1,4 +1,4 @@
-import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
+import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 
 export interface IChatAIRepository {
     submitPrompt(chatAI: ChatAI) : Promise<ChatAI>;

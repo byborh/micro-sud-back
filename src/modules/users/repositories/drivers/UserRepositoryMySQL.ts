@@ -1,4 +1,4 @@
-import { User } from "@modules/users/entity/User.entity";
+import { User } from "@modules/users/entity/typeorm/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
 import { Repository } from "typeorm";
 import { IDatabase } from "@db/contract/IDatabase";

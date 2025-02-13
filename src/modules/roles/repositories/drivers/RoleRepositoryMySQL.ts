@@ -1,4 +1,4 @@
-import { Role } from "@modules/roles/entity/Role.entity";
+import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 import { IRoleRepository } from "../contract/IRoleRepository";
 import { Repository } from "typeorm";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";

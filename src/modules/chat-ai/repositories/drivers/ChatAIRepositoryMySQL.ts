@@ -1,6 +1,6 @@
 import { IChatAIRepository } from "../contract/IChatAIRepository";
 import { Repository } from "typeorm";
-import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
+import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 

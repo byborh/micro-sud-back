@@ -1,6 +1,6 @@
 // Import des modules
 import { UserDTO } from "../dto/UserDTO";
-import { User } from "../entity/User.entity";
+import { User } from "../entity/typeorm/User.entity";
 import { UserContract } from "../contracts/IUser";
 import { Repository } from "typeorm";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";

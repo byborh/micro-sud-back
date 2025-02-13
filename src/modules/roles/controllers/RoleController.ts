@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { RoleService } from "../services/RoleService";
-import { Role } from "../entity/Role.entity";
+import { Role } from "../entity/typeorm/Role.entity";
 import { IdGenerator } from "@core/idGenerator";
 
 export class RoleController {

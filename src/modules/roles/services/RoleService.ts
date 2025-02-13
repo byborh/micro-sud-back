@@ -1,4 +1,4 @@
-import { Role } from "../entity/Role.entity";
+import { Role } from "../entity/typeorm/Role.entity";
 import { RoleRepositoryMySQL } from "../repositories/drivers/RoleRepositoryMySQL";
 
 export class RoleService {

@@ -1,4 +1,4 @@
-import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 
 export interface IAuthTokenRepository {
     createAuthToken(authToken: AuthToken) : Promise<AuthToken>;

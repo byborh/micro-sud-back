@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
-import { User } from "@modules/users/entity/User.entity";
-import { Role } from "@modules/roles/entity/Role.entity";
-import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
-import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
-import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
+import { User } from "@modules/users/entity/typeorm/User.entity";
+import { Role } from "@modules/roles/entity/typeorm/Role.entity";
+import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
+import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 import { IDatabase } from "@db/contract/IDatabase";
 
 

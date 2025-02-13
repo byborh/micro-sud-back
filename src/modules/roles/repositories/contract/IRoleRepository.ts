@@ -1,4 +1,4 @@
-import { Role } from "@modules/roles/entity/Role.entity";
+import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 
 export interface IRoleRepository {
     getRoleByField(field: string, value: string): Promise<Role | null>;

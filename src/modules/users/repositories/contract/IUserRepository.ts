@@ -1,4 +1,4 @@
-import { User } from "../../entity/User.entity";
+import { User } from "../../entity/typeorm/User.entity";
 
 export interface IUserRepository {
     findUserByField(field: string, value: string): Promise<User | null>

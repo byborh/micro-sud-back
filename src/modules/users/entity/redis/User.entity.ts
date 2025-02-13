@@ -1,8 +1,8 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne, JoinColumn } from "typeorm";
-import { UserContract } from '../contracts/IUser';
-import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
-import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
-import { ChatAI } from "@modules/chat-ai/entity/ChatAI.entity";
+import { UserContract } from '../../contracts/IUser';
+import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
+import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 
 @Entity("users")
 export class User implements UserContract {

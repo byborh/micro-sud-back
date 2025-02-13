@@ -1,9 +1,9 @@
 import { UserRepositoryMySQL } from "@modules/users/repositories/drivers/UserRepositoryMySQL";
-import { AuthToken } from "../entity/AuthToken.entity";
+import { AuthToken } from "../entity/typeorm/AuthToken.entity";
 import { AuthTokenRepositoryMySQL } from "../repositories/drivers/AuthTokenRepositoryMySQL";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
-import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { CreateToken } from "@core/auth/createToken";
 import { getDatabase } from "@db/DatabaseClient";
 

@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { RoleContract } from "../contracts/IRole";
-import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
-import { TRoleName } from "../contracts/TRoleName";
+import { RoleContract } from "../../contracts/IRole";
+import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { TRoleName } from "../../contracts/TRoleName";
 
 @Entity("roles")
 export class Role implements RoleContract {

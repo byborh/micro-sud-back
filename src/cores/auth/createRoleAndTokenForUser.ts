@@ -1,8 +1,8 @@
-import { UserRoles } from "@modules/user-roles/entity/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { RoleRepositoryMySQL } from "@modules/roles/repositories/drivers/RoleRepositoryMySQL";
-import { Role } from "@modules/roles/entity/Role.entity";
+import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
-import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { CreateToken } from "./createToken";
 
 export class CreateRoleAndTokenForUser {

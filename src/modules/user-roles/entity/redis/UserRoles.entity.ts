@@ -1,7 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryColumn } from "typeorm";
-import { UserRolesContract } from "../contracts/IUserRoles";
-import { User } from "@modules/users/entity/User.entity";
-import { Role } from "@modules/roles/entity/Role.entity";
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { UserRolesContract } from "../../contracts/IUserRoles";
+import { User } from "@modules/users/entity/typeorm/User.entity";
+import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 
 @Entity("user_role")
 export class UserRoles implements UserRolesContract {

@@ -2,7 +2,7 @@ import { IdGenerator } from "@core/idGenerator";
 import fs from "fs";
 import path from "path";
 import jwt from "jsonwebtoken";
-import { AuthToken } from "@modules/auth-token/entity/AuthToken.entity";
+import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
 
 export class CreateToken{

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/UserService";
-import { User } from "../entity/User.entity";
+import { User } from "../entity/typeorm/User.entity";
 import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "@core/idGenerator";
 

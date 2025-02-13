@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { User } from '@modules/users/entity/User.entity';
+import { User } from '@modules/users/entity/typeorm/User.entity';
 import { getDatabase } from '@db/DatabaseClient';
 import { Repository } from 'typeorm';
 import { MySQLDatabase } from '@db/drivers/mysql.datasource';
