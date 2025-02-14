@@ -1,88 +1,57 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { UserContract } from '../../contracts/IUser';
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
-import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
-import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 
-@Entity("users")
-export class User implements UserContract {
-    @PrimaryColumn({ type: "varchar", length: 255 })
+export class UserRedisEntity implements UserContract { // I think, i'll change the name to User
     id: string;
-
-    @Column({ nullable: true, name: "first_name" })
     firstname?: string | null;
-
-    @Column({ nullable: true, name: "last_name" })
     lastname?: string | null;
-
-    @Column({ nullable: true })
     pseudo?: string | null;
-
-    @Column({ unique: true })
-    @Index()
     email: string;
-
-    @Column()
     password: string;
-
-    @Column({ nullable: true, name: "tel_number" })
     telnumber?: string | null;
-
-    @Column()
     salt: string;
-
-    @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
-
-    @UpdateDateColumn({ type: "timestamp" })
     updatedAt: Date;
 
-    @Column("json", { nullable: true })
-    data: JSON | null;
+    data: Record<string, any> | null;
 
-    @OneToMany(() => UserRoles, userRole => userRole.user, { cascade: true })
-    userRoles: UserRoles[];
-
-    @OneToOne(() => AuthToken, authToken => authToken.user) 
-    authToken: AuthToken;
-
-    @OneToMany(() => ChatAI, chatAI => chatAI.user, { cascade: true })
-    chatAI: ChatAI[]
-
-    /*
-    ----------------------------------------------------------------------------------
-        Add liaisons here with other Entities
-        Ex :
-            - @OneToMany
-                entityName: EntityName
-            - @OneToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-    ----------------------------------------------------------------------------------
-    */
-
-    // Static constructor
-    constructor(params?: UserContract) {
-        if (params) {
-            if (!params.id) throw new Error("ID is required");
-            if (!params.email || !params.email.includes('@')) throw new Error("Invalid email");
-
-            // Verify the password ONLY at creation
-            if (params.password && params.password.length < 8) throw new Error("Password must be at least 8 characters");
-    
-            this.id = params.id;
-            this.email = params.email;
-            this.password = params.password || "";
-            this.salt = params.salt || "";
-            this.firstname = params.firstname || null;
-            this.lastname = params.lastname || null;
-            this.pseudo = params.pseudo || null;
-            this.telnumber = params.telnumber || null;
-        }
+    constructor(data: Partial<UserRedisEntity>) {
+        Object.assign(this, data); // il faut commenter pour comprendre ce que c'est
     }
+
+
+    // Convert object to Redis hash
+    toRedisHash(): { [key: string]: string } {
+        return {
+            id: this.id,
+            email: this.email,
+            password: this.password,
+            salt: this.salt,
+            createdAt: this.createdAt.toISOString(),
+            updatedAt: this.updatedAt.toISOString(),
+            firstname: this.firstname ?? "",
+            lastname: this.lastname ?? "",
+            pseudo: this.pseudo ?? "",
+            telnumber: this.telnumber ?? ""
+        };
+    }
+
+
+    // Convert Redis hash to object
+    static fromRedisHash(hash: { [key: string]: string }): UserRedisEntity {
+        return new UserRedisEntity({
+            id: hash.id,
+            email: hash.email,
+            password: hash.password,
+            salt: hash.salt,
+            createdAt: hash.createdAt ? new Date(hash.createdAt) : new Date(),
+            updatedAt: hash.updatedAt ? new Date(hash.updatedAt) : new Date(),
+            firstname: hash.firstname || null,
+            lastname: hash.lastname || null,
+            pseudo: hash.pseudo || null,
+            telnumber: hash.telnumber || null
+        });
+    }
+
 
     getId(): string {
         return this.id;

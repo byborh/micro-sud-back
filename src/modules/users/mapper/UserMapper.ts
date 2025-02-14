@@ -19,6 +19,8 @@ export class UserMapper {
 
     // Transform the dto to the entity
     static async toEntity(dto: UserDTO): Promise<User> {
+        if (!dto.id) throw new Error("User ID is required.");
+
         // Be sur that the repository is initialized
         await this.initRepository();
         

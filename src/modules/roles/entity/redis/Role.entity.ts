@@ -1,27 +1,35 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { RoleContract } from "../../contracts/IRole";
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { TRoleName } from "../../contracts/TRoleName";
 
-@Entity("roles")
-export class Role implements RoleContract {
-    @PrimaryColumn({ type: "varchar", length: 255 })
+export class RoleRedisEntity implements RoleContract {
     id: string;
-
-    @Column({ length: 50, unique: true })
     name: TRoleName;
-
-    @Column({ type: "text", nullable: true })
     description: string | null;
-
-    @OneToMany(() => UserRoles, userRole => userRole.role, { cascade: true })
     userRoles: UserRoles[];
 
+    data: Record<string, any> | null;
 
-    constructor(id: string, name: TRoleName, description: string) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+    constructor(data: Partial<RoleRedisEntity>) {
+        Object.assign(this, data);
+    }
+
+    // Convert object to Redis hash
+    toRedisHash(): { [key: string]: string } {
+        return {
+            id: this.id,
+            name: this.name as string,
+            description: this.description || "",
+        }
+    }
+
+    // Convert Redis hash to object
+    static fromRedisHash(hash: { [key: string]: string }): RoleRedisEntity {
+        return new RoleRedisEntity({
+            id: hash.id,
+            name: hash.name as TRoleName,
+            description: hash.description
+        })
     }
 
     public getId(): string { return this.id; }
@@ -30,5 +38,5 @@ export class Role implements RoleContract {
 
     public setId(id: string): void { this.id = id; }
     public setName(name: TRoleName): void { this.name = name; }
-    public setDescription(description: string): void { this.description = description; }
+    public setDescription(description: string | null): void { this.description = description; }
 }

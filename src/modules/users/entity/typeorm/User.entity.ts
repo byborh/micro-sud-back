@@ -5,7 +5,7 @@ import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 
 @Entity("users")
-export class User implements UserContract {
+export class User implements UserContract { // Change the name to UserMySQLEntity
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
