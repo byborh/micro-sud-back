@@ -1,9 +1,11 @@
 import { User } from "../../entity/typeorm/User.entity";
 
 export interface IUserRepository {
-    findUserByField(field: string, value: string): Promise<User | null>
-    getAllUsers(): Promise<Array<User> | null>
-    createUser(user: User): Promise<User | null>
-    modifyUser(user: User): Promise<User | null>
-    deleteUser(userId: string): Promise<boolean>
+    findUserByField(field: string, value: string): Promise<User | null>;
+    findUserById(userId: string): Promise<User | null>;
+    findUserByEmail(email: string): Promise<User | null>;
+    getAllUsers(): Promise<Array<User> | null>;
+    createUser(user: User): Promise<User | null>;
+    modifyUser(user: User): Promise<User | null>;
+    deleteUser(userId: string): Promise<boolean>;
 }

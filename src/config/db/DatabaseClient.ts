@@ -15,10 +15,12 @@
  * making it easier to maintain and extend.
  */
 
+import { DatabaseType } from "./contract/DatabaseType";
 import { IDatabase } from "./contract/IDatabase"; // Import the database interface
 import { DatabaseFactory } from "./DatabaseFactory"; // Import the factory to create database instances
 
 let dbInstance: IDatabase | null = null; // Singleton instance of the database
+const databaseType: DatabaseType = process.env.MY_DB as DatabaseType; // Default to MySQL if not specified
 
 /*
  * Function to get the database instance.
@@ -27,8 +29,12 @@ let dbInstance: IDatabase | null = null; // Singleton instance of the database
  */
 export const getDatabase = async (): Promise<IDatabase> => {
     if (!dbInstance) {
+        // Validate databaseType to ensure it is a valid DatabaseType
+        if(databaseType !== "mysql" && databaseType !== "redis") {
+            throw new Error(`Unsupported database type: ${databaseType}`);
+        }
         // Create a database instance based on the configuration (e.g., "redis", "mysql", etc.)
-        dbInstance = DatabaseFactory.createDatabase("mysql"); // Change "mysql" to "redis" or another database if needed
+        dbInstance = DatabaseFactory.createDatabase(databaseType); // Change "mysql" to "redis" or another database if needed
         await dbInstance.connect(); // Connect to the database
     }
 

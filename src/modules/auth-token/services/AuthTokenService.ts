@@ -6,13 +6,14 @@ import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drive
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { CreateToken } from "@core/auth/createToken";
 import { getDatabase } from "@db/DatabaseClient";
+import { IAuthTokenRepository } from "../repositories/contract/IAuthTokenRepository";
 
 export class AuthTokenService {
-    private authTokenRepository: AuthTokenRepositoryMySQL;
+    private authTokenRepository: IAuthTokenRepository;
     private userRepository: UserRepositoryMySQL;
     private userRoleRepository: UserRolesRepositoryMySQL;
 
-    constructor(authTokenRepository: AuthTokenRepositoryMySQL, userRepository: UserRepositoryMySQL, userRoleRepository: UserRolesRepositoryMySQL) {
+    constructor(authTokenRepository: IAuthTokenRepository, userRepository: UserRepositoryMySQL, userRoleRepository: UserRolesRepositoryMySQL) {
         this.authTokenRepository = authTokenRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;

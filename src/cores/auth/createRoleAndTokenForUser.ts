@@ -4,22 +4,24 @@ import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
 import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { CreateToken } from "./createToken";
+import { IRoleRepository } from "@modules/roles/repositories/contract/IRoleRepository";
+import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
 
 export class CreateRoleAndTokenForUser {
     private static instance: CreateRoleAndTokenForUser;
-    private roleRepository: RoleRepositoryMySQL;
-    private userRolesRepository: UserRolesRepositoryMySQL;
+    private roleRepository: IRoleRepository;
+    private userRolesRepository: IUserRolesRepository;
     private createToken: CreateToken;
 
-    private constructor(roleRepo: RoleRepositoryMySQL, userRolesRepo: UserRolesRepositoryMySQL, createToken: CreateToken) {
+    private constructor(roleRepo: IRoleRepository, userRolesRepo: IUserRolesRepository, createToken: CreateToken) {
         this.roleRepository = roleRepo;
         this.userRolesRepository = userRolesRepo;
         this.createToken = createToken;
     }
 
     public static getInstance(
-        roleRepository: RoleRepositoryMySQL,
-        userRolesRepository: UserRolesRepositoryMySQL,
+        roleRepository: IRoleRepository,
+        userRolesRepository: IUserRolesRepository,
         createToken: CreateToken
     ): CreateRoleAndTokenForUser{
         if(!CreateRoleAndTokenForUser.instance) {

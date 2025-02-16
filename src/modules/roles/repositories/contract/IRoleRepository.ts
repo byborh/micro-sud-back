@@ -3,6 +3,7 @@ import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 export interface IRoleRepository {
     getRoleByField(field: string, value: string): Promise<Role | null>;
     getRoleById(roleId: string): Promise<Role | null>;
+    getRoleByName(name: string): Promise<Role | null>;
     getRoles(): Promise<Role[] | null>;
     createRole(role: Role): Promise<Role | null>;
     modifyRole(role: Role): Promise<Role | null>;

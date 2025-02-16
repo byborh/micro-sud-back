@@ -1,15 +1,15 @@
 import * as dotenv from "dotenv";
 import { ChatAI } from "../entity/typeorm/ChatAI.entity";
 import { IdGenerator } from "@core/idGenerator";
-import { ChatAIRepositoryMySQL } from "../repositories/drivers/ChatAIRepositoryMySQL";
+import { IChatAIRepository } from "../repositories/contract/IChatAIRepository";
 const axios = require('axios');
 
 dotenv.config();
 
 export class ChatAIService {
-    private chatAIRepository: ChatAIRepositoryMySQL;
+    private chatAIRepository: IChatAIRepository;
 
-    constructor(chatAIRepository: ChatAIRepositoryMySQL) {this.chatAIRepository = chatAIRepository;}
+    constructor(chatAIRepository: IChatAIRepository) {this.chatAIRepository = chatAIRepository;}
 
     // Crée une requête à l'IA et stocke la réponse
     public async submitPrompt(userId: string, prompt: string): Promise<string> {

@@ -1,19 +1,21 @@
 import { IdGenerator } from "@core/idGenerator";
-import fs from "fs";
-import path from "path";
-import jwt from "jsonwebtoken";
 import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
+import { getDatabase } from "@db/DatabaseClient";
+import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
+import fs from "fs";
+import jwt from "jsonwebtoken";
+import path from "path";
 
 export class CreateToken{
     private static instance: CreateToken;
-    private authTokenRepository: AuthTokenRepositoryMySQL;
+    private authTokenRepository: IAuthTokenRepository;
 
-    constructor(authTokenRepository: AuthTokenRepositoryMySQL) {
+    constructor(authTokenRepository: IAuthTokenRepository) {
         this.authTokenRepository = authTokenRepository;
     }
 
-    public static getInstance(authTokenRepository: AuthTokenRepositoryMySQL): CreateToken {
+    public static getInstance(authTokenRepository: IAuthTokenRepository): CreateToken {
         if(!CreateToken.instance) {
             CreateToken.instance = new CreateToken(authTokenRepository);
         }

@@ -4,12 +4,16 @@ import { ChatAIService } from './services/ChatAIService';
 import { ChatAIRepositoryMySQL } from './repositories/drivers/ChatAIRepositoryMySQL';
 import { ChatAIRoutes } from './route/ChatAIRoutes';
 import { getDatabase } from '@db/DatabaseClient';
+import { IChatAIRepository } from './repositories/contract/IChatAIRepository';
+import { ChatAIRepositoryRedis } from './repositories/drivers/ChatAIRepositoryRedis';
+import { getRepository } from '@core/db/databaseGuards';
 
 export const createChatAIModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
-  const chatAIRepositoryMySQL = new ChatAIRepositoryMySQL(myDB);
-  const chatAIService = new ChatAIService(chatAIRepositoryMySQL);
+  const chatAIRepository = getRepository(myDB, ChatAIRepositoryMySQL, ChatAIRepositoryRedis) as IChatAIRepository;
+
+  const chatAIService = new ChatAIService(chatAIRepository);
   const chatAIController = new ChatAIController(chatAIService);
 
   // Le contrôleur sera injecté dans les routes

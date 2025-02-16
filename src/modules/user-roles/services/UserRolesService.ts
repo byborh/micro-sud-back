@@ -1,10 +1,10 @@
 import { UserRoles } from "../entity/typeorm/UserRoles.entity";
-import { UserRolesRepositoryMySQL } from "../repositories/drivers/UserRolesRepositoryMySQL";
+import { IUserRolesRepository } from "../repositories/contract/IUserRolesRepository";
 
 export class UserRolesService {
-    private userRolesRepository: UserRolesRepositoryMySQL;
+    private userRolesRepository: IUserRolesRepository;
 
-    constructor(userRolesRepository: UserRolesRepositoryMySQL) {
+    constructor(userRolesRepository: IUserRolesRepository) {
         this.userRolesRepository = userRolesRepository;
     }
 

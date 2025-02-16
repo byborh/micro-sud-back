@@ -1,10 +1,11 @@
 import { Role } from "../entity/typeorm/Role.entity";
+import { IRoleRepository } from "../repositories/contract/IRoleRepository";
 import { RoleRepositoryMySQL } from "../repositories/drivers/RoleRepositoryMySQL";
 
 export class RoleService {
-    private roleRepository: RoleRepositoryMySQL;
+    private roleRepository: IRoleRepository;
 
-    constructor(roleRepository: RoleRepositoryMySQL) {
+    constructor(roleRepository: IRoleRepository) {
         this.roleRepository = roleRepository;
     }
 
