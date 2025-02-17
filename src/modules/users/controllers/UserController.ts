@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/UserService";
-import { User } from "../entity/typeorm/User.entity";
-import { UserDTO } from "../dto/UserDTO";
 import { IdGenerator } from "@core/idGenerator";
+import { UserContract } from "../contracts/IUser";
 
 export class UserController {
     constructor(private readonly userService: UserService) {}
@@ -48,7 +47,7 @@ export class UserController {
             const idGenerator = IdGenerator.getInstance();
             const userId: string = idGenerator.generateId(16);
 
-            const user = new User({
+            const user: UserContract = ({
                 id: userId,
                 email,
                 password,
@@ -59,7 +58,7 @@ export class UserController {
                 telnumber,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            });
+            } as UserContract);
             
             const createdUser = await this.userService.createUser(user);
 

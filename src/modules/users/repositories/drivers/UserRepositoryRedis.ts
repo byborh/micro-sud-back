@@ -2,6 +2,7 @@ import { User } from "@modules/users/entity/typeorm/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 import { RedisClientType } from "redis";
+import { UserContract } from "@modules/users/contracts/IUser";
 
 
 export class UserRepositoryRedis implements IUserRepository {
@@ -9,6 +10,17 @@ export class UserRepositoryRedis implements IUserRepository {
     
     constructor(private db: IDatabase) {
         this.client = db.getDataSoure();
+    }
+
+    private getUserKey(userId: string): string {
+        return `users:${userId}`;
+    }
+
+    findUserByField2(field: string, value: string): Promise<UserContract | null> {
+        const user = new User();
+
+        // return user as UserContract;
+        throw new Error("Method not implemented.");
     }
 
     findUserByField(field: string, value: string): Promise<User | null> {

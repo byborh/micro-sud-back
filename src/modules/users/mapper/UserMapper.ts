@@ -1,35 +1,38 @@
 // Import des modules
 import { UserDTO } from "../dto/UserDTO";
-import { User } from "../entity/typeorm/User.entity";
 import { UserContract } from "../contracts/IUser";
-import { Repository } from "typeorm";
-import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { getDatabase } from "@db/DatabaseClient";
+import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL";
+import { UserRepositoryRedis } from "../repositories/drivers/UserRepositoryRedis";
+import { getRepository } from "@core/db/databaseGuards";
+import { IUserRepository } from "../repositories/contract/IUserRepository";
 
 export class UserMapper {
-    private static repository: Repository<User>;
+    private static userRepository: IUserRepository;
 
     // Initialize the repository
     private static async initRepository() {
-        if(!this.repository) {
+        if(!this.userRepository) {
             const myDB = await getDatabase();
-            this.repository = (myDB as MySQLDatabase).getDataSoure().getRepository(User);
+
+            // Il faut passer par le repository, c'est mieux !
+            this.userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
         }
     }
 
     // Transform the dto to the entity
-    static async toEntity(dto: UserDTO): Promise<User> {
+    static async toEntity(dto: UserDTO): Promise<UserContract> {
         if (!dto.id) throw new Error("User ID is required.");
 
         // Be sur that the repository is initialized
         await this.initRepository();
         
         // Get existing user from the database
-        const existingUser: User | null = await this.repository.findOne({ where: { id: dto.id } });
+        const existingUser: UserContract | null = await this.userRepository.findUserById(dto.id);
 
         if (!existingUser) throw new Error("User not found.");
 
-        return new User({
+        return ({
             id: dto.id,
             email: dto.email,
             password: existingUser.password, // Let password unchanged
@@ -45,16 +48,16 @@ export class UserMapper {
 
 
     // Transform the entity to the dto
-    static toDTO(user: User): UserDTO {
+    static toDTO(user: UserContract): UserDTO {
         return {
-            id: user.getId(),
-            email: user.getEmail(),
-            firstname: user.getFirstname(),
-            lastname: user.getLastname(),
-            pseudo: user.getPseudo(),
-            telnumber: user.getTelnumber(),
-            createdAt: user.getCreatedAt(),
-            updatedAt: user.getUpdatedAt()
+            id: user.id,
+            email: user.email,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            pseudo: user.pseudo,
+            telnumber: user.telnumber,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
         };
     }
 }

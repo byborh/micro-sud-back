@@ -2,10 +2,15 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { User } from '@modules/users/entity/typeorm/User.entity';
 import { getDatabase } from '@db/DatabaseClient';
-import { Repository } from 'typeorm';
-import { MySQLDatabase } from '@db/drivers/mysql.datasource';
+import { IUserRepository } from '@modules/users/repositories/contract/IUserRepository';
+import { UserRepositoryRedis } from '@modules/users/repositories/drivers/UserRepositoryRedis';
+import { UserRepositoryMySQL } from '@modules/users/repositories/drivers/UserRepositoryMySQL';
+import { getRepository } from '@core/db/databaseGuards';
+import { UserRoles } from '@modules/user-roles/entity/typeorm/UserRoles.entity';
+import { IUserRolesRepository } from '@modules/user-roles/repositories/contract/IUserRolesRepository';
+import { UserRolesRepositoryMySQL } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL';
+import { UserRolesRepositoryRedis } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryRedis';
 
 const publicKeyPath = path.join(__dirname, '../../ec_public.pem');
 const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
@@ -51,22 +56,29 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
 
             // Initialize database
             const myDB = await getDatabase();
-            const userRepository: Repository<User> = (myDB as MySQLDatabase).getDataSoure().getRepository(User);
+            const userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
+            const userRolesRepository = getRepository(myDB, UserRolesRepositoryMySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
 
             // Verify if user exists
-            const user = await userRepository.findOne({
-                where: { id: decoded.sub },
-                relations: ['userRoles', 'userRoles.role'], // Fetch user roles
-            });
+            const user = await userRepository.findUserById(decoded.sub);
 
             if (!user) {
                 res.status(404).json({ message: 'User not found.' });
                 return;
             }
 
-            const userRoles: string[] = user.userRoles.map((userRole) => userRole.role.name);
+            // Verify if user has a role(s)
+            const userRoles: UserRoles[] = await userRolesRepository.getUserRolesByMultipleFields(["user_id"], [decoded.sub]); // Or use : user.id
+            
+            if (!userRoles || userRoles.length === 0) {
+                res.status(403).json({ message: "Access denied. User does not have a role: GUEST" });
+                return;
+            }
+            
+            const userRolesTable: string[] = userRoles.map((userRole) => userRole.role.name);
 
-            if (requiredRoles.length > 0 && !requiredRoles.some((role) => userRoles.includes(role))) {
+
+            if (requiredRoles.length > 0 && !requiredRoles.some((role) => userRolesTable.includes(role))) {
                 res.status(403).json({ message: "Access denied. Insufficient permissions." });
                 return;
             }
@@ -74,10 +86,9 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
             // Attach user data to the request
             (req as any).user = {
                 id: user.id,
-                roles: userRoles,
+                roles: userRolesTable,
                 tokenId: decoded.jti,
             };
-
 
             next();
         } catch (error) {

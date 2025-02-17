@@ -9,19 +9,20 @@ import { getRepository } from '@core/db/databaseGuards';
 import { AuthTokenRepositoryMySQL } from './repositories/drivers/AuthTokenRepositoryMySQL';
 import { AuthTokenRepositoryRedis } from './repositories/drivers/AuthTokenRepositoryRedis';
 import { IAuthTokenRepository } from './repositories/contract/IAuthTokenRepository';
+import { UserRepositoryRedis } from '@modules/users/repositories/drivers/UserRepositoryRedis';
+import { IUserRepository } from '@modules/users/repositories/contract/IUserRepository';
+import { UserRolesRepositoryRedis } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryRedis';
+import { IUserRolesRepository } from '@modules/user-roles/repositories/contract/IUserRolesRepository';
 
 export const createAuthTokenModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
   const authTokenRepository = getRepository(myDB, AuthTokenRepositoryMySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
+  const userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
+  const userRolesRepository = getRepository(myDB, UserRolesRepositoryMySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
 
-  // User / User-AuthToken repositories in AuthToken module
-  const userRepositoryMySQL = new UserRepositoryMySQL(myDB);
-  const userRolesRepositoryMySQL = new UserRolesRepositoryMySQL(myDB); // à changer à une interface
-
-  const authTokenService = new AuthTokenService(authTokenRepository, userRepositoryMySQL, userRolesRepositoryMySQL);
+  const authTokenService = new AuthTokenService(authTokenRepository, userRepository, userRolesRepository);
   const authTokenController = new AuthTokenController(authTokenService);
 
-  // Le contrôleur sera injecté dans les routes
   return AuthTokenRoutes(authTokenController);
 };

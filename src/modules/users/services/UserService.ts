@@ -1,4 +1,3 @@
-import {User} from "../entity/typeorm/User.entity";
 import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
 import {PasswordManager} from "@core/cryptography/PasswordManager";
@@ -17,6 +16,7 @@ import { UserRolesRepositoryRedis } from "@modules/user-roles/repositories/drive
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
 import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
 import { AuthTokenRepositoryRedis } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryRedis";
+import { UserContract } from "../contracts/IUser";
 import _ from "lodash";
 
 
@@ -34,7 +34,7 @@ export class UserService {
             }
 
             // Call UserRepository to find a user by ID
-            const userEntity: User = await this.userRepository.findUserById(userId);
+            const userEntity: UserContract = await this.userRepository.findUserById(userId);
 
             // If no user is found, return null
             if (!userEntity) {
@@ -61,7 +61,7 @@ export class UserService {
             }
 
             // Call UserRepository to find a user by email
-            const userEntity: User = await this.userRepository.findUserByEmail(email);
+            const userEntity: UserContract = await this.userRepository.findUserByEmail(email);
 
             // If no user is found, return null
             if (!userEntity) {
@@ -83,7 +83,7 @@ export class UserService {
     public async getUsers(): Promise<Array<UserDTO> | null> {
         try {
             // Call UserRepository to find all users
-            const usersEntity: User[] = await this.userRepository.getAllUsers();
+            const usersEntity: UserContract[] = await this.userRepository.getAllUsers();
 
             // If no users are found, return null
             if (!usersEntity) return null;
@@ -97,10 +97,10 @@ export class UserService {
     }
     
     // Create user
-    public async createUser(user: User): Promise<UserDTO | null> {
+    public async createUser(user: UserContract): Promise<UserDTO | null> {
         try {
             // Verify if user exists
-            const localUser: UserDTO | null = await this.userRepository.findUserByEmail(user.getEmail());
+            const localUser: UserDTO | null = await this.userRepository.findUserByEmail(user.email);
             if (localUser) {
                 console.error("User already exists:", localUser);
                 throw new Error("User already exists.");
@@ -113,17 +113,17 @@ export class UserService {
             const salt: string = passwordManager.generateSalt();
 
             // Creation of hashed password
-            const hashedPassword: string = passwordManager.hashPassword(user.getPassword(), salt);
+            const hashedPassword: string = passwordManager.hashPassword(user.password, salt);
 
             // Verification of password
-            const isValid: boolean = passwordManager.verifyPassword(user.getPassword(), salt, hashedPassword);
+            const isValid: boolean = passwordManager.verifyPassword(user.password, salt, hashedPassword); // IL N'EST PAS UTILISE ???
 
             // Assign hashed password to user
             user.setPassword(hashedPassword);
             user.setSalt(salt);
 
             // Create user from repository
-            const createdUser: User | null = await this.userRepository.createUser(user);
+            const createdUser: UserContract | null = await this.userRepository.createUser(user);
 
             // User didn't created
             if (!createdUser) throw new Error("User didn't created...")
@@ -143,7 +143,7 @@ export class UserService {
 
             // Attribute USER role
             const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance(roleRepository, userRolesRepository, createToken);
-            const authToken: AuthToken | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.getId());
+            const authToken: AuthToken | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.id);
 
             if(!authToken) throw new Error("Attribution of role or token didn't created...");
 
@@ -157,7 +157,7 @@ export class UserService {
     }
 
     // Modify user
-    public async modifyUser(userId: string, data: Partial<User>): Promise<UserDTO | null> {
+    public async modifyUser(userId: string, data: Partial<UserContract>): Promise<UserDTO | null> {
         try {
             // Vérification de l'existence de l'utilisateur
             const existingUserDTO: UserDTO | null = await this.getUserById(userId);
@@ -166,33 +166,33 @@ export class UserService {
             }
     
             // Mapping du DTO vers l'entité
-            const existingUser: User = await UserMapper.toEntity(existingUserDTO);
+            const existingUser: UserContract = await UserMapper.toEntity(existingUserDTO);
     
             // Variable pour suivre les modifications
             let hasChanges: boolean = false;
     
             // Comparaison des champs et mise à jour si nécessaire
-            if (data.email && data.email !== existingUser.getEmail()) {
+            if (data.email && data.email !== existingUser.email) {
                 existingUser.setEmail(data.email);
                 hasChanges = true;
             }
     
-            if (data.firstname && data.firstname !== existingUser.getFirstname()) {
+            if (data.firstname && data.firstname !== existingUser.firstname) {
                 existingUser.setFirstname(data.firstname);
                 hasChanges = true;
             }
     
-            if (data.lastname && data.lastname !== existingUser.getLastname()) {
+            if (data.lastname && data.lastname !== existingUser.lastname) {
                 existingUser.setLastname(data.lastname);
                 hasChanges = true;
             }
     
-            if (data.pseudo && data.pseudo !== existingUser.getPseudo()) {
+            if (data.pseudo && data.pseudo !== existingUser.pseudo) {
                 existingUser.setPseudo(data.pseudo);
                 hasChanges = true;
             }
     
-            if (data.telnumber && data.telnumber !== existingUser.getTelnumber()) {
+            if (data.telnumber && data.telnumber !== existingUser.telnumber) {
                 existingUser.setTelnumber(data.telnumber);
                 hasChanges = true;
             }
@@ -202,8 +202,8 @@ export class UserService {
                 const passwordManager = PasswordManager.getInstance();
                 const isPasswordValid: boolean = passwordManager.verifyPassword(
                     data.password,
-                    existingUser.getSalt(),
-                    existingUser.getPassword()
+                    existingUser.salt,
+                    existingUser.password
                 );
     
                 // Si le mot de passe est différent
@@ -225,7 +225,7 @@ export class UserService {
             existingUser.setUpdatedAt(new Date());
     
             // Mise à jour dans la base de données
-            const updatedUser: User | null = await this.userRepository.modifyUser(existingUser);
+            const updatedUser: UserContract | null = await this.userRepository.modifyUser(existingUser);
     
             // Si l'utilisateur n'a pas été mis à jour, retourner null
             if (!updatedUser) {

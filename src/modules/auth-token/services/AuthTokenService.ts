@@ -1,19 +1,21 @@
-import { UserRepositoryMySQL } from "@modules/users/repositories/drivers/UserRepositoryMySQL";
 import { AuthToken } from "../entity/typeorm/AuthToken.entity";
 import { AuthTokenRepositoryMySQL } from "../repositories/drivers/AuthTokenRepositoryMySQL";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { CreateToken } from "@core/auth/createToken";
 import { getDatabase } from "@db/DatabaseClient";
 import { IAuthTokenRepository } from "../repositories/contract/IAuthTokenRepository";
+import { IUserRepository } from "@modules/users/repositories/contract/IUserRepository";
+import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
+import { getRepository } from "@core/db/databaseGuards";
+import { AuthTokenRepositoryRedis } from "../repositories/drivers/AuthTokenRepositoryRedis";
 
 export class AuthTokenService {
     private authTokenRepository: IAuthTokenRepository;
-    private userRepository: UserRepositoryMySQL;
-    private userRoleRepository: UserRolesRepositoryMySQL;
+    private userRepository: IUserRepository;
+    private userRoleRepository: IUserRolesRepository;
 
-    constructor(authTokenRepository: IAuthTokenRepository, userRepository: UserRepositoryMySQL, userRoleRepository: UserRolesRepositoryMySQL) {
+    constructor(authTokenRepository: IAuthTokenRepository, userRepository: IUserRepository, userRoleRepository: IUserRolesRepository) {
         this.authTokenRepository = authTokenRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
@@ -57,7 +59,7 @@ export class AuthTokenService {
         const myDB = await getDatabase();
 
         // Dependencies
-        const authTokenRepository = new AuthTokenRepositoryMySQL(myDB);
+        const authTokenRepository = getRepository(myDB, AuthTokenRepositoryMySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
     
         const createToken = CreateToken.getInstance(authTokenRepository);
         const authToken: AuthToken = await createToken.createToken(userId, roleIds);
