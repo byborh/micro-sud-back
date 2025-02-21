@@ -1,7 +1,5 @@
 import { IdGenerator } from "@core/idGenerator";
-import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
-import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
-import { getDatabase } from "@db/DatabaseClient";
+import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
 import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
 import fs from "fs";
 import jwt from "jsonwebtoken";
@@ -22,7 +20,7 @@ export class CreateToken{
         return CreateToken.instance;
     }
 
-    public async createToken(userId: string, roleIds: string[]): Promise<AuthToken | null> {
+    public async createToken(userId: string, roleIds: string[]): Promise<AuthTokenAbstract | null> {
         // Get the private key
         const privateKeyPath = path.join(__dirname, "../../../ec_private.pem");
         const privateKey: string = fs.readFileSync(privateKeyPath, "utf8");
@@ -51,26 +49,17 @@ export class CreateToken{
         });
 
         // Stock the token ID in the database
-        const authToken: AuthToken = new AuthToken(authTokenId, userId, token, createdAt, expiresAt);
+        const authToken = {
+            id: authTokenId,
+            user_id: userId,
+            token: token,
+            createdAt: createdAt,
+            expiresAt: expiresAt
+        } as AuthTokenAbstract;
 
-        const tokenCreated: AuthToken = await this.authTokenRepository.createAuthToken(authToken);
+        const tokenCreated: AuthTokenAbstract = await this.authTokenRepository.createAuthToken(authToken);
         if(!tokenCreated) throw new Error("Failed to create token.");
 
         return authToken || null;
     }
 }
-
-
-/*
-
-export class HashManager {
-    private static instance: HashManager;
-
-    private constructor() {}
-
-    public static getInstance(): HashManager {
-        if (!HashManager.instance) {
-        HashManager.instance = new HashManager();
-        }
-      
-*/

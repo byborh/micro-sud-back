@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { AuthTokenContract } from "../../contracts/IAuthToken";
 import { User } from "@modules/users/entity/typeorm/User.entity";
+import { AuthTokenAbstract } from "../AuthToken.abstract";
 
 
 @Entity("auth_token")
-export class AuthToken implements AuthTokenContract {
+export class AuthTokenTypeORM extends AuthTokenAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -20,7 +20,7 @@ export class AuthToken implements AuthTokenContract {
     @Column({ type: "timestamp" })
     expiresAt: Date;
 
-    @OneToOne(() => User, user => user.authToken, {onDelete: "CASCADE"})
+    @OneToOne(() => User, user => user.authTokenTypeORM, {onDelete: "CASCADE"})
     @JoinColumn({ name: "user_id" })
     user: User;
 
@@ -40,6 +40,7 @@ export class AuthToken implements AuthTokenContract {
     */
 
     constructor(id: string, user_id: string, token: string, createdAt: Date, expiresAt: Date) {
+        super(id, user_id, token, createdAt, expiresAt);
         this.id = id;
         this.user_id = user_id;
         this.token = token;

@@ -1,7 +1,6 @@
-import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
+import { AuthTokenRedis } from "@modules/auth-token/entity/redis/AuthToken.entity";
 import { IAuthTokenRepository } from "../contract/IAuthTokenRepository";
 import { RedisClientType } from "redis";
-import { RedisDatabase } from "@db/drivers/redis.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 
 
@@ -12,16 +11,16 @@ export class AuthTokenRepositoryRedis implements IAuthTokenRepository {
         this.redisClient = db.getDataSoure();
     }
 
-    createAuthToken(authToken: AuthToken): Promise<AuthToken> {
+    createAuthToken(authToken: AuthTokenRedis): Promise<AuthTokenRedis> {
         throw new Error("Method not implemented.");
     }
-    getAuthTokenByUserId(userId: string): Promise<AuthToken | null> {
+    getAuthTokenByUserId(userId: string): Promise<AuthTokenRedis | null> {
         throw new Error("Method not implemented.");
     }
     deleteAuthTokenByUserId(userId: string): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    getAllAuthTokens(): Promise<AuthToken[] | null> {
+    getAllAuthTokens(): Promise<AuthTokenRedis[] | null> {
         throw new Error("Method not implemented.");
     }
     deleteAuthTokenById(authTokenId: string): Promise<boolean> {

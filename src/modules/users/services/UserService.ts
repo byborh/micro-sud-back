@@ -1,7 +1,6 @@
 import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
 import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
@@ -17,6 +16,7 @@ import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/
 import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
 import { AuthTokenRepositoryRedis } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryRedis";
 import { UserAbstract } from "../entity/User.abstract";
+import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
 import _ from "lodash";
 
 
@@ -143,7 +143,7 @@ export class UserService {
 
             // Attribute USER role
             const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance(roleRepository, userRolesRepository, createToken);
-            const authToken: AuthToken | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.id);
+            const authToken: AuthTokenAbstract | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.id);
 
             if(!authToken) throw new Error("Attribution of role or token didn't created...");
 

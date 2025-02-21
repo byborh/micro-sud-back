@@ -1,4 +1,3 @@
-import { AuthToken } from "../entity/typeorm/AuthToken.entity";
 import { AuthTokenRepositoryMySQL } from "../repositories/drivers/AuthTokenRepositoryMySQL";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
@@ -9,6 +8,7 @@ import { IUserRepository } from "@modules/users/repositories/contract/IUserRepos
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
 import { getRepository } from "@core/db/databaseGuards";
 import { AuthTokenRepositoryRedis } from "../repositories/drivers/AuthTokenRepositoryRedis";
+import { AuthTokenAbstract } from "../entity/AuthToken.abstract";
 
 export class AuthTokenService {
     private authTokenRepository: IAuthTokenRepository;
@@ -45,7 +45,7 @@ export class AuthTokenService {
         if(isAuthTokenExists) {
             const isAuthTokenDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(user.getId());
 
-            if(!isAuthTokenDeleted) throw new Error("Failed to delete existant AuthToken.");
+            if(!isAuthTokenDeleted) throw new Error("Failed to delete existant AuthTokenAbstract.");
         }
 
         const userId: string = user.getId();
@@ -62,7 +62,7 @@ export class AuthTokenService {
         const authTokenRepository = getRepository(myDB, AuthTokenRepositoryMySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
     
         const createToken = CreateToken.getInstance(authTokenRepository);
-        const authToken: AuthToken = await createToken.createToken(userId, roleIds);
+        const authToken: AuthTokenAbstract = await createToken.createToken(userId, roleIds);
 
         return authToken.getToken();
     }
@@ -79,22 +79,22 @@ export class AuthTokenService {
         return true;
     }
 
-    // Récupérer un AuthToken par userId
-    public async getAuthTokenByUserId(userId: string): Promise<AuthToken | null> {
+    // Récupérer un AuthTokenAbstract par userId
+    public async getAuthTokenByUserId(userId: string): Promise<AuthTokenAbstract | null> {
         try {
             if (!userId) {throw new Error("User ID is required.");}
 
             const authToken = await this.authTokenRepository.getAuthTokenByUserId(userId);
-            if (!authToken) {throw new Error("AuthToken not found.");}
+            if (!authToken) {throw new Error("AuthTokenAbstract not found.");}
 
             return authToken;
         } catch (error) {
-            console.error("Error finding AuthToken in AuthTokenService:", error);
-            throw new Error("Failed to find AuthToken.");
+            console.error("Error finding AuthTokenAbstract in AuthTokenService:", error);
+            throw new Error("Failed to find AuthTokenAbstract.");
         }
     }
 
-    // Supprimer un AuthToken par userId
+    // Supprimer un AuthTokenAbstract par userId
     public async deleteAuthTokenByUserId(userId: string): Promise<boolean> {
         try {
             if (!userId) {throw new Error("User ID is required.");}
@@ -102,13 +102,13 @@ export class AuthTokenService {
             const isDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(userId);
             return isDeleted;
         } catch (error) {
-            console.error("Error deleting AuthToken in AuthTokenService:", error);
-            throw new Error("Failed to delete AuthToken.");
+            console.error("Error deleting AuthTokenAbstract in AuthTokenService:", error);
+            throw new Error("Failed to delete AuthTokenAbstract.");
         }
     }
 
     // Récupérer tous les AuthTokens (administration)
-    public async getAllAuthTokens(): Promise<AuthToken[] | null> {
+    public async getAllAuthTokens(): Promise<AuthTokenAbstract[] | null> {
         try {
             const authTokens = await this.authTokenRepository.getAllAuthTokens();
             if (!authTokens || authTokens.length === 0) {
@@ -121,18 +121,18 @@ export class AuthTokenService {
         }
     }
 
-    // Supprimer un AuthToken par son ID
+    // Supprimer un AuthTokenAbstract par son ID
     public async deleteAuthTokenById(authTokenId: string): Promise<boolean> {
         try {
             if (!authTokenId) {
-                throw new Error("AuthToken ID is required.");
+                throw new Error("AuthTokenAbstract ID is required.");
             }
 
             const isDeleted = await this.authTokenRepository.deleteAuthTokenById(authTokenId);
             return isDeleted;
         } catch (error) {
-            console.error("Error deleting AuthToken by ID in AuthTokenService:", error);
-            throw new Error("Failed to delete AuthToken.");
+            console.error("Error deleting AuthTokenAbstract by ID in AuthTokenService:", error);
+            throw new Error("Failed to delete AuthTokenAbstract.");
         }
     }
 }

@@ -20,7 +20,7 @@ export class ChatAITypeORM extends ChatAIAbstract {
     @Column({ type: "timestamp" })
     createdAt: Date;
 
-    @ManyToOne(() => User, user => user.chatAI, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User, user => user.chatAITypeORM, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "user_id" })
     user: User;
 

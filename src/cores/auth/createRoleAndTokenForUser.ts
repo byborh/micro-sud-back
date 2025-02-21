@@ -1,11 +1,9 @@
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
-import { RoleRepositoryMySQL } from "@modules/roles/repositories/drivers/RoleRepositoryMySQL";
 import { Role } from "@modules/roles/entity/typeorm/Role.entity";
-import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
-import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { CreateToken } from "./createToken";
 import { IRoleRepository } from "@modules/roles/repositories/contract/IRoleRepository";
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
+import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
 
 export class CreateRoleAndTokenForUser {
     private static instance: CreateRoleAndTokenForUser;
@@ -31,7 +29,7 @@ export class CreateRoleAndTokenForUser {
     }
 
 
-    public async createRoleAndTokenForUser(userId: string): Promise<AuthToken | null> {
+    public async createRoleAndTokenForUser(userId: string): Promise<AuthTokenAbstract | null> {
 
         // Get ID of USER role
         const role: Role = await this.roleRepository.getRoleByName('USER');
@@ -45,7 +43,7 @@ export class CreateRoleAndTokenForUser {
         if(!userRolesEntity) throw new Error("UserRoles didn't created correctly.")
 
         // Appeler la fonction pour créer un token
-        const authToken: AuthToken = await this.createToken.createToken(userId, [roleId]);
+        const authToken: AuthTokenAbstract = await this.createToken.createToken(userId, [roleId]);
 
         return authToken;
     }

@@ -1,45 +1,17 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { AuthTokenContract } from "../../contracts/IAuthToken";
-import { User } from "@modules/users/entity/typeorm/User.entity";
+import { AuthTokenAbstract } from "../AuthToken.abstract";
 
 
 @Entity("auth_token")
-export class AuthToken implements AuthTokenContract {
-    @PrimaryColumn({ type: "varchar", length: 255 })
+export class AuthTokenRedis extends AuthTokenAbstract {
     id: string;
-
-    @Column({ type: "varchar", length: 255 })
     user_id: string;
-
-    @Column({ type: "varchar", length: 512 })
     token: string;
-
-    @Column({ type: "timestamp" })
     createdAt: Date;
-
-    @Column({ type: "timestamp" })
     expiresAt: Date;
 
-    @OneToOne(() => User, user => user.authToken, {onDelete: "CASCADE"})
-    @JoinColumn({ name: "user_id" })
-    user: User;
-
-    /*
-    ----------------------------------------------------------------------------------
-        Add liaisons here with other Entities
-        Ex :
-            - @OneToMany
-                entityName: EntityName
-            - @OneToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-    ----------------------------------------------------------------------------------
-    */
-
     constructor(id: string, user_id: string, token: string, createdAt: Date, expiresAt: Date) {
+        super(id, user_id, token, createdAt, expiresAt);
         this.id = id;
         this.user_id = user_id;
         this.token = token;
