@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
-import { ChatAI } from "../entity/typeorm/ChatAI.entity";
 import { IdGenerator } from "@core/idGenerator";
 import { IChatAIRepository } from "../repositories/contract/IChatAIRepository";
+import { ChatAIAbstract } from "../entity/ChatAI.abstract";
 const axios = require('axios');
 
 dotenv.config();
@@ -28,7 +28,13 @@ export class ChatAIService {
             const idGenerator = IdGenerator.getInstance();
             const chatAIId: string = idGenerator.generateId(16);
 
-            const chatAI = new ChatAI(chatAIId, userId, prompt, combinedResponse, new Date());
+            const chatAI = {
+                id: chatAIId,
+                user_id: userId,
+                requestContent: prompt,
+                responseContent: combinedResponse,
+                createdAt: new Date()
+            } as ChatAIAbstract;
 
             await this.chatAIRepository.submitPrompt(chatAI);
 
@@ -95,9 +101,9 @@ export class ChatAIService {
     }
 
 
-    public async getAllChatAIs(): Promise<ChatAI[]> {
+    public async getAllChatAIs(): Promise<ChatAIAbstract[]> {
         try {
-            const chatAIs: ChatAI[] = await this.chatAIRepository.getAllChatAIs();
+            const chatAIs: ChatAIAbstract[] = await this.chatAIRepository.getAllChatAIs();
             if (!chatAIs || chatAIs.length === 0) return null;
             return chatAIs
         } catch (error) {
@@ -106,11 +112,11 @@ export class ChatAIService {
         }
     }
 
-    public async getChatAIById(chatAIId: string): Promise<ChatAI> {
+    public async getChatAIById(chatAIId: string): Promise<ChatAIAbstract> {
         try {
             if(!chatAIId || chatAIId.trim() === "") return null;
 
-            const chatAI: ChatAI = await this.chatAIRepository.getChatAIById(chatAIId);
+            const chatAI: ChatAIAbstract = await this.chatAIRepository.getChatAIById(chatAIId);
             if (!chatAI) return null;
 
             return chatAI
@@ -121,11 +127,11 @@ export class ChatAIService {
     }
 
 
-    public async getChatAIsByUserId(userId: string): Promise<ChatAI[]> {
+    public async getChatAIsByUserId(userId: string): Promise<ChatAIAbstract[]> {
         try {
             if(!userId || userId.trim() === "") return null;
 
-            const chatAI: ChatAI[] = await this.chatAIRepository.getChatAIsByUserId(userId);
+            const chatAI: ChatAIAbstract[] = await this.chatAIRepository.getChatAIsByUserId(userId);
             if (!chatAI) return null;
 
             return chatAI

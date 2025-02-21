@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
-import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
+import { ChatAITypeORM } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 import { UserAbstract } from "../User.abstract";
 import { UserDTO } from "@modules/users/dto/UserDTO";
 
@@ -47,8 +47,8 @@ export class User extends UserAbstract {
     @OneToOne(() => AuthToken, authToken => authToken.user) 
     authToken: AuthToken;
 
-    @OneToMany(() => ChatAI, chatAI => chatAI.user, { cascade: true })
-    chatAI: ChatAI[]
+    @OneToMany(() => ChatAITypeORM, chatAI => chatAI.user, { cascade: true })
+    chatAI: ChatAITypeORM[]
 
     /*
     ----------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ import { User } from "@modules/users/entity/typeorm/User.entity";
 import { Role } from "@modules/roles/entity/typeorm/Role.entity";
 import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
 import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
-import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
+import { ChatAITypeORM } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 import { IDatabase } from "@db/contract/IDatabase";
 
 
@@ -23,7 +23,7 @@ export class MySQLDatabase implements IDatabase {
             username: process.env.MYSQL_USER || "root",
             password: process.env.MYSQL_PASSWORD || "",
             database: process.env.MYSQL_DATABASE || "datte",
-            entities: [User, Role, UserRoles, AuthToken, ChatAI],  // ADD ALL ENTITIES
+            entities: [User, Role, UserRoles, AuthToken, ChatAITypeORM],  // ADD ALL ENTITIES
             synchronize: process.env.NODE_ENV !== "production",   // ATTENTION
             logging: process.env.NODE_ENV === "development",     // ATTENTION
         })

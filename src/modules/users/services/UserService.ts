@@ -1,6 +1,6 @@
 import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
-import {PasswordManager} from "@core/cryptography/PasswordManager";
+import { PasswordManager } from "@core/cryptography/PasswordManager";
 import { AuthToken } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
 import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
 import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
@@ -18,7 +18,6 @@ import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/
 import { AuthTokenRepositoryRedis } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryRedis";
 import { UserAbstract } from "../entity/User.abstract";
 import _ from "lodash";
-import { UserContract } from "../contracts/IUser";
 
 
 export class UserService {

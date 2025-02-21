@@ -1,51 +1,39 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ChatAIContract } from "../../contracts/IChatAI";
-import { User } from "@modules/users/entity/typeorm/User.entity";
+import { ChatAIAbstract } from "../ChatAI.abstract";
 
-
-@Entity("chat_ai")
-export class ChatAI implements ChatAIContract {
-    @PrimaryColumn({ type: "varchar", length: 255 })
+export class ChatAIRedis extends ChatAIAbstract {
     id: string;
-
-    @Column({ type: "varchar", length: 255 })
     user_id: string;
-
-    @Column({ type: "varchar", length: 1024 })
     requestContent: string;
-
-    @Column({ type: "varchar", length: 8192})
     responseContent: string;
-
-    @Column({ type: "timestamp" })
     createdAt: Date;
 
-    @ManyToOne(() => User, user => user.chatAI, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: "user_id" })
-    user: User;
-
-    /*
-    ----------------------------------------------------------------------------------
-        Add liaisons here with other Entities
-        Ex :
-            - @OneToMany
-                entityName: EntityName
-            - @OneToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-    ----------------------------------------------------------------------------------
-    */
-
     constructor(id: string, user_id: string, requestContent: string, responseContent: string, createdAt: Date) {
+        super(id, user_id, requestContent, responseContent, createdAt);
+        
         this.id = id;
         this.user_id = user_id;
         this.requestContent = requestContent;
         this.responseContent = responseContent;
         this.createdAt = createdAt;
     }
+
+
+    // Convert object to Redis hash
+    toRedisHash(): { [key: string]: string } {
+        return {
+            id: this.id,
+            user_id: this.user_id,
+            requestContent: this.requestContent,
+            responseContent: this.responseContent,
+            createdAt: this.createdAt.toISOString() // à corriger
+        }
+    }
+
+    // Covert Redis hash to object
+    static fromRedisHash(hash: { [key: string]: string }) {
+        return new ChatAIRedis(hash.id, hash.user_id, hash.requestContent, hash.responseContent, new Date(hash.createdAt));
+    }
+
 
     public getId(): string {return this.id;}
     public getUserId(): string {return this.user_id;}

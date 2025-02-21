@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ChatAIContract } from "../../contracts/IChatAI";
 import { User } from "@modules/users/entity/typeorm/User.entity";
+import { ChatAIAbstract } from "../ChatAI.abstract";
 
 
 @Entity("chat_ai")
-export class ChatAI implements ChatAIContract {
+export class ChatAITypeORM extends ChatAIAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -40,6 +40,7 @@ export class ChatAI implements ChatAIContract {
     */
 
     constructor(id: string, user_id: string, requestContent: string, responseContent: string, createdAt: Date) {
+        super(id, user_id, requestContent, responseContent, createdAt);
         this.id = id;
         this.user_id = user_id;
         this.requestContent = requestContent;

@@ -1,9 +1,9 @@
-import { ChatAI } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
+import { ChatAIAbstract } from "@modules/chat-ai/entity/ChatAI.abstract";
 
 export interface IChatAIRepository {
-    submitPrompt(chatAI: ChatAI) : Promise<ChatAI>;
-    getAllChatAIs() : Promise<ChatAI[]>;
-    getChatAIById(chatAIId: string) : Promise<ChatAI>;
-    getChatAIsByUserId(userId: string) : Promise<ChatAI[]>;
+    submitPrompt(chatAI: ChatAIAbstract) : Promise<ChatAIAbstract>;
+    getAllChatAIs() : Promise<ChatAIAbstract[]>;
+    getChatAIById(chatAIId: string) : Promise<ChatAIAbstract>;
+    getChatAIsByUserId(userId: string) : Promise<ChatAIAbstract[]>;
     deleteChatAIById(chatAIId: string) : Promise<boolean>;
 }
