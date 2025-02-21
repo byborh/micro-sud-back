@@ -1,3 +1,5 @@
+import { UserDTO } from "../dto/UserDTO";
+
 // Interface of the user
 export interface UserContract {
     id: string;
@@ -11,14 +13,5 @@ export interface UserContract {
     createdAt: Date;
     updatedAt: Date;
 
-    // Setters
-    setFirstname(firstname: string): void;
-    setLastname(lastname: string): void;
-    setPseudo(pseudo: string): void;
-    setEmail(email: string): void;
-    setPassword(password: string): void;
-    setSalt(salt: string): void;
-    setTelnumber(telnumber: string): void;
-    setCreatedAt(createdAt: Date): void;
-    setUpdatedAt(updatedAt: Date): void;
+    toDTO(): UserDTO;
 }

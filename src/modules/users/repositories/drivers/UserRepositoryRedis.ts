@@ -1,48 +1,80 @@
-import { User } from "@modules/users/entity/typeorm/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 import { RedisClientType } from "redis";
-import { UserContract } from "@modules/users/contracts/IUser";
-
+import { UserRedisEntity } from "@modules/users/entity/redis/User.entity";
 
 export class UserRepositoryRedis implements IUserRepository {
     private client: RedisClientType;
     
     constructor(private db: IDatabase) {
-        this.client = db.getDataSoure();
+        this.client = db.getDataSoure() as RedisClientType;
+        this.initialize();
     }
 
-    private getUserKey(userId: string): string {
-        return `users:${userId}`;
+    // Connect to database
+    async initialize(): Promise<void> {
+        try {
+            if (!this.client.isOpen) {
+                await this.client.connect();
+            }
+        } catch (error) {
+            console.error('Failed to connect to Redis:', error);
+            throw error;
+        }
+    }
+    async findUserByField(field: string, value: string): Promise<UserRedisEntity | null> {
+        const userData = await this.client.hGetAll(`user:${value}`);
+
+        if (Object.keys(userData).length === 0) return null;
+        
+        return UserRedisEntity.fromRedisHash(userData);
     }
 
-    findUserByField2(field: string, value: string): Promise<UserContract | null> {
-        const user = new User();
-
-        // return user as UserContract;
-        throw new Error("Method not implemented.");
+    async findUserById(userId: string): Promise<UserRedisEntity | null> {
+        return this.findUserByField("id", userId);
     }
 
-    findUserByField(field: string, value: string): Promise<User | null> {
-        throw new Error("Method not implemented.");
+    async findUserByEmail(email: string): Promise<UserRedisEntity | null> {
+        return this.findUserByField('email', email);
     }
-    findUserById(userId: string): Promise<User | null> {
-        throw new Error("Method not implemented.");
+
+    async getAllUsers(): Promise<UserRedisEntity[]> {
+        const keys = await this.client.keys(`user:*`);
+        const users: UserRedisEntity[] = [];
+
+        for(const key of keys) {
+            const userData = await this.client.hGetAll(key);
+            users.push(UserRedisEntity.fromRedisHash(userData))
+        }
+
+        if(Object.keys(users).length === 0) return null;
+
+        return users.length > 0 ? users : [];
     }
-    findUserByEmail(email: string): Promise<User | null> {
-        throw new Error("Method not implemented.");
+
+    async createUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
+        await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+        
+        const exists = await this.client.exists(`user:${user.id}`);
+        
+        if(exists === 1) return user;
+
+        return null;
     }
-    getAllUsers(): Promise<Array<User> | null> {
-        throw new Error("Method not implemented.");
+
+    async modifyUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
+        await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+
+        const exists = await this.client.exists(`user:${user.id}`);
+        
+        if(exists === 1) return user;
+
+        return null;
     }
-    createUser(user: User): Promise<User | null> {
-        throw new Error("Method not implemented.");
-    }
-    modifyUser(user: User): Promise<User | null> {
-        throw new Error("Method not implemented.");
-    }
-    deleteUser(userId: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
+    async deleteUser(userId: string): Promise<boolean> {
+        const result = await this.client.del(`user:${userId}`)
+        
+        return result > 0;
     }
 
 }

@@ -16,8 +16,9 @@ import { UserRolesRepositoryRedis } from "@modules/user-roles/repositories/drive
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
 import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
 import { AuthTokenRepositoryRedis } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryRedis";
-import { UserContract } from "../contracts/IUser";
+import { UserAbstract } from "../entity/User.abstract";
 import _ from "lodash";
+import { UserContract } from "../contracts/IUser";
 
 
 export class UserService {
@@ -34,7 +35,7 @@ export class UserService {
             }
 
             // Call UserRepository to find a user by ID
-            const userEntity: UserContract = await this.userRepository.findUserById(userId);
+            const userEntity: UserAbstract = await this.userRepository.findUserById(userId);
 
             // If no user is found, return null
             if (!userEntity) {
@@ -61,7 +62,7 @@ export class UserService {
             }
 
             // Call UserRepository to find a user by email
-            const userEntity: UserContract = await this.userRepository.findUserByEmail(email);
+            const userEntity: UserAbstract = await this.userRepository.findUserByEmail(email);
 
             // If no user is found, return null
             if (!userEntity) {
@@ -83,7 +84,7 @@ export class UserService {
     public async getUsers(): Promise<Array<UserDTO> | null> {
         try {
             // Call UserRepository to find all users
-            const usersEntity: UserContract[] = await this.userRepository.getAllUsers();
+            const usersEntity: UserAbstract[] = await this.userRepository.getAllUsers();
 
             // If no users are found, return null
             if (!usersEntity) return null;
@@ -97,10 +98,10 @@ export class UserService {
     }
     
     // Create user
-    public async createUser(user: UserContract): Promise<UserDTO | null> {
+    public async createUser(user: UserAbstract): Promise<UserDTO | null> {
         try {
             // Verify if user exists
-            const localUser: UserDTO | null = await this.userRepository.findUserByEmail(user.email);
+            const localUser: UserAbstract | null = await this.userRepository.findUserByEmail(user.email);
             if (localUser) {
                 console.error("User already exists:", localUser);
                 throw new Error("User already exists.");
@@ -123,7 +124,7 @@ export class UserService {
             user.setSalt(salt);
 
             // Create user from repository
-            const createdUser: UserContract | null = await this.userRepository.createUser(user);
+            const createdUser: UserAbstract | null = await this.userRepository.createUser(user);
 
             // User didn't created
             if (!createdUser) throw new Error("User didn't created...")
@@ -157,21 +158,21 @@ export class UserService {
     }
 
     // Modify user
-    public async modifyUser(userId: string, data: Partial<UserContract>): Promise<UserDTO | null> {
+    public async modifyUser(userId: string, data: Partial<UserAbstract>): Promise<UserDTO | null> {
         try {
-            // Vérification de l'existence de l'utilisateur
+            // Verify if user exists
             const existingUserDTO: UserDTO | null = await this.getUserById(userId);
             if (!existingUserDTO) {
                 throw new Error("User not found.");
             }
     
-            // Mapping du DTO vers l'entité
-            const existingUser: UserContract = await UserMapper.toEntity(existingUserDTO);
+            // Mapp the DTO to the entity
+            const existingUser: UserAbstract = await UserMapper.toEntity(existingUserDTO);
     
-            // Variable pour suivre les modifications
+            // Variable to track changes
             let hasChanges: boolean = false;
     
-            // Comparaison des champs et mise à jour si nécessaire
+            // Compare fields and update if necessary
             if (data.email && data.email !== existingUser.email) {
                 existingUser.setEmail(data.email);
                 hasChanges = true;
@@ -197,7 +198,7 @@ export class UserService {
                 hasChanges = true;
             }
     
-            // Vérification du mot de passe (changer uniquement s'il est modifié)
+            // Verify password
             if (data.password) {
                 const passwordManager = PasswordManager.getInstance();
                 const isPasswordValid: boolean = passwordManager.verifyPassword(
@@ -206,7 +207,7 @@ export class UserService {
                     existingUser.password
                 );
     
-                // Si le mot de passe est différent
+                // If password is different
                 if (!isPasswordValid) {
                     const newSalt = passwordManager.generateSalt();
                     const hashedPassword = passwordManager.hashPassword(data.password, newSalt);
@@ -216,23 +217,24 @@ export class UserService {
                 }
             }
     
-            // Si aucune modification n'est détectée, ne rien faire
+            // If no changes are detected, do nothing
             if (!hasChanges) {
                 throw new Error("No changes detected.");
             }
     
             // Mise à jour de la date de modification
+            // Update the updatedAt field
             existingUser.setUpdatedAt(new Date());
     
-            // Mise à jour dans la base de données
-            const updatedUser: UserContract | null = await this.userRepository.modifyUser(existingUser);
+            // Update the user in DB
+            const updatedUser: UserAbstract | null = await this.userRepository.modifyUser(existingUser);
     
-            // Si l'utilisateur n'a pas été mis à jour, retourner null
+            // If user didn't updated, return null
             if (!updatedUser) {
                 throw new Error("User not updated.");
             }
     
-            // Retourner le DTO de l'utilisateur mis à jour sans données sensibles
+            // Return the updated user without sensitive data
             return UserMapper.toDTO(updatedUser);
         } catch (error) {
             console.error("Error modifying user in UserService:", error);

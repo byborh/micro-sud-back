@@ -1,4 +1,3 @@
-// src/modules/users/routes/userRoutes.ts
 import express, { Request, Response, NextFunction } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';

@@ -1,4 +1,3 @@
-// Import des modules
 import { UserDTO } from "../dto/UserDTO";
 import { UserContract } from "../contracts/IUser";
 import { getDatabase } from "@db/DatabaseClient";
@@ -6,6 +5,8 @@ import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL
 import { UserRepositoryRedis } from "../repositories/drivers/UserRepositoryRedis";
 import { getRepository } from "@core/db/databaseGuards";
 import { IUserRepository } from "../repositories/contract/IUserRepository";
+import { UserRedisEntity } from "../entity/redis/User.entity";
+import { UserAbstract } from "../entity/User.abstract";
 
 export class UserMapper {
     private static userRepository: IUserRepository;
@@ -21,14 +22,14 @@ export class UserMapper {
     }
 
     // Transform the dto to the entity
-    static async toEntity(dto: UserDTO): Promise<UserContract> {
+    static async toEntity(dto: UserDTO): Promise<UserAbstract> {
         if (!dto.id) throw new Error("User ID is required.");
 
         // Be sur that the repository is initialized
         await this.initRepository();
         
         // Get existing user from the database
-        const existingUser: UserContract | null = await this.userRepository.findUserById(dto.id);
+        const existingUser: UserAbstract | null = await this.userRepository.findUserById(dto.id);
 
         if (!existingUser) throw new Error("User not found.");
 
@@ -43,21 +44,35 @@ export class UserMapper {
             telnumber: dto.telnumber || null,
             createdAt: dto.createdAt,
             updatedAt: dto.updatedAt
-        } as UserContract);
+        } as UserAbstract);
+    }
+
+    static async toRedisEntity(userDTO: UserDTO): Promise<UserRedisEntity> {
+        if (!userDTO.id) throw new Error("User ID is required.");
+
+        // Be sur that the repository is initialized
+        await this.initRepository();
+        
+        // Get existing user from the database
+        const existingUser: UserContract | null = await this.userRepository.findUserById(userDTO.id);
+
+        if (!existingUser) throw new Error("User not found.");
+        
+        return new UserRedisEntity({
+            id: userDTO.id,
+            email: userDTO.email,
+            password: existingUser.password, // Let password unchanged
+            salt: existingUser.salt, // Let salt unchanged
+            firstname: userDTO.firstname || null,
+            lastname: userDTO.lastname || null,
+            pseudo: userDTO.pseudo || null,
+            telnumber: userDTO.telnumber || null,
+            createdAt: userDTO.createdAt,
+            updatedAt: userDTO.updatedAt
+    });
     }
 
 
     // Transform the entity to the dto
-    static toDTO(user: UserContract): UserDTO {
-        return {
-            id: user.id,
-            email: user.email,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            pseudo: user.pseudo,
-            telnumber: user.telnumber,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
-        };
-    }
+    static toDTO(user: UserContract): UserDTO { return user.toDTO(); }
 }

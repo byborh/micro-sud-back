@@ -1,6 +1,7 @@
-import { UserContract } from '../../contracts/IUser';
+import { UserDTO } from '@modules/users/dto/UserDTO';
+import { UserAbstract } from '../User.abstract';
 
-export class UserRedisEntity implements UserContract { // I think, i'll change the name to User
+export class UserRedisEntity extends UserAbstract {
     id: string;
     firstname?: string | null;
     lastname?: string | null;
@@ -14,9 +15,34 @@ export class UserRedisEntity implements UserContract { // I think, i'll change t
 
     data: Record<string, any> | null;
 
-    constructor(data: Partial<UserRedisEntity>) {
-        Object.assign(this, data); // il faut commenter pour comprendre ce que c'est
+    constructor(data: {
+        id: string,
+        email: string,
+        password: string,
+        salt: string,
+        firstname: string,
+        lastname: string,
+        pseudo: string,
+        telnumber: string,
+        createdAt: Date,
+        updatedAt: Date
+    }) {
+        super(data.id, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt);
+        this.id = data.id;
+        this.email = data.email;
+        this.password = data.password;
+        this.salt = data.salt;
+        this.firstname = data.firstname;
+        this.lastname = data.lastname;
+        this.pseudo = data.pseudo;
+        this.telnumber = data.telnumber;
+        this.createdAt = data.createdAt;
+        this.updatedAt = data.updatedAt;
     }
+
+    // constructor(data: Partial<UserRedisEntity>) {
+    //     Object.assign(this, data); // il faut commenter pour comprendre ce que c'est
+    // }
 
 
     // Convert object to Redis hash
@@ -52,84 +78,38 @@ export class UserRedisEntity implements UserContract { // I think, i'll change t
         });
     }
 
+    getId(): string {return this.id;}
+    getFirstname(): string | null {return this.firstname;}
+    getLastname(): string | null {return this.lastname;}
+    getPseudo(): string | null {return this.pseudo;}
+    getEmail(): string {return this.email;}
+    getPassword(): string {return this.password;}
+    getTelnumber(): string | null {return this.telnumber;}
+    getSalt(): string | null {return this.salt;}
+    getCreatedAt(): Date {return this.createdAt;}
+    getUpdatedAt(): Date {return this.updatedAt;}
+    
+    setId(id: string): void {this.id = id;}
+    setFirstname(firstname: string): void {this.firstname = firstname;}
+    setLastname(lastname: string): void {this.lastname = lastname;}
+    setPseudo(pseudo: string): void {this.pseudo = pseudo;}
+    setEmail(email: string): void {this.email = email;}
+    setPassword(password: string): void {this.password = password;}
+    setTelnumber(telnumber: string): void {this.telnumber = telnumber;}
+    setSalt(salt: string): void {this.salt = salt;}
+    setCreatedAt(date: Date): void {this.createdAt = date;}
+    setUpdatedAt(date: Date): void {this.updatedAt = date;}
 
-    getId(): string {
-        return this.id;
-    }
-
-    setId(id: string): void {
-        this.id = id;
-    }
-
-    getFirstname(): string | null {
-        return this.firstname;
-    }
-
-    setFirstname(firstname: string): void {
-        this.firstname = firstname;
-    }
-
-    getLastname(): string | null {
-        return this.lastname;
-    }
-
-    setLastname(lastname: string): void {
-        this.lastname = lastname;
-    }
-
-    getPseudo(): string | null {
-        return this.pseudo;
-    }
-
-    setPseudo(pseudo: string): void {
-        this.pseudo = pseudo;
-    }
-
-    getEmail(): string {
-        return this.email;
-    }
-
-    setEmail(email: string): void {
-        this.email = email;
-    }
-
-    getPassword(): string {
-        return this.password;
-    }
-
-    setPassword(password: string): void {
-        this.password = password;
-    }
-
-    getTelnumber(): string | null {
-        return this.telnumber;
-    }
-
-    setTelnumber(telnumber: string): void {
-        this.telnumber = telnumber;
-    }
-
-    getSalt(): string | null {
-        return this.salt;
-    }
-
-    setSalt(salt: string): void {
-        this.salt = salt;
-    }
-
-    getCreatedAt(): Date {
-        return this.createdAt;
-    }
-
-    setCreatedAt(date: Date): void {
-        this.createdAt = date;
-    }
-
-    getUpdatedAt(): Date {
-        return this.updatedAt;
-    }
-
-    setUpdatedAt(date: Date): void {
-        this.updatedAt = date;
+    toDto(): UserDTO {
+        return {
+            id: this.id,
+            email: this.email,
+            firstname: this.firstname || null,
+            lastname: this.lastname || null,
+            pseudo: this.pseudo || null,
+            telnumber: this.telnumber || null,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
+        }
     }
 }
