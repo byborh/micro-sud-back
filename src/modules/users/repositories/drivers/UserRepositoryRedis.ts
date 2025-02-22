@@ -5,10 +5,11 @@ import { UserRedisEntity } from "@modules/users/entity/redis/User.entity";
 
 export class UserRepositoryRedis implements IUserRepository {
     private client: RedisClientType;
+    private isInitialized: Promise<void>; // Be sure to wait for initialization
     
     constructor(private db: IDatabase) {
         this.client = db.getDataSoure() as RedisClientType;
-        this.initialize();
+        this.isInitialized = this.initialize();
     }
 
     // Connect to database
@@ -22,12 +23,17 @@ export class UserRepositoryRedis implements IUserRepository {
             throw error;
         }
     }
-    async findUserByField(field: string, value: string): Promise<UserRedisEntity | null> {
-        const userData = await this.client.hGetAll(`user:${value}`);
 
-        if (Object.keys(userData).length === 0) return null;
-        
-        return UserRedisEntity.fromRedisHash(userData);
+    async findUserByField(field: string, value: string): Promise<UserRedisEntity | null> {
+        try {
+            await this.isInitialized; // Wait for initialization
+            const userData = await this.client.hGetAll(`user:${value}`);
+
+            return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
+        } catch (error) {
+            console.error("Failed to find user by field:", error);
+            throw error;
+        }
     }
 
     async findUserById(userId: string): Promise<UserRedisEntity | null> {
@@ -39,42 +45,67 @@ export class UserRepositoryRedis implements IUserRepository {
     }
 
     async getAllUsers(): Promise<UserRedisEntity[]> {
-        const keys = await this.client.keys(`user:*`);
-        const users: UserRedisEntity[] = [];
+        try {
+            await this.isInitialized; // Wait for initialization
+            const users: UserRedisEntity[] = [];
+            let cursor: number = 0;
 
-        for(const key of keys) {
-            const userData = await this.client.hGetAll(key);
-            users.push(UserRedisEntity.fromRedisHash(userData))
+            do {
+                const reply = await this.client.scan(cursor, { MATCH: "user:*", COUNT: 100});
+                cursor = reply.cursor;
+                const keys = reply.keys;
+
+                for(const key of keys) {
+                    const userData = await this.client.hGetAll(key);
+                    users.push(UserRedisEntity.fromRedisHash(userData))
+                }
+        
+            } while(cursor !== 0);
+    
+            return users;
+        } catch (error) {
+            console.error("Failed to find user by field:", error);
+            throw error;
         }
-
-        if(Object.keys(users).length === 0) return null;
-
-        return users.length > 0 ? users : [];
     }
 
     async createUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
-        await this.client.hSet(`user:${user.id}`, user.toRedisHash());
-        
-        const exists = await this.client.exists(`user:${user.id}`);
-        
-        if(exists === 1) return user;
+        try {
+            await this.isInitialized; // Wait for initialization
 
-        return null;
+            await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+        
+            const exists = await this.client.exists(`user:${user.id}`);
+            
+            return exists === 1 ? user : null;
+        } catch (error) {
+            console.error("Failed to find user by field:", error);
+            throw error;
+        }
     }
 
     async modifyUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
-        await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+        try {
+            await this.isInitialized; // Wait for initialization
+            await this.client.hSet(`user:${user.id}`, user.toRedisHash());
 
-        const exists = await this.client.exists(`user:${user.id}`);
-        
-        if(exists === 1) return user;
-
-        return null;
+            const exists = await this.client.exists(`user:${user.id}`);
+            
+            return exists === 1 ? user : null;
+        } catch (error) {
+            console.error("Failed to find user by field:", error);
+            throw error;
+        }
     }
+
     async deleteUser(userId: string): Promise<boolean> {
-        const result = await this.client.del(`user:${userId}`)
-        
-        return result > 0;
+        try {
+            await this.isInitialized; // Wait for initialization
+            const result = await this.client.del(`user:${userId}`);
+            return result > 0;
+        } catch (error) {
+            console.error("Failed to find user by field:", error);
+            throw error;
+        }
     }
-
 }

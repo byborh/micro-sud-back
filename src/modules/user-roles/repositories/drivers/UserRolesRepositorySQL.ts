@@ -1,19 +1,19 @@
 import { Repository } from "typeorm";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
+import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
 
 export class UserRolesRepositorySQL implements IUserRolesRepository {
-    private repository: Repository<UserRoles>;
+    private repository: Repository<UserRolesAbstract>;
 
     constructor(private db: IDatabase) {
         const dataSource = db as MySQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(UserRoles);
+        this.repository = dataSource.getDataSoure().getRepository(UserRolesAbstract);
     }
 
 
-    async getUserRolesByMultipleFields(fields: string[], values: string[]): Promise<UserRoles[] | null> {
+    async getUserRolesByMultipleFields(fields: string[], values: string[]): Promise<UserRolesAbstract[] | null> {
         // Validate fields
         if (fields.length !== values.length || fields.length === 0 || values.length === 0) return null;
 
@@ -25,7 +25,7 @@ export class UserRolesRepositorySQL implements IUserRolesRepository {
         })
 
         // Find userRoles
-        const rawResult: UserRoles[] = await this.repository.find({where: conditions}) || null;
+        const rawResult: UserRolesAbstract[] = await this.repository.find({where: conditions}) || null;
 
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
@@ -36,9 +36,9 @@ export class UserRolesRepositorySQL implements IUserRolesRepository {
         return rowsArray;
     }
 
-    async getUserRoles(): Promise<UserRoles[]> {
+    async getUserRoles(): Promise<UserRolesAbstract[]> {
         // Fetch all userRole from the database
-        const rawResult: UserRoles[] = await this.repository.find();
+        const rawResult: UserRolesAbstract[] = await this.repository.find();
     
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
@@ -48,7 +48,7 @@ export class UserRolesRepositorySQL implements IUserRolesRepository {
         return rowsArray;
     }
 
-    async createUserRoles(userRoles: UserRoles): Promise<UserRoles | null> {
+    async createUserRoles(userRoles: UserRolesAbstract): Promise<UserRolesAbstract | null> {
         // Insert the userRoles in the database
         const result = await this.repository.save(userRoles);
 
@@ -56,7 +56,7 @@ export class UserRolesRepositorySQL implements IUserRolesRepository {
         if (!result) return null;
 
         // Return the userRoles
-        const userRolesEntity: UserRoles[] | null = await this.getUserRolesByMultipleFields(['user_id', 'role_id'], [userRoles.user_id, userRoles.role_id]) || null;
+        const userRolesEntity: UserRolesAbstract[] | null = await this.getUserRolesByMultipleFields(['user_id', 'role_id'], [userRoles.user_id, userRoles.role_id]) || null;
 
         return userRolesEntity[0];
     }

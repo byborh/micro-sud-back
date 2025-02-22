@@ -5,5 +5,5 @@ export interface IChatAIRepository {
     getAllChatAIs() : Promise<ChatAIAbstract[]>;
     getChatAIById(chatAIId: string) : Promise<ChatAIAbstract>;
     getChatAIsByUserId(userId: string) : Promise<ChatAIAbstract[]>;
-    deleteChatAIById(chatAIId: string) : Promise<boolean>;
+    deleteChatAIById(chatAIId: string, userId?: string) : Promise<boolean>;
 }

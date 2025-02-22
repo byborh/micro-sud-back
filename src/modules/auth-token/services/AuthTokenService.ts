@@ -1,6 +1,5 @@
 import { AuthTokenRepositorySQL } from "../repositories/drivers/AuthTokenRepositorySQL";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { CreateToken } from "@core/auth/createToken";
 import { getDatabase } from "@db/DatabaseClient";
 import { IAuthTokenRepository } from "../repositories/contract/IAuthTokenRepository";
@@ -9,6 +8,7 @@ import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/
 import { getRepository } from "@core/db/databaseGuards";
 import { AuthTokenRepositoryRedis } from "../repositories/drivers/AuthTokenRepositoryRedis";
 import { AuthTokenAbstract } from "../entity/AuthToken.abstract";
+import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
 
 export class AuthTokenService {
     private authTokenRepository: IAuthTokenRepository;
@@ -51,10 +51,10 @@ export class AuthTokenService {
         const userId: string = user.getId();
 
         // Get ID of roles
-        const userRoles: UserRoles[] = await this.userRoleRepository.getUserRolesByMultipleFields(["user_id"], [userId]);
+        const userRoles: UserRolesAbstract[] = await this.userRoleRepository.getUserRolesByMultipleFields(["user_id"], [userId]);
         if (!userRoles || userRoles.length === 0) throw new Error("User does not have a role.");
 
-        const roleIds: string[] = userRoles.map(userRole => userRole.getRole_id());
+        const roleIds: string[] = userRoles.map(userRole => userRole.getRoleId());
 
         const myDB = await getDatabase();
 
@@ -67,19 +67,7 @@ export class AuthTokenService {
         return authToken.getToken();
     }
 
-    // Logout
-    public async deleteAuthToken(): Promise<boolean> {
-        // Décoder le token
-
-        // Récupérer l'id d'user
-
-        // Appeler la méthode "deleteAuthTokenByUserId"
-
-        // Retourner true ou false
-        return true;
-    }
-
-    // Récupérer un AuthTokenAbstract par userId
+    // Get AuthToken by userId
     public async getAuthTokenByUserId(userId: string): Promise<AuthTokenAbstract | null> {
         try {
             if (!userId) {throw new Error("User ID is required.");}
@@ -94,7 +82,7 @@ export class AuthTokenService {
         }
     }
 
-    // Supprimer un AuthTokenAbstract par userId
+    // Delete AuthToken by userId
     public async deleteAuthTokenByUserId(userId: string): Promise<boolean> {
         try {
             if (!userId) {throw new Error("User ID is required.");}
@@ -107,7 +95,7 @@ export class AuthTokenService {
         }
     }
 
-    // Récupérer tous les AuthTokens (administration)
+    // Get all AuthTokens for admin
     public async getAllAuthTokens(): Promise<AuthTokenAbstract[] | null> {
         try {
             const authTokens = await this.authTokenRepository.getAllAuthTokens();
@@ -121,7 +109,7 @@ export class AuthTokenService {
         }
     }
 
-    // Supprimer un AuthTokenAbstract par son ID
+    // Logout
     public async deleteAuthTokenById(authTokenId: string): Promise<boolean> {
         try {
             if (!authTokenId) {

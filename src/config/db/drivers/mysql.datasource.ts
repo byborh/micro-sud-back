@@ -3,10 +3,10 @@ import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { AuthTokenSqlEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
-import { ChatAITypeORM } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
+import { ChatAISQLEntity } from "@modules/chat-ai/entity/sql/ChatAI.entity";
 import { IDatabase } from "@db/contract/IDatabase";
+import { UserRolesEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
 
 
 dotenv.config();
@@ -23,7 +23,7 @@ export class MySQLDatabase implements IDatabase {
             username: process.env.MYSQL_USER || "root",
             password: process.env.MYSQL_PASSWORD || "",
             database: process.env.MYSQL_DATABASE || "datte",
-            entities: [UserSQLEntity, RoleSQLEntity, UserRoles, AuthTokenSqlEntity, ChatAITypeORM],  // ADD ALL ENTITIES
+            entities: [UserSQLEntity, RoleSQLEntity, UserRolesEntity, AuthTokenSqlEntity, ChatAISQLEntity],  // ADD ALL ENTITIES HERE
             synchronize: process.env.NODE_ENV !== "production",   // ATTENTION
             logging: process.env.NODE_ENV === "development",     // ATTENTION
         })

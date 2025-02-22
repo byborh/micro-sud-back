@@ -4,7 +4,7 @@ import { ChatAIAbstract } from "../ChatAI.abstract";
 
 
 @Entity("chat_ai")
-export class ChatAITypeORM extends ChatAIAbstract {
+export class ChatAISQLEntity extends ChatAIAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -20,7 +20,7 @@ export class ChatAITypeORM extends ChatAIAbstract {
     @Column({ type: "timestamp" })
     createdAt: Date;
 
-    @ManyToOne(() => UserSQLEntity, user => user.chatAITypeORM, { onDelete: 'CASCADE' })
+    @ManyToOne(() => UserSQLEntity, user => user.chatAISQLEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "user_id" })
     user: UserSQLEntity;
 

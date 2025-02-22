@@ -1,10 +1,10 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { UserRolesContract } from "../../contracts/IUserRoles";
 import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
+import { UserRolesAbstract } from "../UserRoles.abstract";
 
 @Entity("user_role")
-export class UserRoles implements UserRolesContract {
+export class UserRolesEntity extends UserRolesAbstract {
     @PrimaryColumn({ type: 'varchar', length: 255 })
     user_id: string;
 
@@ -20,6 +20,7 @@ export class UserRoles implements UserRolesContract {
     role: RoleSQLEntity;
 
     constructor(user_id: string, role_id: string) {
+        super({user_id, role_id});
         this.user_id = user_id;
         this.role_id = role_id;
     }

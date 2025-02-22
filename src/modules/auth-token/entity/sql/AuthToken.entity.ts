@@ -20,7 +20,7 @@ export class AuthTokenSqlEntity extends AuthTokenAbstract {
     @Column({ type: "timestamp" })
     expiresAt: Date;
 
-    @OneToOne(() => UserSQLEntity, user => user.AuthTokenRepositorySQL, {onDelete: "CASCADE"})
+    @OneToOne(() => UserSQLEntity, user => user.AuthTokenSqlEntity, {onDelete: "CASCADE"})
     @JoinColumn({ name: "user_id" })
     user: UserSQLEntity;
 

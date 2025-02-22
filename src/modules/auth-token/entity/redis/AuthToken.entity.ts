@@ -8,13 +8,41 @@ export class AuthTokenRedisEntity extends AuthTokenAbstract {
     createdAt: Date;
     expiresAt: Date;
 
-    constructor(id: string, user_id: string, token: string, createdAt: Date, expiresAt: Date) {
-        super(id, user_id, token, createdAt, expiresAt);
-        this.id = id;
-        this.user_id = user_id;
-        this.token = token;
-        this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
+    constructor(data: {
+        id: string,
+        user_id: string,
+        token: string,
+        createdAt: Date,
+        expiresAt: Date
+    }) {
+        super(data.id, data.user_id, data.token, data.createdAt, data.expiresAt);
+        this.id = data.id;
+        this.user_id = data.user_id;
+        this.token = data.token;
+        this.createdAt = data.createdAt;
+        this.expiresAt = data.expiresAt;
+    }
+
+    // Convert object to Redis hash
+    toRedisHash(): { [keys: string]: string } {
+        return {
+            id: this.id,
+            user_id: this.user_id,
+            token: this.token,
+            createdAt: this.createdAt.toISOString(),
+            expiresAt: this.expiresAt.toISOString()
+        }
+    }
+
+    // Convert Redis hash to object
+    static fromRedisHash(hash: { [key: string]: string}) {
+        return new AuthTokenRedisEntity({
+            id: hash.id,
+            user_id: hash.user_id,
+            token: hash.token,
+            createdAt: new Date(hash.createdAt),
+            expiresAt: new Date(hash.expiresAt)
+        })
     }
 
     public getId(): string {return this.id;}

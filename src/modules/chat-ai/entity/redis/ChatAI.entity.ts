@@ -7,14 +7,20 @@ export class ChatAIRedisEntity extends ChatAIAbstract {
     responseContent: string;
     createdAt: Date;
 
-    constructor(id: string, user_id: string, requestContent: string, responseContent: string, createdAt: Date) {
-        super(id, user_id, requestContent, responseContent, createdAt);
+    constructor(data: {
+        id: string,
+        user_id: string,
+        requestContent: string,
+        responseContent: string,
+        createdAt: Date
+    }) {
+        super(data.id, data.user_id, data.requestContent, data.responseContent, data.createdAt);
         
-        this.id = id;
-        this.user_id = user_id;
-        this.requestContent = requestContent;
-        this.responseContent = responseContent;
-        this.createdAt = createdAt;
+        this.id = data.id;
+        this.user_id = data.user_id;
+        this.requestContent = data.requestContent;
+        this.responseContent = data.responseContent;
+        this.createdAt = data.createdAt;
     }
 
 
@@ -31,7 +37,13 @@ export class ChatAIRedisEntity extends ChatAIAbstract {
 
     // Covert Redis hash to object
     static fromRedisHash(hash: { [key: string]: string }) {
-        return new ChatAIRedisEntity(hash.id, hash.user_id, hash.requestContent, hash.responseContent, new Date(hash.createdAt));
+        return new ChatAIRedisEntity({
+            id: hash.id,
+            user_id: hash.user_id,
+            requestContent: hash.requestContent,
+            responseContent: hash.responseContent,
+            createdAt: new Date(hash.createdAt)
+        });
     }
 
 

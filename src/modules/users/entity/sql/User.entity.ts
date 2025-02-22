@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne } from "typeorm";
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import { UserRolesEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { AuthTokenSqlEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
-import { ChatAITypeORM } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
+import { ChatAISQLEntity } from "@modules/chat-ai/entity/sql/ChatAI.entity";
 import { UserAbstract } from "../User.abstract";
 import { UserDTO } from "@modules/users/dto/UserDTO";
 
@@ -41,14 +41,14 @@ export class UserSQLEntity extends UserAbstract {
     @Column("json", { nullable: true })
     data: JSON | null;
 
-    @OneToMany(() => UserRoles, userRole => userRole.user, { cascade: true })
-    userRoles: UserRoles[];
+    @OneToMany(() => UserRolesEntity, userRole => userRole.user, { cascade: true })
+    userRoles: UserRolesEntity[];
 
     @OneToOne(() => AuthTokenSqlEntity, authTokenSqlEntity => authTokenSqlEntity.user) 
-    AuthTokenRepositorySQL: AuthTokenSqlEntity;
+    AuthTokenSqlEntity: AuthTokenSqlEntity;
 
-    @OneToMany(() => ChatAITypeORM, chatAITypeORM => chatAITypeORM.user, { cascade: true })
-    chatAITypeORM: ChatAITypeORM[]
+    @OneToMany(() => ChatAISQLEntity, chatAISQLEntity => chatAISQLEntity.user, { cascade: true })
+    chatAISQLEntity: ChatAISQLEntity[]
 
     /*
     ----------------------------------------------------------------------------------
@@ -135,6 +135,15 @@ export class UserSQLEntity extends UserAbstract {
     setUpdatedAt(date: Date): void {this.updatedAt = date;}
 
     toDto(): UserDTO {
-        throw new Error("Method not implemented.");
-    } // Change the name to UserMySQLEntity
+        return {
+            id: this.id,
+            email: this.email,
+            firstname: this.firstname,
+            lastname: this.lastname,
+            pseudo: this.pseudo,
+            telnumber: this.telnumber,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
+        }
+    }
 }

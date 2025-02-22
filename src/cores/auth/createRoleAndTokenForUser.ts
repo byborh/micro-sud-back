@@ -1,9 +1,9 @@
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
-import { Role } from "@modules/roles/entity/sql/Role.entity";
 import { CreateToken } from "./createToken";
 import { IRoleRepository } from "@modules/roles/repositories/contract/IRoleRepository";
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
 import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
+import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
+import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
 
 export class CreateRoleAndTokenForUser {
     private static instance: CreateRoleAndTokenForUser;
@@ -32,14 +32,14 @@ export class CreateRoleAndTokenForUser {
     public async createRoleAndTokenForUser(userId: string): Promise<AuthTokenAbstract | null> {
 
         // Get ID of USER role
-        const role: Role = await this.roleRepository.getRoleByName('USER');
+        const role: RoleAbstract = await this.roleRepository.getRoleByName('USER');
         const roleId: string = role.getId();
 
         // Create userRoles
-        const userRoles: UserRoles = new UserRoles(userId, roleId);
+        const userRoles: UserRolesAbstract = {user_id: userId, role_id: roleId} as UserRolesAbstract;
 
         // Insérer dans la bdd
-        const userRolesEntity: UserRoles = await this.userRolesRepository.createUserRoles(userRoles);
+        const userRolesEntity: UserRolesAbstract = await this.userRolesRepository.createUserRoles(userRoles);
         if(!userRolesEntity) throw new Error("UserRoles didn't created correctly.")
 
         // Appeler la fonction pour créer un token

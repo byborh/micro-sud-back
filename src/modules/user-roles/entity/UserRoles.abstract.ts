@@ -1,0 +1,22 @@
+import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
+import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
+import { UserRolesContract } from "../contracts/IUserRoles";
+
+
+export abstract class UserRolesAbstract implements UserRolesContract {
+    user_id: string;
+    role_id: string;
+    user?: UserSQLEntity;
+    role?: RoleAbstract;
+
+    constructor(data: {user_id: string,role_id: string}) {
+        this.user_id = data.user_id;
+        this.role_id = data.role_id;
+    }
+
+    getUserId(): string | null {return this.user_id;}
+    getRoleId(): string | null {return this.role_id;}
+
+    setUserId(user_id: string): void {this.user_id = user_id;}
+    setRoleId(role_id: string): void {this.role_id = role_id;}
+}

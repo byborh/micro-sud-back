@@ -1,7 +1,7 @@
 import { UserDTO } from "../dto/UserDTO";
 import { UserContract } from "../contracts/IUser";
 import { getDatabase } from "@db/DatabaseClient";
-import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositorySQL";
+import { UserRepositorySQL } from "../repositories/drivers/UserRepositorySQL";
 import { UserRepositoryRedis } from "../repositories/drivers/UserRepositoryRedis";
 import { getRepository } from "@core/db/databaseGuards";
 import { IUserRepository } from "../repositories/contract/IUserRepository";
@@ -17,7 +17,7 @@ export class UserMapper {
             const myDB = await getDatabase();
 
             // Il faut passer par le repository, c'est mieux !
-            this.userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
+            this.userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis) as IUserRepository;
         }
     }
 

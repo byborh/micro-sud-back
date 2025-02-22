@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { IDatabase } from "@db/contract/IDatabase";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 
-export class UserRepositoryMySQL implements IUserRepository {
+export class UserRepositorySQL implements IUserRepository {
     private repository: Repository<UserSQLEntity>;
 
     constructor(private db: IDatabase) {

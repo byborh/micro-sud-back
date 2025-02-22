@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getDatabase } from '@db/DatabaseClient';
 import { IUserRepository } from '@modules/users/repositories/contract/IUserRepository';
 import { UserRepositoryRedis } from '@modules/users/repositories/drivers/UserRepositoryRedis';
-import { UserRepositoryMySQL } from '@modules/users/repositories/drivers/UserRepositorySQL';
+import { UserRepositorySQL } from '@modules/users/repositories/drivers/UserRepositorySQL';
 import { getRepository } from '@core/db/databaseGuards';
 import { UserRoles } from '@modules/user-roles/entity/sql/UserRoles.entity';
 import { IUserRolesRepository } from '@modules/user-roles/repositories/contract/IUserRolesRepository';
@@ -56,7 +56,7 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
 
             // Initialize database
             const myDB = await getDatabase();
-            const userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
+            const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis) as IUserRepository;
             const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
 
             // Verify if user exists

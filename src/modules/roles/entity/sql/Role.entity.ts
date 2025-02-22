@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import { UserRolesEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { TRoleName } from "../../contracts/TRoleName";
 import { RoleAbstract } from "../Role.abstract";
 
@@ -14,8 +14,8 @@ export class RoleSQLEntity  extends RoleAbstract {
     @Column({ type: "text", nullable: true })
     description: string | null;
 
-    @OneToMany(() => UserRoles, userRole => userRole.role, { cascade: true })
-    userRoles: UserRoles[];
+    @OneToMany(() => UserRolesEntity, userRole => userRole.role, { cascade: true })
+    userRoles: UserRolesEntity[];
 
 
     constructor(id: string, name: TRoleName, description: string) {

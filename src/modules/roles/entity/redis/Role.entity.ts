@@ -1,4 +1,3 @@
-import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { TRoleName } from "../../contracts/TRoleName";
 import { RoleAbstract } from "../Role.abstract";
 
@@ -6,7 +5,6 @@ export class RoleRedisEntity extends RoleAbstract {
     id: string;
     name: TRoleName;
     description: string | null;
-    userRoles: UserRoles[];
 
     data: Record<string, any> | null;
 

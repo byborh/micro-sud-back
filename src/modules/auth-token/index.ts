@@ -2,7 +2,7 @@ import express from 'express';
 import { AuthTokenController } from './controllers/AuthTokenController';
 import { AuthTokenService } from './services/AuthTokenService';
 import { AuthTokenRoutes } from './route/AuthTokenRoutes';
-import { UserRepositoryMySQL } from '@modules/users/repositories/drivers/UserRepositorySQL';
+import { UserRepositorySQL } from '@modules/users/repositories/drivers/UserRepositorySQL';
 import { getDatabase } from '@db/DatabaseClient';
 import { UserRolesRepositorySQL } from '@modules/user-roles/repositories/drivers/UserRolesRepositorySQL'
 import { getRepository } from '@core/db/databaseGuards';
@@ -18,7 +18,7 @@ export const createAuthTokenModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
   const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
-  const userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
+  const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis) as IUserRepository;
   const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
 
   const authTokenService = new AuthTokenService(authTokenRepository, userRepository, userRolesRepository);
