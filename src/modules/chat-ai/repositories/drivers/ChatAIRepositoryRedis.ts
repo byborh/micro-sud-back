@@ -1,7 +1,7 @@
 import { IChatAIRepository } from "../contract/IChatAIRepository";
 import { RedisClientType } from "redis";
 import { IDatabase } from "@db/contract/IDatabase";
-import { ChatAIRedis } from "@modules/chat-ai/entity/redis/ChatAI.entity";
+import { ChatAIRedisEntity } from "@modules/chat-ai/entity/redis/ChatAI.entity";
 
 
 export class ChatAIRepositoryRedis implements IChatAIRepository {
@@ -12,16 +12,16 @@ export class ChatAIRepositoryRedis implements IChatAIRepository {
     }
 
 
-    submitPrompt(chatAI: ChatAIRedis): Promise<ChatAIRedis> {
+    submitPrompt(chatAI: ChatAIRedisEntity): Promise<ChatAIRedisEntity> {
         throw new Error("Method not implemented.");
     }
-    getAllChatAIs(): Promise<ChatAIRedis[]> {
+    getAllChatAIs(): Promise<ChatAIRedisEntity[]> {
         throw new Error("Method not implemented.");
     }
-    getChatAIById(chatAIId: string): Promise<ChatAIRedis> {
+    getChatAIById(chatAIId: string): Promise<ChatAIRedisEntity> {
         throw new Error("Method not implemented.");
     }
-    getChatAIsByUserId(userId: string): Promise<ChatAIRedis[]> {
+    getChatAIsByUserId(userId: string): Promise<ChatAIRedisEntity[]> {
         throw new Error("Method not implemented.");
     }
     deleteChatAIById(chatAIId: string): Promise<boolean> {

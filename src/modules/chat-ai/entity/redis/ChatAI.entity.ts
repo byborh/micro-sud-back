@@ -1,6 +1,6 @@
 import { ChatAIAbstract } from "../ChatAI.abstract";
 
-export class ChatAIRedis extends ChatAIAbstract {
+export class ChatAIRedisEntity extends ChatAIAbstract {
     id: string;
     user_id: string;
     requestContent: string;
@@ -31,7 +31,7 @@ export class ChatAIRedis extends ChatAIAbstract {
 
     // Covert Redis hash to object
     static fromRedisHash(hash: { [key: string]: string }) {
-        return new ChatAIRedis(hash.id, hash.user_id, hash.requestContent, hash.responseContent, new Date(hash.createdAt));
+        return new ChatAIRedisEntity(hash.id, hash.user_id, hash.requestContent, hash.responseContent, new Date(hash.createdAt));
     }
 
 

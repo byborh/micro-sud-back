@@ -1,16 +1,16 @@
-import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import fs from 'fs';
-import path from 'path';
 import { getDatabase } from '@db/DatabaseClient';
 import { IUserRepository } from '@modules/users/repositories/contract/IUserRepository';
 import { UserRepositoryRedis } from '@modules/users/repositories/drivers/UserRepositoryRedis';
-import { UserRepositoryMySQL } from '@modules/users/repositories/drivers/UserRepositoryMySQL';
+import { UserRepositoryMySQL } from '@modules/users/repositories/drivers/UserRepositorySQL';
 import { getRepository } from '@core/db/databaseGuards';
-import { UserRoles } from '@modules/user-roles/entity/typeorm/UserRoles.entity';
+import { UserRoles } from '@modules/user-roles/entity/sql/UserRoles.entity';
 import { IUserRolesRepository } from '@modules/user-roles/repositories/contract/IUserRolesRepository';
-import { UserRolesRepositoryMySQL } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL';
+import { UserRolesRepositorySQL } from '@modules/user-roles/repositories/drivers/UserRolesRepositorySQL'
 import { UserRolesRepositoryRedis } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryRedis';
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
 
 const publicKeyPath = path.join(__dirname, '../../ec_public.pem');
 const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
@@ -57,7 +57,7 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
             // Initialize database
             const myDB = await getDatabase();
             const userRepository = getRepository(myDB, UserRepositoryMySQL, UserRepositoryRedis) as IUserRepository;
-            const userRolesRepository = getRepository(myDB, UserRolesRepositoryMySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
+            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
 
             // Verify if user exists
             const user = await userRepository.findUserById(decoded.sub);

@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { User } from "@modules/users/entity/typeorm/User.entity";
+import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { ChatAIAbstract } from "../ChatAI.abstract";
 
 
@@ -20,9 +20,9 @@ export class ChatAITypeORM extends ChatAIAbstract {
     @Column({ type: "timestamp" })
     createdAt: Date;
 
-    @ManyToOne(() => User, user => user.chatAITypeORM, { onDelete: 'CASCADE' })
+    @ManyToOne(() => UserSQLEntity, user => user.chatAITypeORM, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "user_id" })
-    user: User;
+    user: UserSQLEntity;
 
     /*
     ----------------------------------------------------------------------------------

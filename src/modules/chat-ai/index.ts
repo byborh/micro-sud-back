@@ -1,7 +1,7 @@
 import express from 'express';
 import { ChatAIController } from './controllers/ChatAIController';
 import { ChatAIService } from './services/ChatAIService';
-import { ChatAIRepositoryMySQL } from './repositories/drivers/ChatAIRepositoryMySQL';
+import { ChatAIRepositorySQL } from './repositories/drivers/ChatAIRepositorySQL';
 import { ChatAIRoutes } from './route/ChatAIRoutes';
 import { getDatabase } from '@db/DatabaseClient';
 import { IChatAIRepository } from './repositories/contract/IChatAIRepository';
@@ -11,7 +11,7 @@ import { getRepository } from '@core/db/databaseGuards';
 export const createChatAIModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
-  const chatAIRepository = getRepository(myDB, ChatAIRepositoryMySQL, ChatAIRepositoryRedis) as IChatAIRepository;
+  const chatAIRepository = getRepository(myDB, ChatAIRepositorySQL, ChatAIRepositoryRedis) as IChatAIRepository;
 
   const chatAIService = new ChatAIService(chatAIRepository);
   const chatAIController = new ChatAIController(chatAIService);

@@ -1,10 +1,10 @@
 import { Repository } from "typeorm";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 
-export class UserRolesRepositoryMySQL implements IUserRolesRepository {
+export class UserRolesRepositorySQL implements IUserRolesRepository {
     private repository: Repository<UserRoles>;
 
     constructor(private db: IDatabase) {

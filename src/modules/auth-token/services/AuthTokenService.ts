@@ -1,6 +1,6 @@
-import { AuthTokenRepositoryMySQL } from "../repositories/drivers/AuthTokenRepositoryMySQL";
+import { AuthTokenRepositorySQL } from "../repositories/drivers/AuthTokenRepositorySQL";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { CreateToken } from "@core/auth/createToken";
 import { getDatabase } from "@db/DatabaseClient";
 import { IAuthTokenRepository } from "../repositories/contract/IAuthTokenRepository";
@@ -59,7 +59,7 @@ export class AuthTokenService {
         const myDB = await getDatabase();
 
         // Dependencies
-        const authTokenRepository = getRepository(myDB, AuthTokenRepositoryMySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
+        const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
     
         const createToken = CreateToken.getInstance(authTokenRepository);
         const authToken: AuthTokenAbstract = await createToken.createToken(userId, roleIds);

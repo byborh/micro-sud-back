@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { User } from "@modules/users/entity/typeorm/User.entity";
+import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { AuthTokenAbstract } from "../AuthToken.abstract";
 
 
 @Entity("auth_token")
-export class AuthTokenTypeORM extends AuthTokenAbstract {
+export class AuthTokenSqlEntity extends AuthTokenAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -20,9 +20,9 @@ export class AuthTokenTypeORM extends AuthTokenAbstract {
     @Column({ type: "timestamp" })
     expiresAt: Date;
 
-    @OneToOne(() => User, user => user.authTokenTypeORM, {onDelete: "CASCADE"})
+    @OneToOne(() => UserSQLEntity, user => user.AuthTokenRepositorySQL, {onDelete: "CASCADE"})
     @JoinColumn({ name: "user_id" })
-    user: User;
+    user: UserSQLEntity;
 
     /*
     ----------------------------------------------------------------------------------

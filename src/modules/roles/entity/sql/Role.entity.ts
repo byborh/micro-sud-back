@@ -1,10 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { RoleContract } from "../../contracts/IRole";
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { TRoleName } from "../../contracts/TRoleName";
+import { RoleAbstract } from "../Role.abstract";
 
 @Entity("roles")
-export class Role implements RoleContract {
+export class RoleSQLEntity  extends RoleAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -19,6 +19,7 @@ export class Role implements RoleContract {
 
 
     constructor(id: string, name: TRoleName, description: string) {
+        super(id, name, description);
         this.id = id;
         this.name = name;
         this.description = description;

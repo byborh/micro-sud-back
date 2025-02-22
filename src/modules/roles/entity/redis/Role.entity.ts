@@ -1,8 +1,8 @@
-import { RoleContract } from "../../contracts/IRole";
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { TRoleName } from "../../contracts/TRoleName";
+import { RoleAbstract } from "../Role.abstract";
 
-export class RoleRedisEntity implements RoleContract {
+export class RoleRedisEntity extends RoleAbstract {
     id: string;
     name: TRoleName;
     description: string | null;
@@ -10,8 +10,12 @@ export class RoleRedisEntity implements RoleContract {
 
     data: Record<string, any> | null;
 
-    constructor(data: Partial<RoleRedisEntity>) {
-        Object.assign(this, data);
+    constructor(data: { id: string, name: TRoleName, description: string | null }) {
+        super(data.id, data.name, data.description);
+        // Object.assign(this, data);
+        this.id = data.id;
+        this.name = data.name;
+        this.description = data.description;
     }
 
     // Convert object to Redis hash

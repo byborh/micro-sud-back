@@ -1,18 +1,18 @@
-import { User } from "@modules/users/entity/typeorm/User.entity";
+import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
 import { Repository } from "typeorm";
 import { IDatabase } from "@db/contract/IDatabase";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 
 export class UserRepositoryMySQL implements IUserRepository {
-    private repository: Repository<User>;
+    private repository: Repository<UserSQLEntity>;
 
     constructor(private db: IDatabase) {
         const dataSource = db as MySQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(User);
+        this.repository = dataSource.getDataSoure().getRepository(UserSQLEntity);
     }
 
-    async findUserByField(field: string, value: string): Promise<User | null> {
+    async findUserByField(field: string, value: string): Promise<UserSQLEntity | null> {
         // Validate field
         const allowedFields = ['id', 'email', 'first_name', 'last_name', 'pseudo', 'tel_number', 'createdAt', 'updatedAt'];
         if(!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
@@ -28,19 +28,19 @@ export class UserRepositoryMySQL implements IUserRepository {
         // Verify if all required fields are present
         if (!user.id || !user.email || !user.password) {
             console.error("Invalid user data:", user);
-            throw new Error("User data is incomplete.");
+            throw new Error("UserSQLEntity data is incomplete.");
         }
 
-        // Map the result to a User instance
+        // Map the result to a UserSQLEntity instance
         return user || null;
     }
     
-    async findUserById(userId: string): Promise<User | null> {
+    async findUserById(userId: string): Promise<UserSQLEntity | null> {
         if(!userId) return null;
         return await this.findUserByField('id', userId) || null;
     }
 
-    async findUserByEmail(email: string): Promise<User | null> {
+    async findUserByEmail(email: string): Promise<UserSQLEntity | null> {
         if(!email) return null;
         return await this.findUserByField('email', email) || null;
     }
@@ -52,7 +52,7 @@ export class UserRepositoryMySQL implements IUserRepository {
      * @param fields - An array of field names (e.g., ['email', 'username']) to search by.
      * @param values - An array of values (e.g., ['test@example.com', 'john_doe']) corresponding to the fields.
      * 
-     * @returns A Promise that resolves to the found User object if a match is found, or null if no user matches the conditions.
+     * @returns A Promise that resolves to the found UserSQLEntity object if a match is found, or null if no user matches the conditions.
      * 
      * @example useage :
      * const user = await getUserByMultipleFields(['email', 'username'], ['test@example.com', 'john_doe']);
@@ -60,7 +60,7 @@ export class UserRepositoryMySQL implements IUserRepository {
      * @throws This method does not throw errors directly, but the underlying repository might throw errors
      * if there are issues with the database connection or query execution.
      */
-    async getUserByMultipleFields(fields: string[], values: string[]): Promise<User | null> {
+    async getUserByMultipleFields(fields: string[], values: string[]): Promise<UserSQLEntity | null> {
         // Validate fields
         if (fields.length !== values.length || fields.length === 0 || values.length === 0) return null;
 
@@ -75,9 +75,9 @@ export class UserRepositoryMySQL implements IUserRepository {
         return await this.repository.findOne({where: conditions}) || null;
     }
 
-    async getAllUsers(): Promise<User[]> {
+    async getAllUsers(): Promise<UserSQLEntity[]> {
         // Fetch all users from the database
-        const rawResult: User[] = await this.repository.find();
+        const rawResult: UserSQLEntity[] = await this.repository.find();
     
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
@@ -88,7 +88,7 @@ export class UserRepositoryMySQL implements IUserRepository {
         return rowsArray;
     }  
 
-    async createUser(user: User): Promise<User | null> {
+    async createUser(user: UserSQLEntity): Promise<UserSQLEntity | null> {
         // Insert the user in the database
         const result = await this.repository.save(user);
 
@@ -99,9 +99,9 @@ export class UserRepositoryMySQL implements IUserRepository {
         return this.findUserById(user.getId()) || null;
     }
 
-    async modifyUser(user: User): Promise<User | null> {
+    async modifyUser(user: UserSQLEntity): Promise<UserSQLEntity | null> {
         // Be sur that user exists
-        const existingUser: User = await this.repository.findOne({ where: { id: user.getId() } })
+        const existingUser: UserSQLEntity = await this.repository.findOne({ where: { id: user.getId() } })
         if(!existingUser) return null;
 
         // Merge user data with existing user data

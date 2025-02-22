@@ -1,4 +1,4 @@
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 

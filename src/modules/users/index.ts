@@ -1,7 +1,7 @@
 import express from 'express';
 import { UserController } from './controllers/UserController';
 import { UserService } from './services/UserService';
-import { UserRepositoryMySQL } from './repositories/drivers/UserRepositoryMySQL';
+import { UserRepositoryMySQL } from './repositories/drivers/UserRepositorySQL';
 import { UserRoutes } from './route/UserRoutes';
 import { getDatabase } from '@db/DatabaseClient';
 import { IUserRepository } from './repositories/contract/IUserRepository';

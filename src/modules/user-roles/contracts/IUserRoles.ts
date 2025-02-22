@@ -1,10 +1,10 @@
-import { Role } from "@modules/roles/entity/typeorm/Role.entity";
-import { User } from "@modules/users/entity/typeorm/User.entity";
+import { Role } from "@modules/roles/entity/sql/Role.entity";
+import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 
 // Interface of the user roles
 export interface UserRolesContract {
   user_id: string;
   role_id: string;
-  user: User;
+  user: UserSQLEntity;
   role: Role
 }

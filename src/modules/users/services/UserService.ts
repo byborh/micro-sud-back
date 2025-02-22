@@ -2,9 +2,9 @@ import { UserDTO } from "../dto/UserDTO";
 import { UserMapper } from "../mapper/UserMapper";
 import { PasswordManager } from "@core/cryptography/PasswordManager";
 import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
-import { UserRolesRepositoryMySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMySQL";
-import { AuthTokenRepositoryMySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMySQL";
-import { RoleRepositoryMySQL } from "@modules/roles/repositories/drivers/RoleRepositoryMySQL";
+import { UserRolesRepositorySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositorySQL";
+import { AuthTokenRepositorySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositorySQL";
+import { RoleRepositorySQL } from "@modules/roles/repositories/drivers/RoleRepositorySQL";
 import { CreateToken } from "@core/auth/createToken";
 import { getDatabase } from "@db/DatabaseClient";
 import { IUserRepository } from "../repositories/contract/IUserRepository";
@@ -133,11 +133,11 @@ export class UserService {
 
             // Initialize the repository
             // Role repository
-            const roleRepository = getRepository(myDB, RoleRepositoryMySQL, RoleRepositoryRedis) as IRoleRepository;
+            const roleRepository = getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis) as IRoleRepository;
             // UserRoles repository
-            const userRolesRepository = getRepository(myDB, UserRolesRepositoryMySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
+            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
             // AuthToken repository
-            const authTokenRepository = getRepository(myDB, AuthTokenRepositoryMySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
+            const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
 
             const createToken = CreateToken.getInstance(authTokenRepository);            
 

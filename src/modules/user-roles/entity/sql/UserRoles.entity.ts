@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { UserRolesContract } from "../../contracts/IUserRoles";
-import { User } from "@modules/users/entity/typeorm/User.entity";
-import { Role } from "@modules/roles/entity/typeorm/Role.entity";
+import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
+import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
 
 @Entity("user_role")
 export class UserRoles implements UserRolesContract {
@@ -11,13 +11,13 @@ export class UserRoles implements UserRolesContract {
     @PrimaryColumn({ type: 'varchar', length: 255 })
     role_id: string;
 
-    @ManyToOne(() => User, user => user.userRoles, { onDelete: 'CASCADE', orphanedRowAction: 'delete' }) 
+    @ManyToOne(() => UserSQLEntity, user => user.userRoles, { onDelete: 'CASCADE', orphanedRowAction: 'delete' }) 
     @JoinColumn({ name: 'user_id' })
-    user: User;
+    user: UserSQLEntity;
 
-    @ManyToOne(() => Role, role => role.userRoles, { onDelete: 'CASCADE', orphanedRowAction: 'delete' }) 
+    @ManyToOne(() => RoleSQLEntity, role => role.userRoles, { onDelete: 'CASCADE', orphanedRowAction: 'delete' }) 
     @JoinColumn({ name: 'role_id' })
-    role: Role;
+    role: RoleSQLEntity;
 
     constructor(user_id: string, role_id: string) {
         this.user_id = user_id;

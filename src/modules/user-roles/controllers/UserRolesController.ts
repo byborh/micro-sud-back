@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IdGenerator } from "@core/idGenerator";
 import { UserRolesService } from "../services/UserRolesService";
-import { UserRoles } from "../entity/typeorm/UserRoles.entity";
+import { UserRoles } from "../entity/sql/UserRoles.entity";
 
 export class UserRolesController {
     private userRolesService: UserRolesService;

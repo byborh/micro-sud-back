@@ -4,7 +4,7 @@ import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 import { ChatAIAbstract } from "@modules/chat-ai/entity/ChatAI.abstract";
 
-export class ChatAIRepositoryMySQL implements IChatAIRepository {
+export class ChatAIRepositorySQL implements IChatAIRepository {
     private repository: Repository<ChatAIAbstract>;
 
     constructor(private db: IDatabase) {

@@ -1,12 +1,12 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne, JoinColumn } from "typeorm";
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
-import { AuthTokenTypeORM } from "@modules/auth-token/entity/typeorm/AuthToken.entity";
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne } from "typeorm";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import { AuthTokenSqlEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
 import { ChatAITypeORM } from "@modules/chat-ai/entity/typeorm/ChatAI.entity";
 import { UserAbstract } from "../User.abstract";
 import { UserDTO } from "@modules/users/dto/UserDTO";
 
 @Entity("users")
-export class User extends UserAbstract {
+export class UserSQLEntity extends UserAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -44,8 +44,8 @@ export class User extends UserAbstract {
     @OneToMany(() => UserRoles, userRole => userRole.user, { cascade: true })
     userRoles: UserRoles[];
 
-    @OneToOne(() => AuthTokenTypeORM, authTokenTypeORM => authTokenTypeORM.user) 
-    authTokenTypeORM: AuthTokenTypeORM;
+    @OneToOne(() => AuthTokenSqlEntity, authTokenSqlEntity => authTokenSqlEntity.user) 
+    AuthTokenRepositorySQL: AuthTokenSqlEntity;
 
     @OneToMany(() => ChatAITypeORM, chatAITypeORM => chatAITypeORM.user, { cascade: true })
     chatAITypeORM: ChatAITypeORM[]

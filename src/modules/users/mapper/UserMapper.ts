@@ -1,7 +1,7 @@
 import { UserDTO } from "../dto/UserDTO";
 import { UserContract } from "../contracts/IUser";
 import { getDatabase } from "@db/DatabaseClient";
-import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositoryMySQL";
+import { UserRepositoryMySQL } from "../repositories/drivers/UserRepositorySQL";
 import { UserRepositoryRedis } from "../repositories/drivers/UserRepositoryRedis";
 import { getRepository } from "@core/db/databaseGuards";
 import { IUserRepository } from "../repositories/contract/IUserRepository";

@@ -1,5 +1,5 @@
-import { UserRoles } from "@modules/user-roles/entity/typeorm/UserRoles.entity";
-import { Role } from "@modules/roles/entity/typeorm/Role.entity";
+import { UserRoles } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import { Role } from "@modules/roles/entity/sql/Role.entity";
 import { CreateToken } from "./createToken";
 import { IRoleRepository } from "@modules/roles/repositories/contract/IRoleRepository";
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";

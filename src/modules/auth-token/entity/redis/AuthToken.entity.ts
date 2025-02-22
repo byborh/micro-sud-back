@@ -1,9 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { AuthTokenAbstract } from "../AuthToken.abstract";
 
 
-@Entity("auth_token")
-export class AuthTokenRedis extends AuthTokenAbstract {
+export class AuthTokenRedisEntity extends AuthTokenAbstract {
     id: string;
     user_id: string;
     token: string;
