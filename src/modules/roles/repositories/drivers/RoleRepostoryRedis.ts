@@ -98,8 +98,11 @@ export class RoleRepositoryRedis implements IRoleRepository {
         try {
             await this.isInitialize;
             const roleDel = await this.client.del(`role:${roleId}`);
-            // A SUPPRIMER AUSSI LES ROLES QUI UTILISENT LES UTILISATEURS !!!
-            return roleDel > 0;
+            
+            // Delete role users of role
+            const roleUsersDele = await this.client.del(`role_users:${roleId}`);
+
+            return roleDel > 0 || roleUsersDele > 0;
         } catch(error) {
             console.error("Failed to find role by field:", error);
         }

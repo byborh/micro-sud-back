@@ -4,10 +4,10 @@ import { IUserRepository } from '@modules/users/repositories/contract/IUserRepos
 import { UserRepositoryRedis } from '@modules/users/repositories/drivers/UserRepositoryRedis';
 import { UserRepositorySQL } from '@modules/users/repositories/drivers/UserRepositorySQL';
 import { getRepository } from '@core/db/databaseGuards';
-import { UserRoles } from '@modules/user-roles/entity/sql/UserRoles.entity';
 import { IUserRolesRepository } from '@modules/user-roles/repositories/contract/IUserRolesRepository';
 import { UserRolesRepositorySQL } from '@modules/user-roles/repositories/drivers/UserRolesRepositorySQL'
 import { UserRolesRepositoryRedis } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryRedis';
+import { UserRolesAbstract } from '@modules/user-roles/entity/UserRoles.abstract';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
@@ -68,7 +68,7 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
             }
 
             // Verify if user has a role(s)
-            const userRoles: UserRoles[] = await userRolesRepository.getUserRolesByMultipleFields(["user_id"], [decoded.sub]); // Or use : user.id
+            const userRoles: UserRolesAbstract[] = await userRolesRepository.getUserRolesByMultipleFields(["user_id"], [decoded.sub]); // Or use : user.id
             
             if (!userRoles || userRoles.length === 0) {
                 res.status(403).json({ message: "Access denied. User does not have a role: GUEST" });

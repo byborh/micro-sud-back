@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { IdGenerator } from "@core/idGenerator";
 import { UserRolesService } from "../services/UserRolesService";
-import { UserRoles } from "../entity/sql/UserRoles.entity";
+import { UserRolesAbstract } from "../entity/UserRoles.abstract";
 
 export class UserRolesController {
     private userRolesService: UserRolesService;
@@ -14,7 +13,7 @@ export class UserRolesController {
     public async getUserRolesById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Retrieve userRoles by ID using UserRolesService
-            const userRoles: UserRoles[] = await this.userRolesService.getUserRolesById(req.params.user_id, req.params.role_id);
+            const userRoles: UserRolesAbstract[] = await this.userRolesService.getUserRolesById(req.params.user_id, req.params.role_id);
             
             // If no userRoles is found, return 404
             if (!userRoles || userRoles.length === 0) {
@@ -60,7 +59,7 @@ export class UserRolesController {
             }
 
             // Create new userRoles instance
-            const userRoles = new UserRoles(user_id, role_id);
+            const userRoles: UserRolesAbstract = { user_id, role_id } as UserRolesAbstract;
 
             // Create userRoles using UserRolesService
             const createdUserRoles = await this.userRolesService.createUserRoles(userRoles);

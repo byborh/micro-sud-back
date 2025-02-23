@@ -95,4 +95,26 @@ export class UserRolesRepositoryRedis implements IUserRolesRepository {
             console.error("Error creating userRoles in UserRolesRepositoryRedis:", error);
         }
     }
+
+    async deleteUserRolesByMultipleFields(fields: string[], values: string[]): Promise<boolean> {
+        try {
+            await this.isInitialized;
+            
+            // If user_id is provided, delete all its roles
+            if (fields.includes("user_id")) {
+                const userId = values[fields.indexOf("user_id")];
+                await this.client.del(`user_roles:${userId}`);
+            }
+    
+            // If role_id is provided, delete all its users
+            if (fields.includes("role_id")) {
+                const roleId = values[fields.indexOf("role_id")];
+                await this.client.del(`role_users:${roleId}`);
+            }
+
+            return true;
+        } catch(error) {
+            console.error("Error to delete UserRoles in UserRolesRepositoryRedis:", error);
+        }
+    }
 }

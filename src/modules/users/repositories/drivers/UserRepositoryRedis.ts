@@ -101,8 +101,12 @@ export class UserRepositoryRedis implements IUserRepository {
     async deleteUser(userId: string): Promise<boolean> {
         try {
             await this.isInitialized; // Wait for initialization
-            const result = await this.client.del(`user:${userId}`);
-            return result > 0;
+            const userDel = await this.client.del(`user:${userId}`);
+
+            // Delete user roles of user
+            const userRolesDel = await this.client.del(`user_roles:${userId}`);
+
+            return userDel > 0 || userRolesDel > 0;
         } catch (error) {
             console.error("Failed to find user by field:", error);
             throw error;
