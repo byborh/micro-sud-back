@@ -1,4 +1,5 @@
 import { UserRolesAbstract } from "../entity/UserRoles.abstract";
+import { createUserRolesEntity } from "../entity/UserRoles.factory";
 import { IUserRolesRepository } from "../repositories/contract/IUserRolesRepository";
 
 export class UserRolesService {
@@ -50,15 +51,17 @@ export class UserRolesService {
     // Create userRoles
     public async createUserRoles(userRoles: UserRolesAbstract): Promise<UserRolesAbstract | null> {
         try {
+            const userRolesEntity = await createUserRolesEntity(userRoles);
+
             // Check if the userRoles already exists based on user_id and role_id
-            const existingUserRoles: UserRolesAbstract[] | null = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [userRoles.user_id, userRoles.role_id]);
+            const existingUserRoles: UserRolesAbstract[] | null = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [userRolesEntity.user_id, userRolesEntity.role_id]);
             if (existingUserRoles || existingUserRoles.length > 0) {
                 console.error("UserRolesAbstract already exists:", existingUserRoles);
                 throw new Error("UserRolesAbstract already exists.");
             }
 
             // Create userRoles through repository
-            const createdUserRoles: UserRolesAbstract | null = await this.userRolesRepository.createUserRoles(userRoles);
+            const createdUserRoles: UserRolesAbstract | null = await this.userRolesRepository.createUserRoles(userRolesEntity);
 
             // If userRoles creation fails, throw an error
             if (!createdUserRoles) {

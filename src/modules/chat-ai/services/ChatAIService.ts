@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 import { IdGenerator } from "@core/idGenerator";
 import { IChatAIRepository } from "../repositories/contract/IChatAIRepository";
 import { ChatAIAbstract } from "../entity/ChatAI.abstract";
+import { createChatAIEntity } from "../entity/ChatAI.factory";
 const axios = require('axios');
 
 dotenv.config();
@@ -36,7 +37,10 @@ export class ChatAIService {
                 createdAt: new Date()
             } as ChatAIAbstract;
 
-            await this.chatAIRepository.submitPrompt(chatAI);
+            // Creation of entity with correct types
+            const chatAIEntity = await createChatAIEntity(chatAI);
+
+            await this.chatAIRepository.submitPrompt(chatAIEntity);
 
             return combinedResponse;
 

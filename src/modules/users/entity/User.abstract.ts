@@ -12,9 +12,6 @@ export abstract class UserAbstract implements UserContract {
     telnumber?: string;
     createdAt: Date;
     updatedAt: Date;
-    toDTO(): UserDTO {
-        throw new Error("Method not implemented.");
-    }
 
     constructor(id: string, email: string, password: string, salt: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string, createdAt?: Date, updatedAt?: Date) {
         this.id = id;

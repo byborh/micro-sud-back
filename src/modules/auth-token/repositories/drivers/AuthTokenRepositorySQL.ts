@@ -2,22 +2,22 @@ import { IAuthTokenRepository } from "../contract/IAuthTokenRepository";
 import { Repository } from "typeorm";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
-import { AuthTokenSqlEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
+import { AuthTokenSQLEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
 
 export class AuthTokenRepositorySQL implements IAuthTokenRepository {
-    private repository: Repository<AuthTokenSqlEntity>;
+    private repository: Repository<AuthTokenSQLEntity>;
 
     constructor(private db: IDatabase) {
         const dataSource = db as MySQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(AuthTokenSqlEntity);
+        this.repository = dataSource.getDataSoure().getRepository(AuthTokenSQLEntity);
     }
 
-    async createAuthToken(authToken: AuthTokenSqlEntity): Promise<AuthTokenSqlEntity> {
+    async createAuthToken(authToken: AuthTokenSQLEntity): Promise<AuthTokenSQLEntity> {
         const result = await this.repository.save(authToken);
         return result || null;
     }
 
-    async getAuthTokenByUserId(userId: string): Promise<AuthTokenSqlEntity | null> {
+    async getAuthTokenByUserId(userId: string): Promise<AuthTokenSQLEntity | null> {
         if (!userId) return null;
         return await this.repository.findOne({ where: { user_id: userId } }) || null;
     }
@@ -28,7 +28,7 @@ export class AuthTokenRepositorySQL implements IAuthTokenRepository {
         return result.affected !== 0;
     }
 
-    async getAllAuthTokens(): Promise<AuthTokenSqlEntity[]> {
+    async getAllAuthTokens(): Promise<AuthTokenSQLEntity[]> {
         return await this.repository.find();
     }
     

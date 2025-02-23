@@ -1,10 +1,11 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { AuthTokenAbstract } from "../AuthToken.abstract";
+import { AuthTokenContract } from "@modules/auth-token/contracts/IAuthToken";
 
 
 @Entity("auth_token")
-export class AuthTokenSqlEntity extends AuthTokenAbstract {
+export class AuthTokenSQLEntity extends AuthTokenAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
 
@@ -20,7 +21,7 @@ export class AuthTokenSqlEntity extends AuthTokenAbstract {
     @Column({ type: "timestamp" })
     expiresAt: Date;
 
-    @OneToOne(() => UserSQLEntity, user => user.AuthTokenSqlEntity, {onDelete: "CASCADE"})
+    @OneToOne(() => UserSQLEntity, user => user.authTokenSqlEntity, {onDelete: "CASCADE"})
     @JoinColumn({ name: "user_id" })
     user: UserSQLEntity;
 
@@ -39,13 +40,14 @@ export class AuthTokenSqlEntity extends AuthTokenAbstract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(id: string, user_id: string, token: string, createdAt: Date, expiresAt: Date) {
-        super(id, user_id, token, createdAt, expiresAt);
-        this.id = id;
-        this.user_id = user_id;
-        this.token = token;
-        this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
+
+    constructor(data: Partial<AuthTokenContract>) {
+        super(data.id, data.user_id, data.token, data.createdAt, data.expiresAt);
+        this.id = data.id;
+        this.user_id = data.user_id;
+        this.token = data.token;
+        this.createdAt = data.createdAt;
+        this.expiresAt = data.expiresAt;
     }
 
     public getId(): string {return this.id;}

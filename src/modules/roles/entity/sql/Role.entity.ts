@@ -1,7 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { UserRolesEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import { UserRolesSQLEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import { TRoleName } from "../../contracts/TRoleName";
 import { RoleAbstract } from "../Role.abstract";
+import { RoleContract } from "@modules/roles/contracts/IRole";
 
 @Entity("roles")
 export class RoleSQLEntity  extends RoleAbstract {
@@ -14,15 +15,15 @@ export class RoleSQLEntity  extends RoleAbstract {
     @Column({ type: "text", nullable: true })
     description: string | null;
 
-    @OneToMany(() => UserRolesEntity, userRole => userRole.role, { cascade: true })
-    userRoles: UserRolesEntity[];
+    @OneToMany(() => UserRolesSQLEntity, userRole => userRole.role, { cascade: true })
+    userRoles: UserRolesSQLEntity[];
 
 
-    constructor(id: string, name: TRoleName, description: string) {
-        super(id, name, description);
-        this.id = id;
-        this.name = name;
-        this.description = description;
+    constructor(data: Partial<RoleContract>) {
+        super(data.id, data.name, data.description);
+        this.id = data.id;
+        this.name = data.name;
+        this.description = data.description;
     }
 
     public getId(): string { return this.id; }

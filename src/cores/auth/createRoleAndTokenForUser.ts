@@ -4,6 +4,9 @@ import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/
 import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
 import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
 import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
+import { createRoleEntity } from "@modules/roles/entity/Role.factory";
+import { createUserRolesEntity } from "@modules/user-roles/entity/UserRoles.factory";
+import { TRoleName } from "@modules/roles/contracts/TRoleName";
 
 export class CreateRoleAndTokenForUser {
     private static instance: CreateRoleAndTokenForUser;
@@ -21,30 +24,54 @@ export class CreateRoleAndTokenForUser {
         roleRepository: IRoleRepository,
         userRolesRepository: IUserRolesRepository,
         createToken: CreateToken
-    ): CreateRoleAndTokenForUser{
-        if(!CreateRoleAndTokenForUser.instance) {
+    ): CreateRoleAndTokenForUser {
+        if (!CreateRoleAndTokenForUser.instance) {
             CreateRoleAndTokenForUser.instance = new CreateRoleAndTokenForUser(roleRepository, userRolesRepository, createToken);
         }
         return CreateRoleAndTokenForUser.instance;
     }
 
-
     public async createRoleAndTokenForUser(userId: string): Promise<AuthTokenAbstract | null> {
+        try {
+            // Rôles par défaut
+            const defaultRoles: { id: string; name: TRoleName; description: string }[] = [
+                { id: "123sW8eR1tZ4USER", name: "USER", description: "Just a chill user" },
+                { id: "wE3rT6yU8iK2lO7p", name: "MANAGER", description: "Gère les utilisateurs et les permissions avec certaines restrictions" },
+                { id: "qA5sW8eR1tZ4vC9m", name: "ADMIN", description: "Accès total à toutes les ressources" },
+            ];
 
-        // Get ID of USER role
-        const role: RoleAbstract = await this.roleRepository.getRoleByName('USER');
-        const roleId: string = role.getId();
+            // Récupérer les rôles existants
+            const existingRoles = await this.roleRepository.getRoles();
+            const existingRoleNames = new Set(existingRoles.map(role => role.name));
 
-        // Create userRoles
-        const userRoles: UserRolesAbstract = {user_id: userId, role_id: roleId} as UserRolesAbstract;
+            // Créer les rôles manquants
+            for (const defaultRole of defaultRoles) {
+                if (!existingRoleNames.has(defaultRole.name)) {
+                    const roleEntity = await createRoleEntity(defaultRole); // Factory pour créer une entité valide
+                    const createdRole = await this.roleRepository.createRole(roleEntity);
+                    if (!createdRole) throw new Error(`Failed to create role: ${defaultRole.name}`);
+                    existingRoles.push(createdRole);
+                }
+            }
 
-        // Insérer dans la bdd
-        const userRolesEntity: UserRolesAbstract = await this.userRolesRepository.createUserRoles(userRoles);
-        if(!userRolesEntity) throw new Error("UserRoles didn't created correctly.")
+            // Récupérer l'ID du rôle USER
+            const userRole = existingRoles.find(role => role.name === "ADMIN");
+            if (!userRole) throw new Error("ADMIN role not found");
+            const roleId: string = userRole.getId();
 
-        // Appeler la fonction pour créer un token
-        const authToken: AuthTokenAbstract = await this.createToken.createToken(userId, [roleId]);
+            // Créer une association User <-> Role
+            const userRoleEntity = await createUserRolesEntity({ user_id: userId, role_id: roleId });
+            const createdUserRole = await this.userRolesRepository.createUserRoles(userRoleEntity);
+            if (!createdUserRole) throw new Error("UserRoles didn't get created correctly.");
 
-        return authToken;
+            // Générer un token d'authentification
+            const authToken = await this.createToken.createToken(userId, [roleId]);
+            if (!authToken) throw new Error("Failed to generate authentication token.");
+
+            return authToken;
+        } catch (error) {
+            console.error("Error in createRoleAndTokenForUser:", error);
+            throw error;
+        }
     }
 }

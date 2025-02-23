@@ -1,3 +1,4 @@
+import { createRoleEntity } from "../entity/Role.factory";
 import { IRoleRepository } from "../repositories/contract/IRoleRepository";
 import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
 
@@ -52,15 +53,17 @@ export class RoleService {
     // Create role
     public async createRole(role: RoleAbstract): Promise<RoleAbstract | null> {
         try {
+            const roleEntity = await createRoleEntity(role);
+
             // Check if the role already exists based on name and resource
-            const existingRole: RoleAbstract | null = await this.roleRepository.getRoleByName(role.getName());
+            const existingRole: RoleAbstract | null = await this.roleRepository.getRoleByName(roleEntity.getName());
             if (existingRole) {
                 console.error("RoleAbstract already exists:", existingRole);
                 throw new Error("RoleAbstract already exists.");
             }
 
             // Create role through repository
-            const createdRole: RoleAbstract | null = await this.roleRepository.createRole(role);
+            const createdRole: RoleAbstract | null = await this.roleRepository.createRole(roleEntity);
 
             // If role creation fails, throw an error
             if (!createdRole) {
@@ -76,8 +79,10 @@ export class RoleService {
     }
 
     // Modify role
-    public async modifyRole(roleId: string, data: Partial<RoleAbstract>): Promise<RoleAbstract | null> {
+    public async modifyRole(roleId: string, role: Partial<RoleAbstract>): Promise<RoleAbstract | null> {
         try {
+            const roleEntity = await createRoleEntity(role);
+
             // Verify if role exists
             const existingRole: RoleAbstract | null = await this.getRoleById(roleId);
             if (!existingRole) {
@@ -86,14 +91,14 @@ export class RoleService {
 
             let hasChanges: boolean = false;
 
-            // Update data in entity
-            if (data.name && data.name !== existingRole.getName()) {
-                existingRole.setName(data.name);
+            // Update role in entity
+            if (roleEntity.name && roleEntity.name !== existingRole.getName()) {
+                existingRole.setName(roleEntity.name);
                 hasChanges = true;
             }
 
-            if (data.description && data.description !== existingRole.getDescription()) {
-                existingRole.setDescription(data.description);
+            if (roleEntity.description && roleEntity.description !== existingRole.getDescription()) {
+                existingRole.setDescription(roleEntity.description);
                 hasChanges = true;
             }
 

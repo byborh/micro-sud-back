@@ -1,11 +1,12 @@
 import { RoleContract } from "../contracts/IRole";
+import { TRoleName } from "../contracts/TRoleName";
 
 export abstract class RoleAbstract implements RoleContract {
     id: string;
-    name: string;
+    name: TRoleName;
     description: string;
 
-    constructor(id: string, name: string, description: string) {
+    constructor(id: string, name: TRoleName, description: string) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -16,6 +17,6 @@ export abstract class RoleAbstract implements RoleContract {
     getDescription(): string { return this.description; }
 
     setId(id: string): void { this.id = id; }
-    setName(name: string): void { this.name = name; }
+    setName(name: TRoleName): void { this.name = name; }
     setDescription(description: string): void { this.description = description; }
 }

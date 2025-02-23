@@ -1,13 +1,14 @@
+import { UserRolesContract } from "@modules/user-roles/contracts/IUserRoles";
 import { UserRolesAbstract } from "../UserRoles.abstract";
 
-export class UserRolesEntity extends UserRolesAbstract {
+export class UserRolesRedisEntity extends UserRolesAbstract {
     user_id: string;
     role_id: string;
 
-    constructor(user_id: string, role_id: string) {
-        super({user_id, role_id});
-        this.user_id = user_id;
-        this.role_id = role_id;
+    constructor(data: Partial<UserRolesContract>) {
+        super(data.user_id, data.role_id);
+        this.user_id = data.user_id;
+        this.role_id = data.role_id;
     }
 
     getUser_id(): string | null {return this.user_id;}

@@ -1,3 +1,4 @@
+import { AuthTokenContract } from "@modules/auth-token/contracts/IAuthToken";
 import { AuthTokenAbstract } from "../AuthToken.abstract";
 
 
@@ -8,13 +9,7 @@ export class AuthTokenRedisEntity extends AuthTokenAbstract {
     createdAt: Date;
     expiresAt: Date;
 
-    constructor(data: {
-        id: string,
-        user_id: string,
-        token: string,
-        createdAt: Date,
-        expiresAt: Date
-    }) {
+    constructor(data: Partial<AuthTokenContract>) {
         super(data.id, data.user_id, data.token, data.createdAt, data.expiresAt);
         this.id = data.id;
         this.user_id = data.user_id;

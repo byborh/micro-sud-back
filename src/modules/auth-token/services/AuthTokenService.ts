@@ -9,6 +9,8 @@ import { getRepository } from "@core/db/databaseGuards";
 import { AuthTokenRepositoryRedis } from "../repositories/drivers/AuthTokenRepositoryRedis";
 import { AuthTokenAbstract } from "../entity/AuthToken.abstract";
 import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
+import { createUserEntity } from "@modules/users/entity/User.factory";
+import { createAuthTokenEntity } from "../entity/AuthToken.factory";
 
 export class AuthTokenService {
     private authTokenRepository: IAuthTokenRepository;
@@ -26,13 +28,15 @@ export class AuthTokenService {
         // Validation of email and password
         const user = await this.userRepository.findUserByEmail(email);
 
+        const userEntity = await createUserEntity(user);
+
         // Verify if the password is correct
-        if (user) {
+        if (userEntity) {
             const passwordManager = PasswordManager.getInstance();
             const isPasswordValid: boolean = passwordManager.verifyPassword(
                 password,
-                user.getSalt(),
-                user.getPassword()
+                userEntity.getSalt(),
+                userEntity.getPassword()
             );
 
             // If password is different
@@ -40,15 +44,15 @@ export class AuthTokenService {
         } else {throw new Error("Invalid credentials : user not found");}
 
         // Verify if user has already a token
-        const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(user.getId());
+        const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(userEntity.getId());
 
         if(isAuthTokenExists) {
-            const isAuthTokenDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(user.getId());
+            const isAuthTokenDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(userEntity.getId());
 
             if(!isAuthTokenDeleted) throw new Error("Failed to delete existant AuthTokenAbstract.");
         }
 
-        const userId: string = user.getId();
+        const userId: string = userEntity.getId();
 
         // Get ID of roles
         const userRoles: UserRolesAbstract[] = await this.userRoleRepository.getUserRolesByMultipleFields(["user_id"], [userId]);
@@ -64,7 +68,9 @@ export class AuthTokenService {
         const createToken = CreateToken.getInstance(authTokenRepository);
         const authToken: AuthTokenAbstract = await createToken.createToken(userId, roleIds);
 
-        return authToken.getToken();
+        const authTokenEntity = await createAuthTokenEntity(authToken);
+
+        return authTokenEntity.getToken();
     }
 
     // Get AuthToken by userId

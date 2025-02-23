@@ -2,17 +2,18 @@ import { IRoleRepository } from "../contract/IRoleRepository";
 import { Repository } from "typeorm";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
-import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
+import { createRoleEntity } from "@modules/roles/entity/Role.factory";
+import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
 
 export class RoleRepositorySQL implements IRoleRepository {
-    private repository: Repository<RoleAbstract>;
+    private repository: Repository<RoleSQLEntity>;
 
     constructor(private db: IDatabase) {
         const dataSource = db as MySQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(RoleAbstract);
+        this.repository = dataSource.getDataSoure().getRepository(RoleSQLEntity);
     }
 
-    async getRoleByField(field: string, value: string): Promise<RoleAbstract | null> {
+    async getRoleByField(field: string, value: string): Promise<RoleSQLEntity | null> {
         // Validate field
         const allowedFields = ['id', 'name', 'description'];
         if (!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
@@ -28,25 +29,25 @@ export class RoleRepositorySQL implements IRoleRepository {
         // Verify if all required fields are present
         if (!role.id || !role.name) {
             console.error("Invalid role data:", role);
-            throw new Error("RoleAbstract data is incomplete.");
+            throw new Error("RoleSQLEntity data is incomplete.");
         }
 
         return role || null;
     }
 
-    async getRoleById(roleId: string): Promise<RoleAbstract | null> {
+    async getRoleById(roleId: string): Promise<RoleSQLEntity | null> {
         if (!roleId) return null;
         return await this.getRoleByField('id', roleId) || null;
     }
 
-    async getRoleByName(name: string): Promise<RoleAbstract | null> {
+    async getRoleByName(name: string): Promise<RoleSQLEntity | null> {
         if (!name) return null;
         return await this.getRoleByField('name', name) || null;
     }
 
-    async getRoles(): Promise<RoleAbstract[]> {
+    async getRoles(): Promise<RoleSQLEntity[]> {
         // Fetch all roles from the database
-        const rawResult: RoleAbstract[] = await this.repository.find();
+        const rawResult: RoleSQLEntity[] = await this.repository.find();
     
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
@@ -57,30 +58,34 @@ export class RoleRepositorySQL implements IRoleRepository {
         return rowsArray;
     }
 
-    async createRole(role: RoleAbstract): Promise<RoleAbstract | null> {
+    async createRole(role: RoleSQLEntity): Promise<RoleSQLEntity | null> {
+        const roleEntity = await createRoleEntity(role);
+
         // Insert the role in the database
-        const result = await this.repository.save(role);
+        const result = await this.repository.save(roleEntity);
 
         // If the role is not created, return null
         if (!result) return null;
 
         // Return the role
-        return this.getRoleById(role.id) || null;
+        return this.getRoleById(roleEntity.id) || null;
     }
 
-    async modifyRole(role: RoleAbstract): Promise<RoleAbstract | null> {
+    async modifyRole(role: RoleSQLEntity): Promise<RoleSQLEntity | null> {
+        const roleEntity = await createRoleEntity(role);
+
         // Be sure that role exists
-        const existingRole: RoleAbstract = await this.repository.findOne({ where: { id: role.id } });
+        const existingRole: RoleSQLEntity = await this.repository.findOne({ where: { id: roleEntity.id } });
         if (!existingRole) return null;
 
         // Merge role data with existing role data
-        this.repository.merge(existingRole, role);
+        this.repository.merge(existingRole, roleEntity);
 
         // Save the modified role
         const result = await this.repository.save(existingRole);
 
         // Return the role
-        return this.getRoleById(role.id) || null;
+        return this.getRoleById(roleEntity.id) || null;
     }
 
     async deleteRole(roleId: string): Promise<boolean> {

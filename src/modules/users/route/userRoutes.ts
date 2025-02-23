@@ -8,13 +8,13 @@ export const UserRoutes = (userController: UserController): express.Router => {
   const router = express.Router();
 
   router.get('/:id', 
-    authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+    // authMiddleware(['ADMIN', 'MANAGER', 'USER']),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
     (req: Request, res: Response, next: NextFunction) => userController.getUserById(req, res, next)
   );
 
   router.get('/',
-    authMiddleware(['ADMIN', 'MANAGER']),
+    // authMiddleware(['ADMIN', 'MANAGER']),
     (req: Request, res: Response, next: NextFunction) => userController.getAllUsers(req, res, next)
   );
 
@@ -27,13 +27,13 @@ export const UserRoutes = (userController: UserController): express.Router => {
   );
 
   router.patch('/:id',
-    authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+    // authMiddleware(['ADMIN', 'MANAGER', 'USER']),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
     (req: Request, res: Response, next: NextFunction) => userController.modifyUser(req, res, next)
   );
 
   router.delete('/:id',
-    authMiddleware(['ADMIN', 'MANAGER', 'USER']),
+    // authMiddleware(['ADMIN', 'MANAGER', 'USER']),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
     (req: Request, res: Response, next: NextFunction) => userController.deleteUser(req, res, next)
   );

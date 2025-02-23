@@ -1,9 +1,10 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, OneToOne } from "typeorm";
-import { UserRolesEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
-import { AuthTokenSqlEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
+import { UserRolesSQLEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import { AuthTokenSQLEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
 import { ChatAISQLEntity } from "@modules/chat-ai/entity/sql/ChatAI.entity";
 import { UserAbstract } from "../User.abstract";
 import { UserDTO } from "@modules/users/dto/UserDTO";
+import { UserContract } from "@modules/users/contracts/IUser";
 
 @Entity("users")
 export class UserSQLEntity extends UserAbstract {
@@ -41,11 +42,11 @@ export class UserSQLEntity extends UserAbstract {
     @Column("json", { nullable: true })
     data: JSON | null;
 
-    @OneToMany(() => UserRolesEntity, userRole => userRole.user, { cascade: true })
-    userRoles: UserRolesEntity[];
+    @OneToMany(() => UserRolesSQLEntity, userRole => userRole.user, { cascade: true })
+    userRoles: UserRolesSQLEntity[];
 
-    @OneToOne(() => AuthTokenSqlEntity, authTokenSqlEntity => authTokenSqlEntity.user) 
-    AuthTokenSqlEntity: AuthTokenSqlEntity;
+    @OneToOne(() => AuthTokenSQLEntity, authTokenSQLEntity => authTokenSQLEntity.user) 
+    authTokenSqlEntity: AuthTokenSQLEntity;
 
     @OneToMany(() => ChatAISQLEntity, chatAISQLEntity => chatAISQLEntity.user, { cascade: true })
     chatAISQLEntity: ChatAISQLEntity[]
@@ -65,27 +66,20 @@ export class UserSQLEntity extends UserAbstract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(
-        id: string,
-        email: string,
-        password: string,
-        salt: string,
-        firstname: string,
-        lastname: string,
-        pseudo: string,
-        telnumber: string,
-        createdAt: Date,
-        updatedAt: Date
-      ) {
-        super(id, email, password, salt, firstname, lastname, pseudo, telnumber, createdAt, updatedAt);
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.pseudo = pseudo;
-        this.telnumber = telnumber;
-      }
+    constructor(data: Partial<UserContract>) {
+        super(data.id!, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt);
+
+        this.id = data.id!;
+        this.email = data.email!;
+        this.password = data.password!;
+        this.salt = data.salt!;
+        this.firstname = data.firstname ?? null;
+        this.lastname = data.lastname ?? null;
+        this.pseudo = data.pseudo ?? null;
+        this.telnumber = data.telnumber ?? null;
+        this.createdAt = data.createdAt ?? new Date();
+        this.updatedAt = data.updatedAt ?? new Date();
+    }
       
     // Static constructor
     // constructor(params?: UserContract) {

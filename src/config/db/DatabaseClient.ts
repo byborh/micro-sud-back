@@ -20,7 +20,7 @@ import { IDatabase } from "./contract/IDatabase"; // Import the database interfa
 import { DatabaseFactory } from "./DatabaseFactory"; // Import the factory to create database instances
 
 let dbInstance: IDatabase | null = null; // Singleton instance of the database
-const databaseType: DatabaseType = process.env.MY_DB as DatabaseType; // Default to MySQL if not specified
+const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
 
 /*
  * Function to get the database instance.

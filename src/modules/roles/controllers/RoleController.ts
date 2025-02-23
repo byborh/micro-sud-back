@@ -59,7 +59,7 @@ export class RoleController {
             const roleId: string = idGenerator.generateId(16);
 
             // Create new role instance
-            const role = new RoleSQLEntity(roleId, name, description,);
+            const role = new RoleSQLEntity({id: roleId, name: name, description: description});
 
             // Create role using RoleService
             const createdRole = await this.roleService.createRole(role);

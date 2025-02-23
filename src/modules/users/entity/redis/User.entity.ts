@@ -1,5 +1,6 @@
 import { UserDTO } from '@modules/users/dto/UserDTO';
 import { UserAbstract } from '../User.abstract';
+import { UserContract } from '@modules/users/contracts/IUser';
 
 export class UserRedisEntity extends UserAbstract {
     id: string;
@@ -15,29 +16,19 @@ export class UserRedisEntity extends UserAbstract {
 
     data: Record<string, any> | null;
 
-    constructor(data: {
-        id: string,
-        email: string,
-        password: string,
-        salt: string,
-        firstname: string,
-        lastname: string,
-        pseudo: string,
-        telnumber: string,
-        createdAt: Date,
-        updatedAt: Date
-    }) {
-        super(data.id, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt);
-        this.id = data.id;
-        this.email = data.email;
-        this.password = data.password;
-        this.salt = data.salt;
-        this.firstname = data.firstname;
-        this.lastname = data.lastname;
-        this.pseudo = data.pseudo;
-        this.telnumber = data.telnumber;
-        this.createdAt = data.createdAt;
-        this.updatedAt = data.updatedAt;
+    constructor(data: Partial<UserContract>) {
+        super(data.id!, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt);
+
+        this.id = data.id!;
+        this.email = data.email!;
+        this.password = data.password!;
+        this.salt = data.salt!;
+        this.firstname = data.firstname ?? null;
+        this.lastname = data.lastname ?? null;
+        this.pseudo = data.pseudo ?? null;
+        this.telnumber = data.telnumber ?? null;
+        this.createdAt = data.createdAt ?? new Date();
+        this.updatedAt = data.updatedAt ?? new Date();
     }
 
     // constructor(data: Partial<UserRedisEntity>) {

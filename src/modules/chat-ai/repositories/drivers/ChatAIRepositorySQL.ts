@@ -2,34 +2,34 @@ import { IChatAIRepository } from "../contract/IChatAIRepository";
 import { Repository } from "typeorm";
 import { MySQLDatabase } from "@db/drivers/mysql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
-import { ChatAIAbstract } from "@modules/chat-ai/entity/ChatAI.abstract";
+import { ChatAISQLEntity } from "@modules/chat-ai/entity/sql/ChatAI.entity";
 
 export class ChatAIRepositorySQL implements IChatAIRepository {
-    private repository: Repository<ChatAIAbstract>;
+    private repository: Repository<ChatAISQLEntity>;
 
     constructor(private db: IDatabase) {
         const dataSource = db as MySQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(ChatAIAbstract);
+        this.repository = dataSource.getDataSoure().getRepository(ChatAISQLEntity);
     }
 
-    async submitPrompt(chatAI: ChatAIAbstract): Promise<ChatAIAbstract> {
+    async submitPrompt(chatAI: ChatAISQLEntity): Promise<ChatAISQLEntity> {
         const result = await this.repository.save(chatAI);
         return result || null;
     }
 
-    async getAllChatAIs(): Promise<ChatAIAbstract[]> {
+    async getAllChatAIs(): Promise<ChatAISQLEntity[]> {
         const result = await this.repository.find();
         return result || null;
     }
 
-    async getChatAIById(chatAIId: string): Promise<ChatAIAbstract> {
+    async getChatAIById(chatAIId: string): Promise<ChatAISQLEntity> {
         const result = await this.repository.findOneBy({ id: chatAIId });
         return result || null;
     }
 
 
-    async getChatAIsByUserId(userId: string): Promise<ChatAIAbstract[]> {
-        const result: ChatAIAbstract[] = await this.repository.find({  where: { user_id: userId } });
+    async getChatAIsByUserId(userId: string): Promise<ChatAISQLEntity[]> {
+        const result: ChatAISQLEntity[] = await this.repository.find({  where: { user_id: userId } });
         return result || null;
     }
 

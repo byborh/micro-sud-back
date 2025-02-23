@@ -1,0 +1,22 @@
+import { DatabaseType } from "@db/contract/DatabaseType";
+import { RoleRedisEntity } from "./redis/Role.entity";
+import { RoleSQLEntity } from "./sql/Role.entity";
+import { RoleAbstract } from "./Role.abstract";
+import { RoleContract } from "../contracts/IRole";
+
+const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
+
+
+export async function createRoleEntity(role: Partial<RoleContract>, dbType: DatabaseType = databaseType): Promise<RoleAbstract> {
+
+    switch(dbType) {
+        case "mysql":
+            return new RoleSQLEntity(role);
+        case "redis":
+            return new RoleRedisEntity(role);
+        default:
+            throw new Error("Unsupported database type.");
+        
+        // Add more cases for other database types that you want to support
+    }
+}

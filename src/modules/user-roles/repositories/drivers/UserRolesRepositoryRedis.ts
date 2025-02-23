@@ -1,8 +1,7 @@
-import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
 import { IDatabase } from "@db/contract/IDatabase";
+import { UserRolesRedisEntity } from "@modules/user-roles/entity/redis/UserRoles.entity";
 import { RedisClientType } from "redis";
-import { UserRolesEntity } from "@modules/user-roles/entity/redis/UserRoles.entity";
 
 
 export class UserRolesRepositoryRedis implements IUserRolesRepository {
@@ -25,24 +24,24 @@ export class UserRolesRepositoryRedis implements IUserRolesRepository {
     }
 
 
-    async getUserRolesByMultipleFields(fields: string[], values: string[]): Promise<UserRolesAbstract[] | null> {
+    async getUserRolesByMultipleFields(fields: string[], values: string[]): Promise<UserRolesRedisEntity[] | null> {
         try {
             await this.isInitialized;
     
-            const results: UserRolesAbstract[] = [];
+            const results: UserRolesRedisEntity[] = [];
     
             // If user_id is provided, get all its roles
             if (fields.includes("user_id")) {
                 const userId = values[fields.indexOf("user_id")];
                 const roleIds = await this.client.sMembers(`user_roles:${userId}`);
-                results.push(...roleIds.map((roleId) => new UserRolesEntity(userId, roleId)));
+                results.push(...roleIds.map((roleId) => new UserRolesRedisEntity({user_id: userId, role_id: roleId})));
             }
     
             // If role_id is provided, get all its users
             if (fields.includes("role_id")) {
                 const roleId = values[fields.indexOf("role_id")];
                 const userIds = await this.client.sMembers(`role_users:${roleId}`);
-                results.push(...userIds.map((userId) => new UserRolesEntity(userId, roleId)));
+                results.push(...userIds.map((userId) => new UserRolesRedisEntity({user_id: userId, role_id: roleId})));
             }
 
             return results.length > 0 ? results : null;
@@ -52,11 +51,11 @@ export class UserRolesRepositoryRedis implements IUserRolesRepository {
         }
     }
     
-    async getUserRoles(): Promise<UserRolesAbstract[] | null> {
+    async getUserRoles(): Promise<UserRolesRedisEntity[] | null> {
         try {
             await this.isInitialized;
     
-            const userRoles: UserRolesAbstract[] = [];
+            const userRoles: UserRolesRedisEntity[] = [];
             let cursor = 0;
     
             // Loop through all keys
@@ -70,7 +69,7 @@ export class UserRolesRepositoryRedis implements IUserRolesRepository {
                     const roleIds = await this.client.sMembers(key);
     
                     for (const roleId of roleIds) {
-                        userRoles.push(new UserRolesEntity(userId, roleId));
+                        userRoles.push(new UserRolesRedisEntity({user_id: userId, role_id: roleId}));
                     }
                 }
             } while (cursor !== 0);
@@ -82,7 +81,7 @@ export class UserRolesRepositoryRedis implements IUserRolesRepository {
         }
     }
 
-    async createUserRoles(userRoles: UserRolesAbstract): Promise<UserRolesAbstract | null> {
+    async createUserRoles(userRoles: UserRolesRedisEntity): Promise<UserRolesRedisEntity | null> {
         try {
             await this.isInitialized;
 

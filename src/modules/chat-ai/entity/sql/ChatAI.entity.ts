@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { ChatAIAbstract } from "../ChatAI.abstract";
+import { ChatAIContract } from "@modules/chat-ai/contracts/IChatAI";
 
 
 @Entity("chat_ai")
@@ -39,13 +40,13 @@ export class ChatAISQLEntity extends ChatAIAbstract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(id: string, user_id: string, requestContent: string, responseContent: string, createdAt: Date) {
-        super(id, user_id, requestContent, responseContent, createdAt);
-        this.id = id;
-        this.user_id = user_id;
-        this.requestContent = requestContent;
-        this.responseContent = responseContent;
-        this.createdAt = createdAt;
+    constructor(data: Partial<ChatAIContract>) {
+        super(data.id, data.user_id, data.requestContent, data.responseContent, data.createdAt);
+        this.id = data.id;
+        this.user_id = data.user_id;
+        this.requestContent = data.requestContent;
+        this.responseContent = data.responseContent;
+        this.createdAt = data.createdAt;
     }
 
     public getId(): string {return this.id;}

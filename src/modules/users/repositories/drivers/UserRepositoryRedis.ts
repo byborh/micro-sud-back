@@ -2,6 +2,7 @@ import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 import { RedisClientType } from "redis";
 import { UserRedisEntity } from "@modules/users/entity/redis/User.entity";
+import { UserContract } from "@modules/users/contracts/IUser";
 
 export class UserRepositoryRedis implements IUserRepository {
     private client: RedisClientType;

@@ -74,5 +74,5 @@ export class UserMapper {
 
 
     // Transform the entity to the dto
-    static toDTO(user: UserContract): UserDTO { return user.toDTO(); }
+    static toDTO(user: UserContract): UserDTO { return user.toDto(); }
 }

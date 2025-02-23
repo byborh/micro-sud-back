@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Landing page for the moment
 app.get('/', (req, res) => {
-  res.send('Welcome to Datte C1 ! \n Version 0.0.2 \n By Datte - C1 \n http:localhost:3000/api/v0.0.2');
+  res.send('Welcome to Datte C1 ! \n Version 1.0.0 \n By Datte - C1 \n http:localhost:3000/api/v0.0.2');
 });
 
 

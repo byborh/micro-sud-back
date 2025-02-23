@@ -1,3 +1,4 @@
+import { RoleContract } from "@modules/roles/contracts/IRole";
 import { TRoleName } from "../../contracts/TRoleName";
 import { RoleAbstract } from "../Role.abstract";
 
@@ -8,7 +9,7 @@ export class RoleRedisEntity extends RoleAbstract {
 
     data: Record<string, any> | null;
 
-    constructor(data: { id: string, name: TRoleName, description: string | null }) {
+    constructor(data: Partial<RoleContract>) {
         super(data.id, data.name, data.description);
         // Object.assign(this, data);
         this.id = data.id;

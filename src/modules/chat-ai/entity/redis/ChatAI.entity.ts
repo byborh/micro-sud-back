@@ -1,3 +1,4 @@
+import { ChatAIContract } from "@modules/chat-ai/contracts/IChatAI";
 import { ChatAIAbstract } from "../ChatAI.abstract";
 
 export class ChatAIRedisEntity extends ChatAIAbstract {
@@ -7,13 +8,7 @@ export class ChatAIRedisEntity extends ChatAIAbstract {
     responseContent: string;
     createdAt: Date;
 
-    constructor(data: {
-        id: string,
-        user_id: string,
-        requestContent: string,
-        responseContent: string,
-        createdAt: Date
-    }) {
+    constructor(data: Partial<ChatAIContract>) {
         super(data.id, data.user_id, data.requestContent, data.responseContent, data.createdAt);
         
         this.id = data.id;

@@ -13,5 +13,5 @@ export interface UserContract {
     createdAt: Date;
     updatedAt: Date;
 
-    toDTO(): UserDTO;
+    toDto(): UserDTO;
 }
