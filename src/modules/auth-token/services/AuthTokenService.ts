@@ -25,34 +25,48 @@ export class AuthTokenService {
 
     // Create authToken
     public async createAuthToken(email: string, password: string): Promise<string> {
+        console.log("ALL IS OK FOR THE MOMENT");
+
         // Validation of email and password
         const user = await this.userRepository.findUserByEmail(email);
 
-        const userEntity = await createUserEntity(user);
+        console.log("ALL IS OK FOR THE MOMENT");
+        console.log("User entity:", user);
+
+        // const userEntity = await createUserEntity(user);
+
+        console.log("ALL IS OK FOR THE MOMENT");
 
         // Verify if the password is correct
-        if (userEntity) {
+        if (user) {
+            console.log("ALL IS OK FOR THE MOMENT");
+
             const passwordManager = PasswordManager.getInstance();
             const isPasswordValid: boolean = passwordManager.verifyPassword(
                 password,
-                userEntity.getSalt(),
-                userEntity.getPassword()
+                user.getSalt(),
+                user.getPassword()
             );
+
+            console.log("ALL IS OK FOR THE MOMENT");
 
             // If password is different
             if (!isPasswordValid) {throw new Error("Invalid credentials : password is different");}
         } else {throw new Error("Invalid credentials : user not found");}
 
+        console.log("ALL IS OK FOR THE MOMENT");
+        console.log("User entity:", user);
+
         // Verify if user has already a token
-        const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(userEntity.getId());
+        const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(user.getId());
 
         if(isAuthTokenExists) {
-            const isAuthTokenDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(userEntity.getId());
+            const isAuthTokenDeleted = await this.authTokenRepository.deleteAuthTokenByUserId(user.getId());
 
-            if(!isAuthTokenDeleted) throw new Error("Failed to delete existant AuthTokenAbstract.");
+            if(!isAuthTokenDeleted) throw new Error("Failed to delete existant AuthToken.");
         }
 
-        const userId: string = userEntity.getId();
+        const userId: string = user.getId();
 
         // Get ID of roles
         const userRoles: UserRolesAbstract[] = await this.userRoleRepository.getUserRolesByMultipleFields(["user_id"], [userId]);
@@ -60,13 +74,21 @@ export class AuthTokenService {
 
         const roleIds: string[] = userRoles.map(userRole => userRole.getRoleId());
 
+        console.log("ALL IS OK FOR THE MOMENT");
+
         const myDB = await getDatabase();
 
         // Dependencies
         const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
     
+        console.log("ALL IS OK FOR THE MOMENT");
+
+
         const createToken = CreateToken.getInstance(authTokenRepository);
         const authToken: AuthTokenAbstract = await createToken.createToken(userId, roleIds);
+
+        console.log("ALL IS OK FOR THE MOMENT");
+
 
         const authTokenEntity = await createAuthTokenEntity(authToken);
 

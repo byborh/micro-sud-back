@@ -104,7 +104,6 @@ export class ChatAIService {
         }
     }
 
-
     public async getAllChatAIs(): Promise<ChatAIAbstract[]> {
         try {
             const chatAIs: ChatAIAbstract[] = await this.chatAIRepository.getAllChatAIs();
@@ -129,7 +128,6 @@ export class ChatAIService {
             throw new Error("Failed to find chatAI.");
         }
     }
-
 
     public async getChatAIsByUserId(userId: string): Promise<ChatAIAbstract[]> {
         try {
