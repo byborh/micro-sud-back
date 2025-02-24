@@ -1,5 +1,6 @@
 import { IdGenerator } from "@core/idGenerator";
 import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
+import { createAuthTokenEntity } from "@modules/auth-token/entity/AuthToken.factory";
 import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
 import fs from "fs";
 import jwt from "jsonwebtoken";
@@ -57,7 +58,9 @@ export class CreateToken{
             expiresAt: expiresAt
         } as AuthTokenAbstract;
 
-        const tokenCreated: AuthTokenAbstract = await this.authTokenRepository.createAuthToken(authToken);
+        const authTokenEntity = await createAuthTokenEntity(authToken);
+
+        const tokenCreated: AuthTokenAbstract = await this.authTokenRepository.createAuthToken(authTokenEntity);
         if(!tokenCreated) throw new Error("Failed to create token.");
 
         return authToken || null;

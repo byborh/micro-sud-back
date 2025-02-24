@@ -17,8 +17,8 @@ import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/
 import { AuthTokenRepositoryRedis } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryRedis";
 import { UserAbstract } from "../entity/User.abstract";
 import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
-import _ from "lodash";
 import { createUserEntity } from "../entity/User.factory";
+import _ from "lodash";
 
 
 export class UserService {
@@ -175,33 +175,36 @@ export class UserService {
     
             // Mapp the DTO to the entity
             const existingUser: UserAbstract = await UserMapper.toEntity(existingUserDTO);
+
+            // Factory to create a correct type of user entity
+            const existingUserEntity = await createUserEntity(existingUser);
     
             // Variable to track changes
             let hasChanges: boolean = false;
     
             // Compare fields and update if necessary
-            if (userEntity.email && userEntity.email !== existingUser.email) {
-                existingUser.setEmail(userEntity.email);
+            if (userEntity.email && userEntity.email !== existingUserEntity.email) {
+                existingUserEntity.setEmail(userEntity.email);
                 hasChanges = true;
             }
     
-            if (userEntity.firstname && userEntity.firstname !== existingUser.firstname) {
-                existingUser.setFirstname(userEntity.firstname);
+            if (userEntity.firstname && userEntity.firstname !== existingUserEntity.firstname) {
+                existingUserEntity.setFirstname(userEntity.firstname);
                 hasChanges = true;
             }
     
-            if (userEntity.lastname && userEntity.lastname !== existingUser.lastname) {
-                existingUser.setLastname(userEntity.lastname);
+            if (userEntity.lastname && userEntity.lastname !== existingUserEntity.lastname) {
+                existingUserEntity.setLastname(userEntity.lastname);
                 hasChanges = true;
             }
     
-            if (userEntity.pseudo && userEntity.pseudo !== existingUser.pseudo) {
-                existingUser.setPseudo(userEntity.pseudo);
+            if (userEntity.pseudo && userEntity.pseudo !== existingUserEntity.pseudo) {
+                existingUserEntity.setPseudo(userEntity.pseudo);
                 hasChanges = true;
             }
     
-            if (userEntity.telnumber && userEntity.telnumber !== existingUser.telnumber) {
-                existingUser.setTelnumber(userEntity.telnumber);
+            if (userEntity.telnumber && userEntity.telnumber !== existingUserEntity.telnumber) {
+                existingUserEntity.setTelnumber(userEntity.telnumber);
                 hasChanges = true;
             }
     
@@ -210,16 +213,16 @@ export class UserService {
                 const passwordManager = PasswordManager.getInstance();
                 const isPasswordValid: boolean = passwordManager.verifyPassword(
                     userEntity.password,
-                    existingUser.salt,
-                    existingUser.password
+                    existingUserEntity.salt,
+                    existingUserEntity.password
                 );
     
                 // If password is different
                 if (!isPasswordValid) {
                     const newSalt = passwordManager.generateSalt();
                     const hashedPassword = passwordManager.hashPassword(userEntity.password, newSalt);
-                    existingUser.setSalt(newSalt);
-                    existingUser.setPassword(hashedPassword);
+                    existingUserEntity.setSalt(newSalt);
+                    existingUserEntity.setPassword(hashedPassword);
                     hasChanges = true;
                 }
             }
@@ -231,10 +234,10 @@ export class UserService {
     
             // Mise à jour de la date de modification
             // Update the updatedAt field
-            existingUser.setUpdatedAt(new Date());
+            existingUserEntity.setUpdatedAt(new Date());
     
             // Update the user in DB
-            const updatedUser: UserAbstract | null = await this.userRepository.modifyUser(existingUser);
+            const updatedUser: UserAbstract | null = await this.userRepository.modifyUser(existingUserEntity);
     
             // If user didn't updated, return null
             if (!updatedUser) {

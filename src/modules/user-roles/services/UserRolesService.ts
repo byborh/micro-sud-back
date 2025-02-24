@@ -55,7 +55,7 @@ export class UserRolesService {
 
             // Check if the userRoles already exists based on user_id and role_id
             const existingUserRoles: UserRolesAbstract[] | null = await this.userRolesRepository.getUserRolesByMultipleFields(["user_id", "role_id"], [userRolesEntity.user_id, userRolesEntity.role_id]);
-            if (existingUserRoles || existingUserRoles.length > 0) {
+            if (existingUserRoles) {
                 console.error("UserRolesAbstract already exists:", existingUserRoles);
                 throw new Error("UserRolesAbstract already exists.");
             }
