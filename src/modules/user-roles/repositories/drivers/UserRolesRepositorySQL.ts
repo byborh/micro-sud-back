@@ -60,4 +60,18 @@ export class UserRolesRepositorySQL implements IUserRolesRepository {
 
         return userRolesEntity[0];
     }
+
+    async deleteUserRolesByMultipleFields(fields: string[], values: string[]): Promise<boolean> {
+        if (fields.length !== values.length || fields.length === 0) return false;
+    
+        const conditions = fields.reduce((acc, field, index) => {
+            acc[field] = values[index];
+            return acc;
+        }, {} as Record<string, string>);
+    
+        const result = await this.repository.delete(conditions);
+    
+        return result.affected !== undefined && result.affected > 0;
+    }
+    
 }

@@ -75,4 +75,16 @@ export class UserRolesService {
             throw new Error("Failed to create userRoles.");
         }
     }
+
+    public async deleteUserRoles(user_id: string, role_id: string): Promise<boolean> {
+        try {
+            if (!user_id || !role_id) return false;
+    
+            return await this.userRolesRepository.deleteUserRolesByMultipleFields(["user_id", "role_id"], [user_id, role_id]);
+        } catch (error) {
+            console.error("Error deleting userRoles in UserRolesService:", error);
+            throw new Error("Failed to delete userRoles.");
+        }
+    }
+    
 }

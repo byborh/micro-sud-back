@@ -140,9 +140,16 @@ export class AuthTokenService {
     // Logout
     public async deleteAuthTokenById(authTokenId: string): Promise<boolean> {
         try {
+
+            console.log("ALL IS OK FOR THE MOMENT");
+
             if (!authTokenId) {
                 throw new Error("AuthTokenAbstract ID is required.");
             }
+
+            console.log("ALL IS OK FOR THE MOMENT");
+
+            console.log()
 
             const isDeleted = await this.authTokenRepository.deleteAuthTokenById(authTokenId);
             return isDeleted;

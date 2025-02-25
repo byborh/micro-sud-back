@@ -76,4 +76,30 @@ export class UserRolesController {
             next(error);
         }
     }
+
+    // Delete a userRoles
+    public async deleteUserRoles(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { user_id, role_id } = req.params;
+    
+            // Vérification des paramètres
+            if (!user_id || !role_id) {
+                res.status(400).json({ error: "user_id and role_id are required." });
+                return;
+            }
+    
+            // Suppression dans le service
+            const isDeleted = await this.userRolesService.deleteUserRoles(user_id, role_id);
+    
+            if (!isDeleted) {
+                res.status(400).json({ error: "UserRoles could not be deleted." });
+                return;
+            }
+    
+            res.status(200).json({ message: "UserRoles deleted successfully." });
+        } catch (error) {
+            next(error);
+        }
+    }
+    
 }

@@ -27,4 +27,11 @@ export interface IUserRolesRepository {
      *          or `null` if the creation fails.
      */
     createUserRoles(userRoles: UserRolesAbstract): Promise<UserRolesAbstract | null>;
+
+
+    /* 
+    *
+    *
+    *  */
+    deleteUserRolesByMultipleFields(fields: string[], values: string[]): Promise<boolean>;
 }

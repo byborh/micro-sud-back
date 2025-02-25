@@ -17,7 +17,7 @@ export const AuthTokenRoutes = (authTokenController: AuthTokenController): expre
     // Deconnexion
     router.post(
         "/logout",
-        // authMiddleware(["ADMIN", "MANAGER", "USER"]),
+        authMiddleware(["ADMIN", "MANAGER", "USER"]),
         (req: Request, res: Response, next: NextFunction) => authTokenController.deleteAuthToken(req, res, next)
     );    
     

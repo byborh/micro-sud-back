@@ -71,7 +71,7 @@ export class ChatAIRepositoryRedis implements IChatAIRepository {
             // Return all chatAIs
             return chatAIs;
         } catch (error) {
-            console.error("Error submitting prompt:", error);
+            console.error("Error getting all chatAIs:", error);
             throw error;
         }
     }
@@ -84,7 +84,7 @@ export class ChatAIRepositoryRedis implements IChatAIRepository {
             const chatAIData = await this.client.hGetAll(`chatAI:${chatAIId}`);
             return Object.keys(chatAIData).length > 0 ? ChatAIRedisEntity.fromRedisHash(chatAIData) : null;
         } catch (error) {
-            console.error("Error submitting prompt:", error);
+            console.error("Error getting chatAI by id:", error);
             throw error;
         }
     }
@@ -105,7 +105,7 @@ export class ChatAIRepositoryRedis implements IChatAIRepository {
     
             return chats;
         } catch (error) {
-            console.error("Error submitting prompt:", error);
+            console.error("Error getting chatAI by user id:", error);
             throw error;
         }
     }
@@ -115,10 +115,13 @@ export class ChatAIRepositoryRedis implements IChatAIRepository {
             await this.isInitialized; // Wait for initialization
 
             const chatDel = await this.client.del(`chatAI:${chatAIId}`);
-            const userDel = await this.client.sRem(`user_chatAIs${userId}`, userId);
+            const userDel = await this.client.sRem(`user_chatAIs${userId}`, chatAIId);
+
+            console.log("This is what i received fromd db: ", chatDel, userDel);
+
             return chatDel > 0 || userDel > 0;
         } catch (error) {
-            console.error("Error submitting prompt:", error);
+            console.error("Error deleting chatAI:", error);
             throw error;
         }
     }

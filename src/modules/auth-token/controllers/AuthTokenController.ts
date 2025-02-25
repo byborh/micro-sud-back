@@ -36,6 +36,9 @@ export class AuthTokenController {
     public async deleteAuthToken(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const authTokenId = (req as any).user.tokenId; // Récupéré via le middleware
+
+            console.log("ALL IS OK FOR THE MOMENT");
+            console.log("AuthToken ID:", authTokenId);
     
             const deletedToken = await this.authTokenService.deleteAuthTokenById(authTokenId);
             if (!deletedToken) {

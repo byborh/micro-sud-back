@@ -2,7 +2,6 @@ import { IUserRepository } from "../contract/IUserRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 import { RedisClientType } from "redis";
 import { UserRedisEntity } from "@modules/users/entity/redis/User.entity";
-import { UserContract } from "@modules/users/contracts/IUser";
 
 export class UserRepositoryRedis implements IUserRepository {
     private client: RedisClientType;
@@ -26,9 +25,14 @@ export class UserRepositoryRedis implements IUserRepository {
     }
 
     async findUserByField(field: string, value: string): Promise<UserRedisEntity | null> {
+        return null; // Don't use this method
+    }
+
+    async findUserById(userId: string): Promise<UserRedisEntity | null> {
         try {
             await this.isInitialized; // Wait for initialization
-            const userData = await this.client.hGetAll(`user:${value}`);
+
+            const userData = await this.client.hGetAll(`user:${userId}`);
 
             return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
         } catch (error) {
@@ -37,12 +41,19 @@ export class UserRepositoryRedis implements IUserRepository {
         }
     }
 
-    async findUserById(userId: string): Promise<UserRedisEntity | null> {
-        return this.findUserByField("id", userId);
-    }
-
     async findUserByEmail(email: string): Promise<UserRedisEntity | null> {
-        return this.findUserByField('email', email);
+        try {
+            await this.isInitialized; // Wait for initialization
+
+            const user = await this.client.hGet(`user_index`, `email:${email}`);
+            if(!user) return null;
+
+            const userData = await this.client.hGetAll(`user:${user}`);
+            return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
+        } catch (error) {
+            console.error("Failed to find user by field:", error);
+            throw error;
+        }
     }
 
     async getAllUsers(): Promise<UserRedisEntity[]> {
@@ -75,7 +86,11 @@ export class UserRepositoryRedis implements IUserRepository {
             await this.isInitialized; // Wait for initialization
 
             await this.client.hSet(`user:${user.id}`, user.toRedisHash());
-        
+
+            // Create an index in email
+            await this.client.hSet(`user_index`, `email:${user.email}`, user.id);
+
+            // Verify if user was created
             const exists = await this.client.exists(`user:${user.id}`);
             
             return exists === 1 ? user : null;
@@ -88,7 +103,12 @@ export class UserRepositoryRedis implements IUserRepository {
     async modifyUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
         try {
             await this.isInitialized; // Wait for initialization
+
             await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+
+            // Update the index in email
+            await this.client.hDel("user_index", `email:${user.email}`);
+            await this.client.hSet(`user_index`, `email:${user.email}`, user.id);
 
             const exists = await this.client.exists(`user:${user.id}`);
             
@@ -102,12 +122,20 @@ export class UserRepositoryRedis implements IUserRepository {
     async deleteUser(userId: string): Promise<boolean> {
         try {
             await this.isInitialized; // Wait for initialization
+
+            // stock email of user in constant
+            const email = await this.client.hGet(`user:${userId}`, "email");
+
+            // Delete the User
             const userDel = await this.client.del(`user:${userId}`);
 
             // Delete user roles of user
             const userRolesDel = await this.client.del(`user_roles:${userId}`);
 
-            return userDel > 0 || userRolesDel > 0;
+            // Delete user index
+            const userIndexDel = await this.client.hDel("user_index", `email:${email}`);
+
+            return userDel > 0 || userRolesDel > 0 || userIndexDel > 0;
         } catch (error) {
             console.error("Failed to find user by field:", error);
             throw error;

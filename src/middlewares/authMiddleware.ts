@@ -11,6 +11,9 @@ import { UserRolesAbstract } from '@modules/user-roles/entity/UserRoles.abstract
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
+import { RoleRepositorySQL } from '@modules/roles/repositories/drivers/RoleRepositorySQL';
+import { RoleRepositoryRedis } from '@modules/roles/repositories/drivers/RoleRepostoryRedis';
+import { IRoleRepository } from '@modules/roles/repositories/contract/IRoleRepository';
 
 const publicKeyPath = path.join(__dirname, '../../ec_public.pem');
 const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
@@ -74,8 +77,18 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
                 res.status(403).json({ message: "Access denied. User does not have a role: GUEST" });
                 return;
             }
-            
-            const userRolesTable: string[] = userRoles.map((userRole) => userRole.role.name);
+
+            const roleRepository = await getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis) as IRoleRepository;
+
+            const userRolesTable: string[] = await Promise.all(
+                userRoles.map(async (userRole) => {
+                    if (!userRole.role_id) {
+                        throw new Error("Role ID is missing in userRole");
+                    }
+                    const roleEntity = await roleRepository.getRoleById(userRole.role_id);
+                    return roleEntity.name;
+                })
+            );
 
 
             if (requiredRoles.length > 0 && !requiredRoles.some((role) => userRolesTable.includes(role))) {

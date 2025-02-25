@@ -50,7 +50,7 @@ export class ChatAIService {
         }
     }
 
-    // Envoie la requête à l'IA et gère la réponse en flux
+    // Send the prompt to the Chat AI server and handle the response in a stream
     private async sendPromptToChatAI(payload: object): Promise<string> {
         try {
             const apiUrl = process.env.AI_API_URL;

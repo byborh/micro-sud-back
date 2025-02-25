@@ -44,9 +44,9 @@ async function startServer() {
 
     // Add module's here
     apiRouter.use('/users', modules.userModule);
-    apiRouter.use('/roles', modules.roleModule);
     apiRouter.use('/userroles', modules.userRolesModule);
     apiRouter.use('/auth', modules.authTokenModule);
+    apiRouter.use('/roles', modules.roleModule);
     apiRouter.use('/chatai', modules.chatAIModule);
     // Add other load modules HERE
 
