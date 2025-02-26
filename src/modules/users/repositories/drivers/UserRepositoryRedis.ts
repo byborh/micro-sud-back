@@ -45,10 +45,10 @@ export class UserRepositoryRedis implements IUserRepository {
         try {
             await this.isInitialized; // Wait for initialization
 
-            const user = await this.client.hGet(`user_index`, `email:${email}`);
-            if(!user) return null;
+            const userId = await this.client.hGet(`user_index`, `email:${email}`);
+            if(!userId) return null;
 
-            const userData = await this.client.hGetAll(`user:${user}`);
+            const userData = await this.client.hGetAll(`user:${userId}`);
             return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
         } catch (error) {
             console.error("Failed to find user by field:", error);

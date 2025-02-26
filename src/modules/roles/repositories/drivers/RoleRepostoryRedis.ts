@@ -23,10 +23,14 @@ export class RoleRepositoryRedis implements IRoleRepository {
     }
 
     async getRoleByField(field: string, value: string): Promise<RoleRedisEntity | null> {
+        return null; // Don't use this method for redis
+    }
+
+    async getRoleById(roleId: string): Promise<RoleRedisEntity | null> {
         try {
             await this.isInitialize;
 
-            const role = await this.client.hGetAll(`role:${value}`);
+            const role = await this.client.hGetAll(`role:${roleId}`);
 
             return Object.keys(role).length > 0 ? RoleRedisEntity.fromRedisHash(role) : null;
         } catch(error) {
@@ -34,12 +38,20 @@ export class RoleRepositoryRedis implements IRoleRepository {
         }
     }
 
-    async getRoleById(roleId: string): Promise<RoleRedisEntity | null> {
-        return this.getRoleByField('id', roleId) || null;
-    }
-
     async getRoleByName(name: string): Promise<RoleRedisEntity | null> {
-        return this.getRoleByField('name', name) || null;
+        try {
+            await this.isInitialize;
+
+            // Get the id of role from index
+            const roleId = await this.client.hGet(`role_index`, `name:${name}`);
+
+            // find the role
+            const role = await this.client.hGetAll(`role:${roleId}`);
+
+            return Object.keys(role).length > 0 ? RoleRedisEntity.fromRedisHash(role) : null;
+        } catch(error) {
+            console.error("Failed to find role by field:", error);
+        }
     }
 
     async getRoles(): Promise<RoleRedisEntity[] | null> {
@@ -69,8 +81,13 @@ export class RoleRepositoryRedis implements IRoleRepository {
     async createRole(role: RoleRedisEntity): Promise<RoleRedisEntity | null> {
         try {
             await this.isInitialize;
+            
             // Create role in db
-            const roleData = await this.client.hSet(`role:${role.id}`, role.toRedisHash());
+            await this.client.hSet(`role:${role.id}`, role.toRedisHash());
+
+            // Create an index in name
+            await this.client.hSet(`role_index`, `name:${role.name}`, role.id);
+
             // Verify if role was created
             const exists = await this.client.exists(`role:${role.id}`);
             
@@ -83,8 +100,15 @@ export class RoleRepositoryRedis implements IRoleRepository {
     async modifyRole(role: RoleRedisEntity): Promise<RoleRedisEntity | null> {
         try {
             await this.isInitialize;
+            
             // Modify role in db
-            const roleData = await this.client.hSet(`role:${role.id}`, role.toRedisHash());
+            await this.client.hSet(`role:${role.id}`, role.toRedisHash());
+
+            // Delete index in name and re-create a new
+            await this.client.hDel(`role_index`, `name:${role.name}`);
+            await this.client.hSet(`role_index`, `name:${role.name}`, role.id);
+
+
             // Verify if role was modified
             const exists = await this.client.exists(`role:${role.id}`);
             
@@ -97,12 +121,20 @@ export class RoleRepositoryRedis implements IRoleRepository {
     async deleteRole(roleId: string): Promise<boolean> {
         try {
             await this.isInitialize;
+
+            // Get the name of role from index
+            const roleName = await this.client.hGet(`role:${roleId}`, `name`);
+
+            // Delete the role
             const roleDel = await this.client.del(`role:${roleId}`);
+
+            // Delete index in name
+            const roleIndexDel = await this.client.hDel(`role_index`, `name:${roleName}`);
             
-            // Delete role users of role
+            // Delete role users of role (index)
             const roleUsersDele = await this.client.del(`role_users:${roleId}`);
 
-            return roleDel > 0 || roleUsersDele > 0;
+            return roleDel > 0 || roleUsersDele > 0 || roleIndexDel > 0;
         } catch(error) {
             console.error("Failed to find role by field:", error);
         }
