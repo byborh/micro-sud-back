@@ -2,13 +2,13 @@ import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { IUserRepository } from "../contract/IUserRepository";
 import { Repository } from "typeorm";
 import { IDatabase } from "@db/contract/IDatabase";
-import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { SQLDatabase } from "@db/drivers/sql.datasource";
 
 export class UserRepositorySQL implements IUserRepository {
     private repository: Repository<UserSQLEntity>;
 
     constructor(private db: IDatabase) {
-        const dataSource = db as MySQLDatabase;
+        const dataSource = db as SQLDatabase;
         this.repository = dataSource.getDataSoure().getRepository(UserSQLEntity);
     }
 

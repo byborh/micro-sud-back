@@ -1,10 +1,10 @@
 import { IDatabase } from "@db/contract/IDatabase";
-import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { SQLDatabase } from "@db/drivers/sql.datasource";
 import { RedisDatabase } from "@db/drivers/redis.datasource";
 
 // Function to check if the database is of type MySQL
-function isMySQLDatabase(db: IDatabase): db is MySQLDatabase {
-    return db instanceof MySQLDatabase; // Verifies if the db instance is of type MySQLDatabase
+function isMySQLDatabase(db: IDatabase): db is SQLDatabase {
+    return db instanceof SQLDatabase; // Verifies if the db instance is of type SQLDatabase
 }
 
 // Function to check if the database is of type Redis
@@ -20,12 +20,12 @@ interface IRepository<T extends IDatabase> {
 // Function to get the appropriate repository based on the database type
 export function getRepository<T extends IDatabase, R>(
     myDB: T,                    // The database instance to use (either MySQL or Redis)
-    mysqlRepo: IRepository<MySQLDatabase>,  // Repository class for MySQL
+    mysqlRepo: IRepository<SQLDatabase>,  // Repository class for MySQL
     redisRepo: IRepository<RedisDatabase>   // Repository class for Redis
 ): R {
     // If the database is MySQL, create and return the corresponding MySQL repository
     if (isMySQLDatabase(myDB)) {
-        return new mysqlRepo(myDB as MySQLDatabase) as R;  // Cast to MySQLDatabase and instantiate the repository
+        return new mysqlRepo(myDB as SQLDatabase) as R;  // Cast to SQLDatabase and instantiate the repository
     } 
     // If the database is Redis, create and return the corresponding Redis repository
     else if (isRedisDatabase(myDB)) {

@@ -1,6 +1,6 @@
 import { UserService } from "../../../src/modules/users/services/UserService";
 import { UserRepositoryMySQL } from "../../../src/modules/users/repositories/drivers/UserRepositoryMySQL";
-import { MySQLDatabase } from "../../../src/config/db/drivers/MySQLDatabase";
+import { SQLDatabase } from "../../../src/config/db/drivers/SQLDatabase";
 import { getUserDTOMock } from "../mock/UserDTO.mock";
 import { UserDTO } from "../../../src/modules/users/dto/UserDTO";
 import { User } from "../../../src/modules/users/domain/User";
@@ -13,7 +13,7 @@ describe('UserService', () => {
     let userService: UserService;
 
     beforeEach(() => {
-        userService = new UserService(new UserRepositoryMySQL(new MySQLDatabase));
+        userService = new UserService(new UserRepositoryMySQL(new SQLDatabase));
     });
 
     /*
@@ -25,7 +25,7 @@ describe('UserService', () => {
 
     // beforeAll(async () => {
     //     // Initialisez la connexion à la base de données
-    //     const dataSource = new MySQLDatabase;
+    //     const dataSource = new SQLDatabase;
     //     await dataSource.initialize();
     
     //     // Ajoutez des données de test

@@ -1,12 +1,12 @@
 import { IDatabase } from "./contract/IDatabase";
-import { MySQLDatabase } from "./drivers/mysql.datasource";
+import { SQLDatabase } from "./drivers/sql.datasource";
 import { RedisDatabase } from "./drivers/redis.datasource";
 
 export class DatabaseFactory {
     static createDatabase(type: "mysql" | "redis"): IDatabase {
         switch (type) {
             case "mysql":
-                return new MySQLDatabase();
+                return new SQLDatabase();
             case "redis":
                 return new RedisDatabase();
 

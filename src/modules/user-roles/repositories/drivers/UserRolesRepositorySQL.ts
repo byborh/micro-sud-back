@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { IUserRolesRepository } from "../contract/IUserRolesRepository";
-import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { SQLDatabase } from "@db/drivers/sql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 import { UserRolesSQLEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
 
@@ -8,7 +8,7 @@ export class UserRolesRepositorySQL implements IUserRolesRepository {
     private repository: Repository<UserRolesSQLEntity>;
 
     constructor(private db: IDatabase) {
-        const dataSource = db as MySQLDatabase;
+        const dataSource = db as SQLDatabase;
         this.repository = dataSource.getDataSoure().getRepository(UserRolesSQLEntity);
     }
 

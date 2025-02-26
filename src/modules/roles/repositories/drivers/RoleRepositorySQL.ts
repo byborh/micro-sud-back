@@ -1,6 +1,6 @@
 import { IRoleRepository } from "../contract/IRoleRepository";
 import { Repository } from "typeorm";
-import { MySQLDatabase } from "@db/drivers/mysql.datasource";
+import { SQLDatabase } from "@db/drivers/sql.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 import { createRoleEntity } from "@modules/roles/entity/Role.factory";
 import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
@@ -9,7 +9,7 @@ export class RoleRepositorySQL implements IRoleRepository {
     private repository: Repository<RoleSQLEntity>;
 
     constructor(private db: IDatabase) {
-        const dataSource = db as MySQLDatabase;
+        const dataSource = db as SQLDatabase;
         this.repository = dataSource.getDataSoure().getRepository(RoleSQLEntity);
     }
 

@@ -11,7 +11,7 @@ import { UserRolesSQLEntity } from "@modules/user-roles/entity/sql/UserRoles.ent
 
 dotenv.config();
 
-export class MySQLDatabase implements IDatabase {
+export class SQLDatabase implements IDatabase {
     // Get DataSource instance
     private dataSource: DataSource;
 
