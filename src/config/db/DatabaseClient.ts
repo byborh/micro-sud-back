@@ -30,7 +30,14 @@ const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql
 export const getDatabase = async (): Promise<IDatabase> => {
     if (!dbInstance) {
         // Validate databaseType to ensure it is a valid DatabaseType
-        if(databaseType !== "mysql" && databaseType !== "redis") {
+        if(
+            databaseType !== "mysql"
+            && databaseType !== "postgresql"
+            && databaseType !== "sqlite"
+            && databaseType !== "mariadb"
+            && databaseType !== "mssql"
+            && databaseType !== "redis"
+        ) {
             throw new Error(`Unsupported database type: ${databaseType}`);
         }
         // Create a database instance based on the configuration (e.g., "redis", "mysql", etc.)

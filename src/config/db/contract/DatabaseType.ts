@@ -1,2 +1,4 @@
 // Database Types
-export type DatabaseType = "mysql" | "redis"; // Add here all databases that you want
+export type DatabaseType = "mysql" | "postgresql" | "sqlite" | "mariadb" | "mssql"| "redis";
+
+// Add here all databases that you want to support
