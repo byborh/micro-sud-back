@@ -21,7 +21,6 @@ export class UserSQLEntity extends UserAbstract {
     pseudo?: string | null;
 
     @Column({ unique: true })
-    @Index()
     email: string;
 
     @Column()

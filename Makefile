@@ -46,6 +46,10 @@ mysql: network
 	@docker run --name mysql -e MYSQL_DATABASE=${MYSQL_DATABASE} -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -d mysql:5.7
 	@docker network connect datte-network mysql
 
+# Add here ALL type of databases MySQL, Redis, PostgreSQL, etc
+
+
+
 init-mysql:
 	@echo "Initializing MySQL permissions..."
 	@docker exec -it mysql mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION; FLUSH PRIVILEGES;"

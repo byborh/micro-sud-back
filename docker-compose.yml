@@ -32,11 +32,12 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "--connect-timeout", "4"]
       interval: 5s
-      timeout: 5s
-      retries: 55
+      timeout: 10s
+      retries: 100
 
 networks:
   mysql-private-tunnel:
+    driver: bridge
 
 volumes:
   mysql_data:
