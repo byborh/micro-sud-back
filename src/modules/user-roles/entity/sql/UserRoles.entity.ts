@@ -20,10 +20,10 @@ export class UserRolesSQLEntity extends UserRolesAbstract {
     @JoinColumn({ name: 'role_id' })
     role: RoleSQLEntity;
 
-    constructor(data: Partial<UserRolesContract>) {
-        super(data.user_id, data.role_id);
-        this.user_id = data.user_id;
-        this.role_id = data.role_id;
+    constructor(data?: Partial<UserRolesContract>) {
+        super(data?.user_id ?? "", data?.role_id ?? "");
+        this.user_id = data?.user_id ?? null;
+        this.role_id = data?.role_id ?? null;
     }
 
 

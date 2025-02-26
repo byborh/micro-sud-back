@@ -41,14 +41,22 @@ export class AuthTokenSQLEntity extends AuthTokenAbstract {
     */
 
 
-    constructor(data: Partial<AuthTokenContract>) {
-        super(data.id, data.user_id, data.token, data.createdAt, data.expiresAt);
-        this.id = data.id;
-        this.user_id = data.user_id;
-        this.token = data.token;
-        this.createdAt = data.createdAt;
-        this.expiresAt = data.expiresAt;
+    constructor(data?: Partial<AuthTokenContract>) {
+        super(
+            data?.id ?? "",
+            data?.user_id ?? "",
+            data?.token ?? "",
+            data?.createdAt ?? new Date(),
+            data?.expiresAt ?? new Date()
+        );
+    
+        this.id = data?.id ?? "";
+        this.user_id = data?.user_id ?? "";
+        this.token = data?.token ?? "";
+        this.createdAt = data?.createdAt ?? new Date();
+        this.expiresAt = data?.expiresAt ?? new Date();
     }
+    
 
     public getId(): string {return this.id;}
     public getUserId(): string {return this.user_id;}

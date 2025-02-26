@@ -40,13 +40,20 @@ export class ChatAISQLEntity extends ChatAIAbstract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(data: Partial<ChatAIContract>) {
-        super(data.id, data.user_id, data.requestContent, data.responseContent, data.createdAt);
-        this.id = data.id;
-        this.user_id = data.user_id;
-        this.requestContent = data.requestContent;
-        this.responseContent = data.responseContent;
-        this.createdAt = data.createdAt;
+    constructor(data?: Partial<ChatAIContract>) {
+        super(
+            data?.id ?? "",
+            data?.user_id ?? "",
+            data?.requestContent ?? "",
+            data?.responseContent ?? "",
+            data?.createdAt ?? new Date()
+        );
+    
+        this.id = data?.id ?? "";
+        this.user_id = data?.user_id ?? "";
+        this.requestContent = data?.requestContent ?? "";
+        this.responseContent = data?.responseContent ?? "";
+        this.createdAt = data?.createdAt ?? new Date();
     }
 
     public getId(): string {return this.id;}

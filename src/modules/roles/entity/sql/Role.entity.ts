@@ -19,12 +19,16 @@ export class RoleSQLEntity  extends RoleAbstract {
     userRoles: UserRolesSQLEntity[];
 
 
-    constructor(data: Partial<RoleContract>) {
-        super(data.id, data.name, data.description);
-        this.id = data.id;
-        this.name = data.name;
-        this.description = data.description;
+    constructor(data?: Partial<RoleContract>) {
+        super(data?.id ?? "", data?.name ?? "USER", data?.description ?? null);
+        
+        this.id = data?.id ?? "";
+        this.name = data?.name ?? "USER";
+        this.description = data?.description ?? null;
     }
+    
+    
+    
 
     public getId(): string { return this.id; }
     public getName(): string { return this.name; }

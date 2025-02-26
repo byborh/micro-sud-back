@@ -9,6 +9,13 @@ const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql
 
 export async function createRoleEntity(role: Partial<RoleContract>, dbType: DatabaseType = databaseType): Promise<RoleAbstract> {
 
+    // Validate required fields
+    if (!role.id || !role.name) {
+        throw new Error("Missing required fields for Role entity.");
+    }
+
+    console.log("Role entity from a factory:", role);
+
     switch(dbType) {
         case "mysql":
             return new RoleSQLEntity(role);

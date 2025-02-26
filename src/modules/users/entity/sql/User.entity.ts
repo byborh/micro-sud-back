@@ -66,19 +66,30 @@ export class UserSQLEntity extends UserAbstract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(data: Partial<UserContract>) {
-        super(data.id!, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt);
-
-        this.id = data.id!;
-        this.email = data.email!;
-        this.password = data.password!;
-        this.salt = data.salt!;
-        this.firstname = data.firstname ?? null;
-        this.lastname = data.lastname ?? null;
-        this.pseudo = data.pseudo ?? null;
-        this.telnumber = data.telnumber ?? null;
-        this.createdAt = data.createdAt ?? new Date();
-        this.updatedAt = data.updatedAt ?? new Date();
+    constructor(data?: Partial<UserContract>) {
+        super(
+            data?.id ?? "",
+            data?.email ?? "",
+            data?.password ?? "",
+            data?.salt ?? "",
+            data?.firstname ?? null,
+            data?.lastname ?? null,
+            data?.pseudo ?? null,
+            data?.telnumber ?? null,
+            data?.createdAt ?? new Date(),
+            data?.updatedAt ?? new Date()
+        );
+    
+        this.id = data?.id ?? "";
+        this.email = data?.email ?? "";
+        this.password = data?.password ?? "";
+        this.salt = data?.salt ?? "";
+        this.firstname = data?.firstname ?? null;
+        this.lastname = data?.lastname ?? null;
+        this.pseudo = data?.pseudo ?? null;
+        this.telnumber = data?.telnumber ?? null;
+        this.createdAt = data?.createdAt ?? new Date();
+        this.updatedAt = data?.updatedAt ?? new Date();
     }
       
     // Static constructor
