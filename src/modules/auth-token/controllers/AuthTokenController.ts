@@ -37,8 +37,6 @@ export class AuthTokenController {
         try {
             const authTokenId = (req as any).user.tokenId; // Récupéré via le middleware
 
-            console.log("AuthToken ID:", authTokenId);
-    
             const deletedToken = await this.authTokenService.deleteAuthTokenById(authTokenId);
             if (!deletedToken) {
                 res.status(404).json({ error: "AuthToken not found or could not be deleted." });

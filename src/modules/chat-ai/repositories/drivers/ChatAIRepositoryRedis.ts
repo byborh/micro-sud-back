@@ -117,8 +117,6 @@ export class ChatAIRepositoryRedis implements IChatAIRepository {
             const chatDel = await this.client.del(`chatAI:${chatAIId}`);
             const userDel = await this.client.sRem(`user_chatAIs${userId}`, chatAIId);
 
-            console.log("This is what i received fromd db: ", chatDel, userDel);
-
             return chatDel > 0 || userDel > 0;
         } catch (error) {
             console.error("Error deleting chatAI:", error);

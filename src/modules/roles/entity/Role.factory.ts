@@ -14,8 +14,6 @@ export async function createRoleEntity(role: Partial<RoleContract>, dbType: Data
         throw new Error("Missing required fields for Role entity.");
     }
 
-    console.log("Role entity from a factory:", role);
-
     switch(dbType) {
         case "mysql":
             return new RoleSQLEntity(role);
