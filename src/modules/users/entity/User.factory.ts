@@ -11,6 +11,10 @@ export async function createUserEntity(user: Partial<UserContract>, dbType: Data
 
     switch(dbType) {
         case "mysql":
+        case "postgresql":
+        case "sqlite":
+        case "mariadb":
+        case "mssql":
             return new UserSQLEntity(user);
         case "redis":
             return new UserRedisEntity(user);

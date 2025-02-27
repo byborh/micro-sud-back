@@ -11,6 +11,10 @@ export async function createAuthTokenEntity(authToken: Partial<AuthTokenContract
 
     switch(dbType) {
         case "mysql":
+        case "postgresql":
+        case "sqlite":
+        case "mariadb":
+        case "mssql":
             return new AuthTokenSQLEntity(authToken);
         case "redis":
             return new AuthTokenRedisEntity(authToken);

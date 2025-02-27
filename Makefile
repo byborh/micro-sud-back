@@ -50,7 +50,7 @@ build-dev:
 build: build-dev
 
 # Add here ALL type of databases MySQL, Redis, PostgreSQL, etc
-
+# ----------------------------------------------------------------------------------------------------------------
 # MySQL
 mysql: network
 	@echo "Starting MySQL container..."
@@ -60,6 +60,9 @@ mysql: network
 init-mysql:
 	@echo "Initializing MySQL permissions..."
 	@docker exec -it mysql mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
+
+
 
 # Redis
 REDIS_CMD=docker compose exec redis redis-cli
@@ -86,14 +89,31 @@ redis: network
 
 
 
+# PostgreSQL
+postgresql: network
+	@echo "Starting PostgreSQL container..."
+	@docker run --name postgresql -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:latest
+	@docker network connect datte-network postgresql
+	@echo "Waiting for PostgreSQL to be ready..."
+	@sleep 5  # Wait 5 seconds to be sure the container is ready
+	@until docker exec postgresql pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" > /dev/null 2>&1; do sleep 1; done
+	@echo "PostgreSQL is ready!"
+	@$(MAKE) init-postgresql
+
+init-postgresql:
+	@echo "Initializing PostgreSQL database and permissions..."
+	@docker exec -it postgresql sh -c "psql -U \"${POSTGRES_USER}\" -d postgres -c \"SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}';\""
+	@docker exec -it postgresql sh -c 'psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -c "ALTER USER ${POSTGRES_USER} WITH SUPERUSER;"'
+
+
 
 
 # Build for production or development
-# ---------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------
 # Put the db that you want to use here : 
 # prod: build-prod network [HERE]
-# ---------------------------------------------------------------------------------
-prod: build-prod network redis
+# ----------------------------------------------------------------------------------------------------------------
+prod: build-prod network mysql
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \
@@ -139,6 +159,8 @@ clean:
 	@docker container rm mysql || true
 	@docker container stop redis || true
 	@docker container rm redis || true
+	@docker container stop postgresql || true
+	@docker container rm postgresql || true
 
 clean-all:
 	@echo "Removing all containers related to $(APP_NAME)..."

@@ -5,40 +5,41 @@ services:
       dockerfile: ./docker/Dockerfile.dev
     environment:
       NODE_ENV: $NODE_ENV
-      REDIS_URL: ${REDIS_URL}
-      REDIS_HOST: redis
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgresdb
     depends_on:
-      redis:
+      postgresdb:
         condition: service_healthy
     networks:
-      - redis-private-tunnel
+      - postgres-private-tunnel
     ports:
-      - "3000:3000"
-    restart: unless-stopped
+      - 3000:3000
 
-  redis:
-    image: redis:6.2-alpine
-    container_name: redis
-    hostname: redis
+  postgresdb:
+    image: postgres:14-alpine
+    container_name: postgres
+    hostname: postgres
     restart: always
-    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD} --cluster-enabled no
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
-      - redis-private-tunnel
+      - postgres-private-tunnel
     volumes:
-      - redis_data:/data
-    # ports:
-    #   - "6379:6379"
+      - postgres_data:/var/lib/postgres
     healthcheck:
-      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "ping"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 10s
       retries: 5
 
 networks:
-  redis-private-tunnel:
+  postgres-private-tunnel:
     driver: bridge
 
 volumes:
-  redis_data:
+  postgres_data:
     driver: local

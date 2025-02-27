@@ -12,6 +12,10 @@ export async function createUserRolesEntity(role: Partial<UserRolesContract>, db
 
     switch(dbType) {
         case "mysql":
+        case "postgresql":
+        case "sqlite":
+        case "mariadb":
+        case "mssql":
             return new UserRolesSQLEntity(role);
         case "redis":
             return new UserRolesRedisEntity(role);

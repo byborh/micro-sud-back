@@ -11,6 +11,10 @@ export async function createChatAIEntity(chatAI: Partial<ChatAIContract>, dbType
 
     switch(dbType) {
         case "mysql":
+        case "postgresql":
+        case "sqlite":
+        case "mariadb":
+        case "mssql":
             return new ChatAISQLEntity(chatAI);
         case "redis":
             return new ChatAIRedisEntity(chatAI);

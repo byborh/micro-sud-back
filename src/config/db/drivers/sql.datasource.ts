@@ -25,7 +25,7 @@ export class SQLDatabase implements IDatabase {
             case "mysql":
             case "mariadb":
                 if (!process.env.MYSQL_HOST || !process.env.MYSQL_USER || !process.env.MYSQL_PASSWORD || !process.env.MYSQL_DATABASE) {
-                    throw new Error("Missing MySQL environment variables");
+                    throw new Error("Missing MySQL/MariaDB environment variables");
                 }
                 dbConfig = {
                     type: "mysql",
@@ -37,7 +37,7 @@ export class SQLDatabase implements IDatabase {
                 };
                 break;
             case "postgresql":
-                if (!process.env.POSTGRES_HOST || !process.env.POSTGRES_USER || !process.env.POSTGRES_PASSWORD || !process.env.POSTGRES_DATABASE) {
+                if (!process.env.POSTGRES_HOST || !process.env.POSTGRES_USER || !process.env.POSTGRES_PASSWORD || !process.env.POSTGRES_DB) {
                     throw new Error("Missing PostgreSQL environment variables");
                 }
                 dbConfig = {
@@ -46,7 +46,7 @@ export class SQLDatabase implements IDatabase {
                     port: Number(process.env.POSTGRES_PORT) || 5432,
                     username: process.env.POSTGRES_USER,
                     password: process.env.POSTGRES_PASSWORD,
-                    database: process.env.POSTGRES_DATABASE,
+                    database: process.env.POSTGRES_DB,
                 };
                 break;
             case "sqlite":
