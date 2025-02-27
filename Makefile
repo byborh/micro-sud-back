@@ -107,13 +107,26 @@ init-postgresql:
 
 
 
+# SQLite
+init-sqlite:
+	@echo "Initializing SQLite database..."
+	@mkdir -p ./data
+	@chown -R 1000:1000 ./data
+	@chmod -R 775 ./data
+	@touch ./data/mydatabase.sqlite
+	@echo "SQLite database initialized at ./data/mydatabase.sqlite"
+
+sqlite: network
+	@echo "Starting SQLite container..."
+	@$(MAKE) init-sqlite
+	@echo "SQLite setup complete!"
 
 # Build for production or development
 # ----------------------------------------------------------------------------------------------------------------
 # Put the db that you want to use here : 
 # prod: build-prod network [HERE]
 # ----------------------------------------------------------------------------------------------------------------
-prod: build-prod network mysql
+prod: build-prod network sqlite
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \
