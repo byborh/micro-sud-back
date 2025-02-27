@@ -1,0 +1,18 @@
+services:
+  back:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
+    environment:
+      NODE_ENV: $NODE_ENV
+      DATABASE_URL: ${SQLITE_DATABASE_URL}
+    volumes:
+      - ./data:/app/data
+    networks:
+      - private-network
+    ports:
+      - 3000:3000
+
+networks:
+  private-network:
+    driver: bridge

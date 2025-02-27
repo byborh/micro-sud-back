@@ -19,56 +19,65 @@ export class SQLDatabase implements IDatabase {
         // Get type of database from .env
         const dbType = process.env.MY_DB || "mysql"; // Default to MySQL if not specified
         let dbConfig: any;
-
+    
         // Switch between database types
         switch(dbType) {
             case "mysql":
             case "mariadb":
+                if (!process.env.MYSQL_HOST || !process.env.MYSQL_USER || !process.env.MYSQL_PASSWORD || !process.env.MYSQL_DATABASE) {
+                    throw new Error("Missing MySQL environment variables");
+                }
                 dbConfig = {
                     type: "mysql",
-                    host: process.env.MYSQL_HOST || "localhost",
+                    host: process.env.MYSQL_HOST,
                     port: Number(process.env.MYSQL_PORT) || 3306,
-                    username: process.env.MYSQL_USER || "root",
-                    password: process.env.MYSQL_PASSWORD || "",
-                    database: process.env.MYSQL_DATABASE || "datte",
+                    username: process.env.MYSQL_USER,
+                    password: process.env.MYSQL_PASSWORD,
+                    database: process.env.MYSQL_DATABASE,
                 };
                 break;
             case "postgresql":
+                if (!process.env.POSTGRES_HOST || !process.env.POSTGRES_USER || !process.env.POSTGRES_PASSWORD || !process.env.POSTGRES_DATABASE) {
+                    throw new Error("Missing PostgreSQL environment variables");
+                }
                 dbConfig = {
                     type: "postgres",
-                    host: process.env.POSTGRES_HOST || "localhost",
+                    host: process.env.POSTGRES_HOST,
                     port: Number(process.env.POSTGRES_PORT) || 5432,
-                    username: process.env.POSTGRES_USER || "postgres",
-                    password: process.env.POSTGRES_PASSWORD || "",
-                    database: process.env.POSTGRES_DATABASE || "datte",
+                    username: process.env.POSTGRES_USER,
+                    password: process.env.POSTGRES_PASSWORD,
+                    database: process.env.POSTGRES_DATABASE,
                 };
                 break;
             case "sqlite":
                 dbConfig = {
                     type: "sqlite",
-                    database: process.env.SQLITE_DATABASE || "./database.sqlite",
+                    database: process.env.SQLITE_DATABASE || "/app/data/database.sqlite",
                 };
                 break;
             case "mssql":
+                if (!process.env.MSSQL_HOST || !process.env.MSSQL_USER || !process.env.MSSQL_PASSWORD || !process.env.MSSQL_DATABASE) {
+                    throw new Error("Missing MSSQL environment variables");
+                }
                 dbConfig = {
                     type: "mssql",
-                    host: process.env.MSSQL_HOST || "localhost",
+                    host: process.env.MSSQL_HOST || "mssqldb",
                     port: Number(process.env.MSSQL_PORT) || 1433,
-                    username: process.env.MSSQL_USER || "sa",
-                    password: process.env.MSSQL_PASSWORD || "",
-                    database: process.env.MSSQL_DATABASE || "datte",
+                    username: process.env.MSSQL_USER,
+                    password: process.env.MSSQL_PASSWORD,
+                    database: process.env.MSSQL_DATABASE,
                 };
                 break;
             default:
-                throw new Error(`Unsupported database type: ${dbType}`);
+                throw new Error(`Unsupported database type: ${dbType}. Supported types are: mysql, mariadb, postgresql, sqlite, mssql`);
         }
-
+    
         this.dataSource = new DataSource({
             ...dbConfig,
             entities: [UserSQLEntity, RoleSQLEntity, UserRolesSQLEntity, AuthTokenSQLEntity, ChatAISQLEntity],  // ADD ALL ENTITIES HERE
             synchronize: process.env.NODE_ENV !== "production",   // ATTENTION
             logging: process.env.NODE_ENV === "development",     // ATTENTION
-        })
+        });
     }
 
     // Connect to database

@@ -1,0 +1,45 @@
+services:
+  back:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
+    environment:
+      NODE_ENV: $NODE_ENV
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_HOST: postgresdb
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    networks:
+      - postgres-private-tunnel
+    ports:
+      - 3000:3000
+
+  postgresdb:
+    image: postgres:14-alpine
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+    networks:
+      - postgres-private-tunnel
+    volumes:
+      - postgres_data:/var/lib/postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE}"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+networks:
+  postgres-private-tunnel:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

@@ -33,7 +33,7 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "--connect-timeout", "4"]
       interval: 5s
       timeout: 10s
-      retries: 100
+      retries: 5
 
 networks:
   mysql-private-tunnel:
