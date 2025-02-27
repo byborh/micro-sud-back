@@ -37,7 +37,6 @@ export class AuthTokenController {
         try {
             const authTokenId = (req as any).user.tokenId; // Récupéré via le middleware
 
-            console.log("ALL IS OK FOR THE MOMENT");
             console.log("AuthToken ID:", authTokenId);
     
             const deletedToken = await this.authTokenService.deleteAuthTokenById(authTokenId);

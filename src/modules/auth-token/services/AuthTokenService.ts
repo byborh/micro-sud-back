@@ -25,22 +25,13 @@ export class AuthTokenService {
 
     // Create authToken
     public async createAuthToken(email: string, password: string): Promise<string> {
-        console.log("ALL IS OK FOR THE MOMENT");
-
         // Validation of email and password
         const user = await this.userRepository.findUserByEmail(email);
 
-        console.log("ALL IS OK FOR THE MOMENT");
-        console.log("User entity:", user);
-
         // const userEntity = await createUserEntity(user);
-
-        console.log("ALL IS OK FOR THE MOMENT");
 
         // Verify if the password is correct
         if (user) {
-            console.log("ALL IS OK FOR THE MOMENT");
-
             const passwordManager = PasswordManager.getInstance();
             const isPasswordValid: boolean = passwordManager.verifyPassword(
                 password,
@@ -48,14 +39,9 @@ export class AuthTokenService {
                 user.getPassword()
             );
 
-            console.log("ALL IS OK FOR THE MOMENT");
-
             // If password is different
             if (!isPasswordValid) {throw new Error("Invalid credentials : password is different");}
         } else {throw new Error("Invalid credentials : user not found");}
-
-        console.log("ALL IS OK FOR THE MOMENT");
-        console.log("User entity:", user);
 
         // Verify if user has already a token
         const isAuthTokenExists = await this.authTokenRepository.getAuthTokenByUserId(user.getId());
@@ -74,20 +60,15 @@ export class AuthTokenService {
 
         const roleIds: string[] = userRoles.map(userRole => userRole.getRoleId());
 
-        console.log("ALL IS OK FOR THE MOMENT");
 
         const myDB = await getDatabase();
 
         // Dependencies
         const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
     
-        console.log("ALL IS OK FOR THE MOMENT");
-
 
         const createToken = CreateToken.getInstance(authTokenRepository);
         const authToken: AuthTokenAbstract = await createToken.createToken(userId, roleIds);
-
-        console.log("ALL IS OK FOR THE MOMENT");
 
 
         const authTokenEntity = await createAuthTokenEntity(authToken);
@@ -141,15 +122,9 @@ export class AuthTokenService {
     public async deleteAuthTokenById(authTokenId: string): Promise<boolean> {
         try {
 
-            console.log("ALL IS OK FOR THE MOMENT");
-
             if (!authTokenId) {
                 throw new Error("AuthTokenAbstract ID is required.");
             }
-
-            console.log("ALL IS OK FOR THE MOMENT");
-
-            console.log()
 
             const isDeleted = await this.authTokenRepository.deleteAuthTokenById(authTokenId);
             return isDeleted;

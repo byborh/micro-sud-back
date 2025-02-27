@@ -125,8 +125,6 @@ export class UserService {
             // Create user from repository
             const createdUser: UserAbstract | null = await this.userRepository.createUser(userEntity);
 
-            console.log("Created User: ", createdUser);
-
             // User didn't created
             if (!createdUser) throw new Error("User didn't created...")
 
@@ -143,12 +141,9 @@ export class UserService {
 
             const createToken = CreateToken.getInstance(authTokenRepository);            
 
-            console.log("ALL IS OK FOR THE MOMENT");
-
             // Attribute USER role
             const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance(roleRepository, userRolesRepository, createToken);
             const authToken: AuthTokenAbstract | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.getId());
-            console.log("ALL IS OK FOR THE MOMENT");
 
             if(!authToken) throw new Error("Attribution of role or token didn't created...");
 
