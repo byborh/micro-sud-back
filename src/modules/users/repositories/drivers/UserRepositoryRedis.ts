@@ -51,7 +51,7 @@ export class UserRepositoryRedis implements IUserRepository {
             const userData = await this.client.hGetAll(`user:${userId}`);
             return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
         } catch (error) {
-            console.error("Failed to find user by field:", error);
+            console.error("Failed to find user by email:", error);
             throw error;
         }
     }
@@ -76,7 +76,7 @@ export class UserRepositoryRedis implements IUserRepository {
     
             return users;
         } catch (error) {
-            console.error("Failed to find user by field:", error);
+            console.error("Failed to find all users:", error);
             throw error;
         }
     }
@@ -95,7 +95,7 @@ export class UserRepositoryRedis implements IUserRepository {
             
             return exists === 1 ? user : null;
         } catch (error) {
-            console.error("Failed to find user by field:", error);
+            console.error("Failed to create user:", error);
             throw error;
         }
     }
@@ -114,7 +114,7 @@ export class UserRepositoryRedis implements IUserRepository {
             
             return exists === 1 ? user : null;
         } catch (error) {
-            console.error("Failed to find user by field:", error);
+            console.error("Failed to modify user:", error);
             throw error;
         }
     }
@@ -137,7 +137,7 @@ export class UserRepositoryRedis implements IUserRepository {
 
             return userDel > 0 || userRolesDel > 0 || userIndexDel > 0;
         } catch (error) {
-            console.error("Failed to find user by field:", error);
+            console.error("Failed to delete user:", error);
             throw error;
         }
     }

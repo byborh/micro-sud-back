@@ -10,16 +10,26 @@ export class RedisDatabase implements IDatabase {
 
     constructor() {
         this.client = createClient({
-            url: process.env.REDIS_URL || "redis://localhost:6379"
+            url: process.env.REDIS_URL || "redis://localhost:6379" // redis://:root@redis:6379
         });
     }
 
     // Connect to database
     async connect(): Promise<void> {
-        this.client.on("error", (err) => {console.error("❌ Redis Error: ", err)});
+        this.client.on("error", (err) => { console.error("❌ Redis Error: ", err); });
+    
         await this.client.connect();
         console.log("✅ Redis connected");
+    
+        // Fast test to be sur that the connection works
+        try {
+            const pong = await this.client.ping();
+            console.log("Redis PING response:", pong);
+        } catch (err) {
+            console.error("❌ Redis PING failed:", err);
+        }
     }
+    
 
     // Disconnect from database
     async disconnect(): Promise<void> {

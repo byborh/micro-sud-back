@@ -34,7 +34,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
 
             return Object.keys(role).length > 0 ? RoleRedisEntity.fromRedisHash(role) : null;
         } catch(error) {
-            console.error("Failed to find role by field:", error);
+            console.error("Failed to find role by id:", error);
         }
     }
 
@@ -50,7 +50,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
 
             return Object.keys(role).length > 0 ? RoleRedisEntity.fromRedisHash(role) : null;
         } catch(error) {
-            console.error("Failed to find role by field:", error);
+            console.error("Failed to find role by name:", error);
         }
     }
 
@@ -74,7 +74,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
 
             return roles;
         } catch(error) {
-            console.error("Failed to find role by field:", error);
+            console.error("Failed to find roles:", error);
         }
     }
 
@@ -93,7 +93,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
             
             return exists === 1 ? role : null;
         } catch(error) {
-            console.error("Failed to find role by field:", error);
+            console.error("Failed to create role:", error);
         }
     }
 
@@ -114,7 +114,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
             
             return exists === 1 ? role : null;
         } catch(error) {
-            console.error("Failed to find role by field:", error);
+            console.error("Failed to modify role:", error);
         }
     }
 
@@ -136,7 +136,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
 
             return roleDel > 0 || roleUsersDele > 0 || roleIndexDel > 0;
         } catch(error) {
-            console.error("Failed to find role by field:", error);
+            console.error("Failed to delete:", error);
         }
     }
     

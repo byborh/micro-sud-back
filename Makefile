@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 VERSION=$(shell git rev-parse --short HEAD)
-APP_NAME=datte-node
+APP_NAME=datte
 DOCKER_REPO=registry.gitlab.com/datte-company
 
 dpl ?= .env
@@ -29,6 +29,14 @@ help:
 	@echo "  clean-all       Supprime tous les conteneurs liés à l'application"
 	@echo "  info            Affiche les détails du conteneur"
 
+start:
+	@echo "Starting container..."
+	docker compose up -d
+
+stop:
+	@echo "Stopping container..."
+	docker compose stop
+
 # Build pour production
 build-prod:
 	@echo "Building production image..."
@@ -41,20 +49,51 @@ build-dev:
 
 build: build-dev
 
+# Add here ALL type of databases MySQL, Redis, PostgreSQL, etc
+
+# MySQL
 mysql: network
 	@echo "Starting MySQL container..."
 	@docker run --name mysql -e MYSQL_DATABASE=${MYSQL_DATABASE} -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -d mysql:5.7
 	@docker network connect datte-network mysql
 
-# Add here ALL type of databases MySQL, Redis, PostgreSQL, etc
-
-
-
 init-mysql:
 	@echo "Initializing MySQL permissions..."
 	@docker exec -it mysql mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 
-prod: build-prod network mysql
+# Redis
+REDIS_CMD=docker compose exec redis redis-cli
+REDIS_PWD=-a ${shell grep REDIS_PASSWORD .env | cut -d '=' -f2}  # Get the password from .env
+
+redis-cli:
+	@echo "Starting Redis container..."
+	${REDIS_CMD} ${REDIS_PWD}
+
+redis-status:
+	@echo "=== Redis Status ==="
+	${REDIS_CMD} ${REDIS_PWD} INFO | grep used_memory_human
+	${REDIS_CMD} ${REDIS_PWD} INFO | grep connected_clients
+
+redis-reset:
+	${REDIS_CMD} ${REDIS_PWD} FLUSHALL
+	@echo "Redis flushed"
+
+redis: network
+	@echo "Starting Redis container..."
+	@docker compose up -d redis
+	@docker network connect datte-network redis
+
+
+
+
+
+
+# Build for production or development
+# ---------------------------------------------------------------------------------
+# Put the db that you want to use here : 
+# prod: build-prod network [HERE]
+# ---------------------------------------------------------------------------------
+prod: build-prod network redis
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \
@@ -98,6 +137,8 @@ clean:
 	@docker container rm $(APP_NAME) || true
 	@docker container stop mysql || true
 	@docker container rm mysql || true
+	@docker container stop redis || true
+	@docker container rm redis || true
 
 clean-all:
 	@echo "Removing all containers related to $(APP_NAME)..."
