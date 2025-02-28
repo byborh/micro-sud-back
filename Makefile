@@ -49,6 +49,11 @@ build-dev:
 
 build: build-dev
 
+
+deploy-db:
+	@echo "Deploying correct database..."
+	@./scripts/deploy.sh
+
 # Add here ALL type of databases MySQL, Redis, PostgreSQL, etc
 # ----------------------------------------------------------------------------------------------------------------
 # MySQL
@@ -135,7 +140,7 @@ mssql: network
 # Put the db that you want to use here : 
 # prod: build-prod network [HERE]
 # ----------------------------------------------------------------------------------------------------------------
-prod: build-prod network ${MY_DB}
+prod: deploy-db build-prod network ${MY_DB}
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \

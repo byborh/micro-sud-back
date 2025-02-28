@@ -4,48 +4,41 @@ services:
       context: .
       dockerfile: ./container/dockerfile/Dockerfile.dev
     environment:
-      NODE_ENV: ${NODE_ENV}
-      MSSQL_HOST: ${MSSQL_HOST}
-      MSSQL_PORT: ${MSSQL_PORT}
-      MSSQL_USER: ${MSSQL_USER}
-      MSSQL_PASSWORD: ${MSSQL_PASSWORD}
-      MSSQL_DATABASE: ${MSSQL_DATABASE}
+      NODE_ENV: $NODE_ENV
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      mssql:
+      redis:
         condition: service_healthy
     networks:
-      - mssql-private-tunnel
+      - redis-private-tunnel
     ports:
-      - 3000:3000
-    extra_hosts:
-      - "mssql:172.20.0.2"
+      - "3000:3000"
+    restart: unless-stopped
 
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql
-    hostname: mssql
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    hostname: redis
     restart: always
-    environment:
-      SA_PASSWORD: ${MSSQL_PASSWORD}
-      ACCEPT_EULA: "Y"
-      MSSQL_PID: ${MSSQL_PID}
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD} --cluster-enabled no
     networks:
-      - mssql-private-tunnel
+      - redis-private-tunnel
     volumes:
-      - mssql_data:/var/opt/mssql
-    expose:
-      - "1433"
+      - redis_data:/data
+    # ports:
+    #   - "6379:6379"
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MSSQL_PASSWORD}", "-Q", "SELECT 1"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "ping"]
+      interval: 5s
+      timeout: 10s
       retries: 5
-      start_period: 30s
 
 networks:
-  mssql-private-tunnel:
+  redis-private-tunnel:
     driver: bridge
 
 volumes:
-  mssql_data:
+  redis_data:
     driver: local

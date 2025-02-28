@@ -18,8 +18,6 @@ export class SQLDatabase implements IDatabase {
     constructor() {
         // Get type of database from .env
 
-        console.log("ALL IS OK FOR THE MOMENT ! SQLDATASOURCE.ts");
-
         const dbType = process.env.MY_DB || "mysql"; // Default to MySQL if not specified
         let dbConfig: any;
     
@@ -75,9 +73,6 @@ export class SQLDatabase implements IDatabase {
                 throw new Error(`Unsupported database type: ${dbType}. Supported types are: mysql, mariadb, postgresql, sqlite, mssql`);
         }
 
-        console.log("ALL IS OK FOR THE MOMENT ! SQLDATASOURCE.ts");
-
-    
         this.dataSource = new DataSource({
             ...dbConfig,
             entities: [UserSQLEntity, RoleSQLEntity, UserRolesSQLEntity, AuthTokenSQLEntity, ChatAISQLEntity],  // ADD ALL ENTITIES HERE
