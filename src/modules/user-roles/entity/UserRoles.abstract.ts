@@ -1,12 +1,12 @@
 import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
-import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { UserRolesContract } from "../contracts/IUserRoles";
+import { UserAbstract } from "@modules/users/entity/User.abstract";
 
 
 export abstract class UserRolesAbstract implements UserRolesContract {
     user_id: string;
     role_id: string;
-    user?: UserSQLEntity;
+    user?: UserAbstract;
     role?: RoleAbstract;
 
     constructor(user_id: string, role_id: string) {

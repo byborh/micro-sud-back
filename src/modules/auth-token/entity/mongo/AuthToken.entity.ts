@@ -1,11 +1,11 @@
-import { Column, Entity, ObjectIdColumn, ManyToOne } from "typeorm";
-import { ChatAIAbstract } from "../ChatAI.abstract";
-import { ChatAIContract } from "@modules/chat-ai/contracts/IChatAI";
+import { Column, Entity, ObjectIdColumn, OneToOne } from "typeorm";
+import { AuthTokenAbstract } from "../AuthToken.abstract";
+import { AuthTokenContract } from "@modules/auth-token/contracts/IAuthToken";
 import { UserMongoEntity } from "@modules/users/entity/mongo/User.entity";
 
 
-@Entity("chat_ai")
-export class ChatAIMongoEntity extends ChatAIAbstract {
+@Entity("auth_token")
+export class AuthTokenMongoEntity extends AuthTokenAbstract {
     @ObjectIdColumn()
     id: string;
 
@@ -13,15 +13,15 @@ export class ChatAIMongoEntity extends ChatAIAbstract {
     user_id: string;
 
     @Column()
-    requestContent: string;
+    token: string;
 
-    @Column()
-    responseContent: string;
-
-    @Column()
+    @Column({ default: () => new Date() })
     createdAt: Date;
 
-    @ManyToOne(() => UserMongoEntity, user => user.chatAIMongoEntity, { onDelete: 'CASCADE' })
+    @Column({ default: () => new Date() })
+    expiresAt: Date;
+
+    @OneToOne(() => UserMongoEntity, user => user.authTokenMongoEntity, { onDelete: 'CASCADE' })
     user: UserMongoEntity;
 
     /*
@@ -39,32 +39,34 @@ export class ChatAIMongoEntity extends ChatAIAbstract {
     ----------------------------------------------------------------------------------
     */
 
-    constructor(data?: Partial<ChatAIContract>) {
+
+    constructor(data?: Partial<AuthTokenContract>) {
         super(
             data?.id ?? "",
             data?.user_id ?? "",
-            data?.requestContent ?? "",
-            data?.responseContent ?? "",
-            data?.createdAt ?? new Date()
+            data?.token ?? "",
+            data?.createdAt ?? new Date(),
+            data?.expiresAt ?? new Date()
         );
     
         this.id = data?.id ?? "";
         this.user_id = data?.user_id ?? "";
-        this.requestContent = data?.requestContent ?? "";
-        this.responseContent = data?.responseContent ?? "";
+        this.token = data?.token ?? "";
         this.createdAt = data?.createdAt ?? new Date();
+        this.expiresAt = data?.expiresAt ?? new Date();
     }
+    
 
     public getId(): string {return this.id;}
     public getUserId(): string {return this.user_id;}
-    public getRequestContent(): string {return this.requestContent;}
-    public getResponseContent(): string {return this.responseContent;}
+    public getToken(): string {return this.token;}
     public getCreatedAt(): Date {return this.createdAt;}
-
+    public getExpiresAt(): Date {return this.expiresAt;}
 
     public setId(id: string): void {this.id = id;}
     public setUserId(userId: string): void {this.user_id = userId;}
-    public setRequestContent(requestContent: string): void {this.requestContent = requestContent;}
-    public setResponseContent(responseContent: string): void {this.responseContent = responseContent;}
-    public setCreatedAt(createdAt: Date): void {this.createdAt = createdAt;}
+    public setToken(token: string): void {this.token = token;}
+    public setCreatedAt(date: Date): void {this.createdAt = date;}
+    public setExpiresAt(date: Date): void {this.expiresAt = date;}
+
 }
