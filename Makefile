@@ -40,12 +40,12 @@ stop:
 # Build pour production
 build-prod:
 	@echo "Building production image..."
-	@docker build --progress=plain . -t $(APP_NAME) -f ./docker/Dockerfile.prod
+	@docker build --progress=plain . -t $(APP_NAME) -f ./container/dockerfile/Dockerfile.prod
 
 # Build pour développement
 build-dev:
 	@echo "Building development image..."
-	@docker build --progress=plain . -t $(APP_NAME)-dev -f ./docker/Dockerfile.dev
+	@docker build --progress=plain . -t $(APP_NAME)-dev -f ./container/dockerfile/Dockerfile.dev
 
 build: build-dev
 
@@ -110,29 +110,39 @@ init-postgresql:
 # SQLite
 init-sqlite:
 	@echo "Initializing SQLite database..."
-	@mkdir -p ./data
-	@chown -R 1000:1000 ./data
-	@chmod -R 775 ./data
-	@touch ./data/mydatabase.sqlite
-	@echo "SQLite database initialized at ./data/mydatabase.sqlite"
+	# @docker compose exec back sh -c "touch /app/data/datte.sqlite"
+	@docker compose exec back sh -c "mkdir -p /app/data && touch /app/data/datte.sqlite && chmod 777 /app/data/datte.sqlite"
+	@echo "SQLite database initialized inside container."
 
 sqlite: network
 	@echo "Starting SQLite container..."
 	@$(MAKE) init-sqlite
 	@echo "SQLite setup complete!"
 
+
+
+# MSSQL
+mssql: network
+	@echo "Starting MSSQL container..."
+	@docker compose up -d mssql
+	@echo "Waiting for MSSQL to be ready..."
+	@sleep 5
+	@docker compose logs --tail=10 mssql
+
+
 # Build for production or development
 # ----------------------------------------------------------------------------------------------------------------
 # Put the db that you want to use here : 
 # prod: build-prod network [HERE]
 # ----------------------------------------------------------------------------------------------------------------
-prod: build-prod network sqlite
+prod: build-prod network ${MY_DB}
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \
 		--network=datte-network \
 		-v $(APP_NAME)-logs:/app/logs \
 		-d $(APP_NAME)
+	@echo "Logs: $(APP_NAME)-logs"
 	@docker logs -f $(APP_NAME)
 
 dev: build network
@@ -174,6 +184,10 @@ clean:
 	@docker container rm redis || true
 	@docker container stop postgresql || true
 	@docker container rm postgresql || true
+	@docker container stop sqlite || true
+	@docker container rm sqlite || true
+	@docker container stop mssql || true
+	@docker container rm mssql || true
 
 clean-all:
 	@echo "Removing all containers related to $(APP_NAME)..."

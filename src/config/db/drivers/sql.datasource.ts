@@ -17,6 +17,9 @@ export class SQLDatabase implements IDatabase {
 
     constructor() {
         // Get type of database from .env
+
+        console.log("ALL IS OK FOR THE MOMENT ! SQLDATASOURCE.ts");
+
         const dbType = process.env.MY_DB || "mysql"; // Default to MySQL if not specified
         let dbConfig: any;
     
@@ -61,7 +64,7 @@ export class SQLDatabase implements IDatabase {
                 }
                 dbConfig = {
                     type: "mssql",
-                    host: process.env.MSSQL_HOST || "mssqldb",
+                    host: process.env.MSSQL_HOST || "mssql",
                     port: Number(process.env.MSSQL_PORT) || 1433,
                     username: process.env.MSSQL_USER,
                     password: process.env.MSSQL_PASSWORD,
@@ -71,6 +74,9 @@ export class SQLDatabase implements IDatabase {
             default:
                 throw new Error(`Unsupported database type: ${dbType}. Supported types are: mysql, mariadb, postgresql, sqlite, mssql`);
         }
+
+        console.log("ALL IS OK FOR THE MOMENT ! SQLDATASOURCE.ts");
+
     
         this.dataSource = new DataSource({
             ...dbConfig,

@@ -2,7 +2,7 @@ services:
   back:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.dev
+      dockerfile: ./container/dockerfile/Dockerfile.dev
     environment:
       NODE_ENV: $NODE_ENV
       REDIS_URL: ${REDIS_URL}

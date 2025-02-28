@@ -1,13 +1,14 @@
+version: '3'
 services:
   back:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.dev
+      dockerfile: ./container/dockerfile/Dockerfile.dev
     environment:
       NODE_ENV: $NODE_ENV
       DATABASE_URL: ${SQLITE_DATABASE_URL}
     volumes:
-      - ./data:/app/data
+      - sqlite_data:/app/data
     networks:
       - private-network
     ports:
@@ -16,3 +17,7 @@ services:
 networks:
   private-network:
     driver: bridge
+
+volumes:
+  sqlite_data:
+    drive: local

@@ -1,8 +1,6 @@
 # Image Location
 FROM node:20-alpine
 
-LABEL maintener="emmariodelar@gmail.com"
-
 # Install dependencies and required packages
 RUN yarn global add yarn@latest &&\
     apk add openssl bash &&\
@@ -26,7 +24,9 @@ USER node
 
 # Copy package.json and install dependencies
 COPY ./package.json .
-RUN yarn
+# RUN yarn
+RUN yarn install --frozen-lockfile
+
 
 # Copy project files
 COPY . .

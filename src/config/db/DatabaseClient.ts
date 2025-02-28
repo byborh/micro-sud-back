@@ -40,6 +40,9 @@ export const getDatabase = async (): Promise<IDatabase> => {
         ) {
             throw new Error(`Unsupported database type: ${databaseType}`);
         }
+        
+        console.log("ALL IS OK FOR THE MOMENT ! DatabaseClient.ts");
+
         // Create a database instance based on the configuration (e.g., "redis", "mysql", etc.)
         dbInstance = DatabaseFactory.createDatabase(databaseType); // Change "mysql" to "redis" or another database if needed
         await dbInstance.connect(); // Connect to the database

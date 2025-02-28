@@ -22,7 +22,8 @@ app.get('/', (req, res) => {
 
 async function loadModules() {
   const userModule = await createUserModule();
-  const roleModule = await createRoleModule();
+    console.log("ALL IS OK FOR THE MOMENT ! index.ts");
+    const roleModule = await createRoleModule();
   const userRolesModule = await createUserRolesModule();
   const authTokenModule = await createAuthTokenModule();
   const chatAIModule = await createChatAIModule();
@@ -39,8 +40,12 @@ async function startServer() {
     // Load modules
     const modules = await loadModules();
 
+    console.log("ALL IS OK FOR THE MOMENT ! index.ts");
+
     // Create router for prefix : /api/v0.0.2
     const apiRouter = express.Router();
+
+    console.log("ALL IS OK FOR THE MOMENT ! index.ts");
 
     // Add module's here
     apiRouter.use('/users', modules.userModule);
@@ -49,6 +54,8 @@ async function startServer() {
     apiRouter.use('/roles', modules.roleModule);
     apiRouter.use('/chatai', modules.chatAIModule);
     // Add other load modules HERE
+
+    console.log("ALL IS OK FOR THE MOMENT ! index.ts");
 
     app.use('/api/v0.0.2', apiRouter);
 
@@ -65,5 +72,5 @@ async function startServer() {
   }
 }
 
-// 🚀 Démarrage de Datte
+// 🚀 Run Datte
 startServer();

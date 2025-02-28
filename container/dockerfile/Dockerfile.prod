@@ -1,8 +1,6 @@
 # Image Location
 FROM node:20-alpine
 
-LABEL maintener="emmariodelar@gmail.com"
-
 # Install dependencies and required packages
 RUN yarn global add yarn@latest &&\
     apk add openssl bash &&\
@@ -22,7 +20,8 @@ RUN chown -R root:node /usr/bin/entrypoint &&\
 
 # Set working directory and user
 WORKDIR ${APP_PATH}
-USER node
+# USER node
+RUN yarn install --frozen-lockfile
 
 # Copy package.json and install dependencies
 COPY ./package.json .
