@@ -9,7 +9,7 @@ export class UserRepositorySQL implements IUserRepository {
 
     constructor(private db: IDatabase) {
         const dataSource = db as SQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(UserSQLEntity);
+        this.repository = dataSource.getDataSource().getRepository(UserSQLEntity);
     }
 
     async findUserByField(field: string, value: string): Promise<UserSQLEntity | null> {

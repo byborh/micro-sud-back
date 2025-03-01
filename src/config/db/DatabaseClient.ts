@@ -37,6 +37,7 @@ export const getDatabase = async (): Promise<IDatabase> => {
             && databaseType !== "mariadb"
             && databaseType !== "mssql"
             && databaseType !== "redis"
+            && databaseType !== "mongodb"
         ) {
             throw new Error(`Unsupported database type: ${databaseType}`);
         }

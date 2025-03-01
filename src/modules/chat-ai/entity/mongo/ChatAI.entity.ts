@@ -1,44 +1,28 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, JoinColumn } from "typeorm";
+import { Column, Entity, ObjectIdColumn, ManyToOne } from "typeorm";
 import { ChatAIAbstract } from "../ChatAI.abstract";
 import { ChatAIContract } from "@modules/chat-ai/contracts/IChatAI";
-import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
+import { UserMongoEntity } from "@modules/users/entity/mongo/User.entity";
 
 
 @Entity("chat_ai")
-export class ChatAISQLEntity extends ChatAIAbstract {
-    @PrimaryColumn({ type: "varchar", length: 255 })
+export class ChatAIMongoEntity extends ChatAIAbstract {
+    @ObjectIdColumn()
     id: string;
 
-    @Column({ type: "varchar", length: 255 })
+    @Column()
     user_id: string;
 
-    @Column({ type: "varchar", length: 1024 })
+    @Column()
     requestContent: string;
 
-    @Column({ type: "varchar", length: 8192})
+    @Column()
     responseContent: string;
 
-    @Column({ type: "timestamp" })
+    @Column()
     createdAt: Date;
 
-    @ManyToOne(() => UserSQLEntity, user => user.chatAISQLEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: "user_id" })
-    user: UserSQLEntity;
-
-    /*
-    ----------------------------------------------------------------------------------
-        Add liaisons here with other Entities
-        Ex :
-            - @OneToMany
-                entityName: EntityName
-            - @OneToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-            - @ManyToMany
-                entityName: EntityName
-    ----------------------------------------------------------------------------------
-    */
+    @ManyToOne(() => UserMongoEntity, user => user.chatAIMongoEntity, { onDelete: 'CASCADE' })
+    user: UserMongoEntity;
 
     constructor(data?: Partial<ChatAIContract>) {
         super(

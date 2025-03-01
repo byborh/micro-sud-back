@@ -9,7 +9,7 @@ export class ChatAIRepositorySQL implements IChatAIRepository {
 
     constructor(private db: IDatabase) {
         const dataSource = db as SQLDatabase;
-        this.repository = dataSource.getDataSoure().getRepository(ChatAISQLEntity);
+        this.repository = dataSource.getDataSource().getRepository(ChatAISQLEntity);
     }
 
     async submitPrompt(chatAI: ChatAISQLEntity): Promise<ChatAISQLEntity> {

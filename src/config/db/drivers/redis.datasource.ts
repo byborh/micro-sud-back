@@ -41,5 +41,5 @@ export class RedisDatabase implements IDatabase {
     isConnected(): boolean { return this.client.isOpen; }
 
     // Get datasource
-    getDataSoure(): RedisClientType { return this.client; }
+    getDataSource(): RedisClientType { return this.client; }
 }

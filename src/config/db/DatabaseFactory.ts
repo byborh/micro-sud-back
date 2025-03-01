@@ -1,9 +1,10 @@
 import { IDatabase } from "./contract/IDatabase";
 import { SQLDatabase } from "./drivers/sql.datasource";
 import { RedisDatabase } from "./drivers/redis.datasource";
+import { DatabaseType } from "./contract/DatabaseType";
 
 export class DatabaseFactory {
-    static createDatabase(type: "mysql" | "postgresql" | "sqlite" | "mariadb" | "mssql" | "redis"): IDatabase {
+    static createDatabase(type: DatabaseType): IDatabase {
 
         switch (type) {
             case "mysql":

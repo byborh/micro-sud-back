@@ -83,9 +83,14 @@ export class SQLDatabase implements IDatabase {
 
     // Connect to database
     async connect(): Promise<void> {
-        if(!this.dataSource.isInitialized) {
-            await this.dataSource.initialize();
-            console.log("✅ MySQL Database connected");
+        try {
+            if(!this.dataSource.isInitialized) {
+                await this.dataSource.initialize();
+                console.log("✅ SQL Database connected");
+            }
+        } catch (error) {
+            console.error("❌ SQL Connection Error:", error);
+            throw error;
         }
     }
 
@@ -93,7 +98,7 @@ export class SQLDatabase implements IDatabase {
     async disconnect(): Promise<void> {
         if(this.dataSource.isInitialized) {
             await this.dataSource.destroy();
-            console.log("❌ MySQL Database disconnected");
+            console.log("❌ SQL Database disconnected");
         }
     }
 
@@ -102,5 +107,5 @@ export class SQLDatabase implements IDatabase {
     isConnected(): boolean { return this.dataSource.isInitialized; }
     
     // Get DataSource
-    getDataSoure(): DataSource { return this.dataSource; }
+    getDataSource(): DataSource { return this.dataSource; }
 }

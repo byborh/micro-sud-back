@@ -1,19 +1,19 @@
 import { IRoleRepository } from "../contract/IRoleRepository";
 import { Repository } from "typeorm";
-import { SQLDatabase } from "@db/drivers/sql.datasource";
+import { MongoDatabase } from "@db/drivers/mongo.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 import { createRoleEntity } from "@modules/roles/entity/Role.factory";
-import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
+import { RoleMongoEntity } from "@modules/roles/entity/mongo/Role.entity";
 
-export class RoleRepositorySQL implements IRoleRepository {
-    private repository: Repository<RoleSQLEntity>;
+export class RoleRepositoryMongo implements IRoleRepository {
+    private repository: Repository<RoleMongoEntity>;
 
     constructor(private db: IDatabase) {
-        const dataSource = db as SQLDatabase;
-        this.repository = dataSource.getDataSource().getRepository(RoleSQLEntity);
+        const dataSource = db as MongoDatabase;
+        this.repository = dataSource.getDataSource().getRepository(RoleMongoEntity);
     }
 
-    async getRoleByField(field: string, value: string): Promise<RoleSQLEntity | null> {
+    async getRoleByField(field: string, value: string): Promise<RoleMongoEntity | null> {
         // Validate field
         const allowedFields = ['id', 'name', 'description'];
         if (!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
@@ -29,36 +29,36 @@ export class RoleRepositorySQL implements IRoleRepository {
         // Verify if all required fields are present
         if (!role.id || !role.name) {
             console.error("Invalid role data:", role);
-            throw new Error("RoleSQLEntity data is incomplete.");
+            throw new Error("RoleMongoEntity data is incomplete.");
         }
 
         return role || null;
     }
 
-    async getRoleById(roleId: string): Promise<RoleSQLEntity | null> {
+    async getRoleById(roleId: string): Promise<RoleMongoEntity | null> {
         if (!roleId) return null;
         return await this.getRoleByField('id', roleId) || null;
     }
 
-    async getRoleByName(name: string): Promise<RoleSQLEntity | null> {
+    async getRoleByName(name: string): Promise<RoleMongoEntity | null> {
         if (!name) return null;
         return await this.getRoleByField('name', name) || null;
     }
 
-    async getRoles(): Promise<RoleSQLEntity[]> {
+    async getRoles(): Promise<RoleMongoEntity[]> {
         // Fetch all roles from the database
-        const rawResult: RoleSQLEntity[] = await this.repository.find();
-    
+        const rawResult: RoleMongoEntity[] = await this.repository.find();
+
         // Verify if rawResult is an array or a single object
         const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
-    
+
         if (rowsArray.length === 0) return [];
-    
+
         // Return the array of roles
         return rowsArray;
     }
 
-    async createRole(role: RoleSQLEntity): Promise<RoleSQLEntity | null> {
+    async createRole(role: RoleMongoEntity): Promise<RoleMongoEntity | null> {
         const roleEntity = await createRoleEntity(role);
 
         // Insert the role in the database
@@ -71,11 +71,11 @@ export class RoleRepositorySQL implements IRoleRepository {
         return this.getRoleById(roleEntity.id) || null;
     }
 
-    async modifyRole(role: RoleSQLEntity): Promise<RoleSQLEntity | null> {
+    async modifyRole(role: RoleMongoEntity): Promise<RoleMongoEntity | null> {
         const roleEntity = await createRoleEntity(role);
 
         // Be sure that role exists
-        const existingRole: RoleSQLEntity = await this.repository.findOne({ where: { id: roleEntity.id } });
+        const existingRole: RoleMongoEntity | null = await this.repository.findOneBy({ id: roleEntity.id });
         if (!existingRole) return null;
 
         // Merge role data with existing role data
@@ -92,6 +92,6 @@ export class RoleRepositorySQL implements IRoleRepository {
         const result = await this.repository.delete(roleId);
 
         // Return true if the role is deleted, false otherwise
-        return !result ? false : true;
+        return !!result.affected;
     }
 }

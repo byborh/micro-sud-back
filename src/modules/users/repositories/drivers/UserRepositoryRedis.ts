@@ -8,7 +8,7 @@ export class UserRepositoryRedis implements IUserRepository {
     private isInitialized: Promise<void>; // Be sure to wait for initialization
     
     constructor(private db: IDatabase) {
-        this.client = db.getDataSoure() as RedisClientType;
+        this.client = db.getDataSource() as RedisClientType;
         this.isInitialized = this.initialize();
     }
 

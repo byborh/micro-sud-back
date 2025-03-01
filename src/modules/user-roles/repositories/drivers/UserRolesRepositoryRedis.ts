@@ -9,7 +9,7 @@ export class UserRolesRepositoryRedis implements IUserRolesRepository {
     private isInitialized: Promise<void>;
 
     constructor(private db: IDatabase) {
-        this.client = db.getDataSoure() as RedisClientType;
+        this.client = db.getDataSource() as RedisClientType;
         this.isInitialized = this.initialized();
     }
 

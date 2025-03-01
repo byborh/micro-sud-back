@@ -8,7 +8,7 @@ export class RoleRepositoryRedis implements IRoleRepository {
     private isInitialize: Promise<void>;
 
     constructor(private db: IDatabase) {
-        this.client = db.getDataSoure() as RedisClientType;
+        this.client = db.getDataSource() as RedisClientType;
     }
 
     async initialize(): Promise<void> {

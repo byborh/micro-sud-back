@@ -1,23 +1,23 @@
 import { IAuthTokenRepository } from "../contract/IAuthTokenRepository";
 import { Repository } from "typeorm";
-import { SQLDatabase } from "@db/drivers/sql.datasource";
+import { MongoDatabase } from "@db/drivers/mongo.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
-import { AuthTokenSQLEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
+import { AuthTokenMongoEntity } from "@modules/auth-token/entity/mongo/AuthToken.entity";
 
-export class AuthTokenRepositorySQL implements IAuthTokenRepository {
-    private repository: Repository<AuthTokenSQLEntity>;
+export class AuthTokenRepositoryMongo implements IAuthTokenRepository {
+    private repository: Repository<AuthTokenMongoEntity>;
 
     constructor(private db: IDatabase) {
-        const dataSource = db as SQLDatabase;
-        this.repository = dataSource.getDataSource().getRepository(AuthTokenSQLEntity);
+        const dataSource = db as MongoDatabase;
+        this.repository = dataSource.getDataSource().getRepository(AuthTokenMongoEntity);
     }
 
-    async createAuthToken(authToken: AuthTokenSQLEntity): Promise<AuthTokenSQLEntity> {
+    async createAuthToken(authToken: AuthTokenMongoEntity): Promise<AuthTokenMongoEntity> {
         const result = await this.repository.save(authToken);
         return result || null;
     }
 
-    async getAuthTokenByUserId(userId: string): Promise<AuthTokenSQLEntity | null> {
+    async getAuthTokenByUserId(userId: string): Promise<AuthTokenMongoEntity | null> {
         if (!userId) return null;
         return await this.repository.findOne({ where: { user_id: userId } }) || null;
     }
@@ -28,10 +28,10 @@ export class AuthTokenRepositorySQL implements IAuthTokenRepository {
         return result.affected !== 0;
     }
 
-    async getAllAuthTokens(): Promise<AuthTokenSQLEntity[]> {
+    async getAllAuthTokens(): Promise<AuthTokenMongoEntity[]> {
         return await this.repository.find();
     }
-    
+
     async deleteAuthTokenById(authTokenId: string): Promise<boolean> {
         if (!authTokenId) return false;
         const result = await this.repository.delete(authTokenId);
