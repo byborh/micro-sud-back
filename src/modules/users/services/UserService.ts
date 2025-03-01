@@ -19,6 +19,9 @@ import { UserAbstract } from "../entity/User.abstract";
 import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
 import { createUserEntity } from "../entity/User.factory";
 import _ from "lodash";
+import { RoleRepositoryMongo } from "@modules/roles/repositories/drivers/RoleRepositoryMongo";
+import { UserRolesRepositoryMongo } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMongo";
+import { AuthTokenRepositoryMongo } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMongo";
 
 
 export class UserService {
@@ -133,11 +136,11 @@ export class UserService {
 
             // Initialize the repository
             // Role repository
-            const roleRepository = getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis) as IRoleRepository;
+            const roleRepository = getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis, RoleRepositoryMongo) as IRoleRepository;
             // UserRoles repository
-            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
+            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis, UserRolesRepositoryMongo) as IUserRolesRepository;
             // AuthToken repository
-            const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
+            const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis, AuthTokenRepositoryMongo) as IAuthTokenRepository;
 
             const createToken = CreateToken.getInstance(authTokenRepository);            
 

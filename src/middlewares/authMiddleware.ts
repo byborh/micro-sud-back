@@ -14,6 +14,9 @@ import path from 'path';
 import { RoleRepositorySQL } from '@modules/roles/repositories/drivers/RoleRepositorySQL';
 import { RoleRepositoryRedis } from '@modules/roles/repositories/drivers/RoleRepostoryRedis';
 import { IRoleRepository } from '@modules/roles/repositories/contract/IRoleRepository';
+import { UserRepositoryMongo } from '@modules/users/repositories/drivers/UserRepositoryMongo';
+import { UserRolesRepositoryMongo } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryMongo';
+import { RoleRepositoryMongo } from '@modules/roles/repositories/drivers/RoleRepositoryMongo';
 
 const publicKeyPath = path.join(__dirname, '../../ec_public.pem');
 const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
@@ -59,8 +62,8 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
 
             // Initialize database
             const myDB = await getDatabase();
-            const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis) as IUserRepository;
-            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
+            const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, UserRepositoryMongo) as IUserRepository;
+            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis, UserRolesRepositoryMongo) as IUserRolesRepository;
 
             // Verify if user exists
             const user = await userRepository.findUserById(decoded.sub);
@@ -78,7 +81,7 @@ export const authMiddleware = (requiredRoles: string[] = []) => {
                 return;
             }
 
-            const roleRepository = await getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis) as IRoleRepository;
+            const roleRepository = await getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis, RoleRepositoryMongo) as IRoleRepository;
 
             const userRolesTable: string[] = await Promise.all(
                 userRoles.map(async (userRole) => {

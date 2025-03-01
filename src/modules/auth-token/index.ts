@@ -13,13 +13,16 @@ import { UserRepositoryRedis } from '@modules/users/repositories/drivers/UserRep
 import { IUserRepository } from '@modules/users/repositories/contract/IUserRepository';
 import { UserRolesRepositoryRedis } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryRedis';
 import { IUserRolesRepository } from '@modules/user-roles/repositories/contract/IUserRolesRepository';
+import { AuthTokenRepositoryMongo } from './repositories/drivers/AuthTokenRepositoryMongo';
+import { UserRepositoryMongo } from '@modules/users/repositories/drivers/UserRepositoryMongo';
+import { UserRolesRepositoryMongo } from '@modules/user-roles/repositories/drivers/UserRolesRepositoryMongo';
 
 export const createAuthTokenModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
-  const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
-  const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis) as IUserRepository;
-  const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
+  const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis, AuthTokenRepositoryMongo) as IAuthTokenRepository;
+  const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, UserRepositoryMongo) as IUserRepository;
+  const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis, UserRolesRepositoryMongo) as IUserRolesRepository;
 
   const authTokenService = new AuthTokenService(authTokenRepository, userRepository, userRolesRepository);
   const authTokenController = new AuthTokenController(authTokenService);

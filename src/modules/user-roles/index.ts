@@ -7,12 +7,13 @@ import { getRepository } from '@core/db/databaseGuards';
 import { UserRolesRepositorySQL } from './repositories/drivers/UserRolesRepositorySQL';
 import { UserRolesRepositoryRedis } from './repositories/drivers/UserRolesRepositoryRedis';
 import { IUserRolesRepository } from './repositories/contract/IUserRolesRepository';
+import { UserRolesRepositoryMongo } from './repositories/drivers/UserRolesRepositoryMongo';
 
 
 export const createUserRolesModule = async (): Promise<express.Router> => {
     const myDB = await getDatabase();
 
-    const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis) as IUserRolesRepository;
+    const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis, UserRolesRepositoryMongo) as IUserRolesRepository;
 
     const userRolesService = new UserRolesService(userRolesRepository);
     const userRolesController = new UserRolesController(userRolesService);

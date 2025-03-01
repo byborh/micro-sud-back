@@ -7,6 +7,7 @@ import { getRepository } from "@core/db/databaseGuards";
 import { IUserRepository } from "../repositories/contract/IUserRepository";
 import { UserRedisEntity } from "../entity/redis/User.entity";
 import { UserAbstract } from "../entity/User.abstract";
+import { UserRepositoryMongo } from "../repositories/drivers/UserRepositoryMongo";
 
 export class UserMapper {
     private static userRepository: IUserRepository;
@@ -17,7 +18,7 @@ export class UserMapper {
             const myDB = await getDatabase();
 
             // Il faut passer par le repository, c'est mieux !
-            this.userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, RepositoryMongo) as IUserRepository;
+            this.userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, UserRepositoryMongo) as IUserRepository;
         }
     }
 

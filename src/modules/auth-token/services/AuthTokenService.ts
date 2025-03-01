@@ -11,6 +11,7 @@ import { AuthTokenAbstract } from "../entity/AuthToken.abstract";
 import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
 import { createUserEntity } from "@modules/users/entity/User.factory";
 import { createAuthTokenEntity } from "../entity/AuthToken.factory";
+import { AuthTokenRepositoryMongo } from "../repositories/drivers/AuthTokenRepositoryMongo";
 
 export class AuthTokenService {
     private authTokenRepository: IAuthTokenRepository;
@@ -64,7 +65,7 @@ export class AuthTokenService {
         const myDB = await getDatabase();
 
         // Dependencies
-        const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis) as IAuthTokenRepository;
+        const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis, AuthTokenRepositoryMongo) as IAuthTokenRepository;
     
 
         const createToken = CreateToken.getInstance(authTokenRepository);
