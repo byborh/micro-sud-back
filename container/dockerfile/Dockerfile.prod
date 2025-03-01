@@ -20,18 +20,16 @@ RUN chown -R root:node /usr/bin/entrypoint &&\
 
 # Set working directory and user
 WORKDIR ${APP_PATH}
-# USER node
-RUN yarn install --frozen-lockfile
+USER node
 
 # Copy package.json and install dependencies
 COPY ./package.json .
-RUN yarn
+# RUN yarn
+RUN yarn install --frozen-lockfile
+
 
 # Copy project files
 COPY . .
-
-# Build the application
-RUN yarn build
 
 # Define entrypoint script
 ENTRYPOINT ["entrypoint"]

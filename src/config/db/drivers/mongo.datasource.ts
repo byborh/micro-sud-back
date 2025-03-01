@@ -15,13 +15,13 @@ export class MongoDatabase implements IDatabase {
     private dataSource: DataSource;
 
     constructor() {
-        if (!process.env.MONGODB_URI) {
+        if (!process.env.MONGODB_URL) {
             throw new Error("Invalid or missing MongoDB URI");
         }
 
         this.dataSource = new DataSource({
             type: "mongodb",
-            url: process.env.MONGODB_URI,
+            url: process.env.MONGODB_URL,
             entities: [UserMongoEntity, RoleMongoEntity, UserRolesMongoEntity, AuthTokenMongoEntity, ChatAIMongoEntity],
             synchronize: process.env.NODE_ENV !== "production",
             logging: process.env.NODE_ENV === "development",

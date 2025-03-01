@@ -17,7 +17,7 @@ export class UserMapper {
             const myDB = await getDatabase();
 
             // Il faut passer par le repository, c'est mieux !
-            this.userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis) as IUserRepository;
+            this.userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, RepositoryMongo) as IUserRepository;
         }
     }
 

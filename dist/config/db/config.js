@@ -21,6 +21,6 @@ exports.dbConfig = {
         password: process.env.REDIS_PASSWORD || "",
     },
     mongodb: {
-        uri: process.env.MONGODB_URI || "mongodb://localhost:27017/datte",
+        uri: process.env.MONGODB_URL || "mongodb://localhost:27017/datte",
     },
 };

@@ -130,10 +130,24 @@ sqlite: network
 mssql: network
 	@echo "Starting MSSQL container..."
 	@docker compose up -d mssql
+	@echo "Connect to network..."
+	@docker network connect datte-network mssql
 	@echo "Waiting for MSSQL to be ready..."
 	@sleep 5
 	@docker compose logs --tail=10 mssql
 
+
+
+
+# MongoDB
+mongodb: network
+	@echo "Starting MongoDB container..."
+	@docker compose up -d mongodb
+	@echo "Connect to network..."
+	@docker network connect datte-network mongodb
+	@echo "Waiting for MongoDB to be ready..."
+	@sleep 5
+	@docker compose logs --tail=10 mongodb
 
 # Build for production or development
 # ----------------------------------------------------------------------------------------------------------------
@@ -193,6 +207,8 @@ clean:
 	@docker container rm sqlite || true
 	@docker container stop mssql || true
 	@docker container rm mssql || true
+	@docker container stop mongodb || true
+	@docker container rm mongodb || true
 
 clean-all:
 	@echo "Removing all containers related to $(APP_NAME)..."
