@@ -58,8 +58,8 @@ export class RoleService {
             // Check if the role already exists based on name and resource
             const existingRole: RoleAbstract | null = await this.roleRepository.getRoleByName(roleEntity.getName());
             if (existingRole) {
-                console.error("RoleAbstract already exists:", existingRole);
-                throw new Error("RoleAbstract already exists.");
+                console.error("Role already exists:", existingRole);
+                throw new Error("Role already exists.");
             }
 
             // Create role through repository
@@ -67,7 +67,7 @@ export class RoleService {
 
             // If role creation fails, throw an error
             if (!createdRole) {
-                throw new Error("RoleAbstract didn't create...");
+                throw new Error("Role didn't create...");
             }
 
             // Return the created role

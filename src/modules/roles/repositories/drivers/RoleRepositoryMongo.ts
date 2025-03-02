@@ -4,6 +4,8 @@ import { MongoDatabase } from "@db/drivers/mongo.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 import { createRoleEntity } from "@modules/roles/entity/Role.factory";
 import { RoleMongoEntity } from "@modules/roles/entity/mongo/Role.entity";
+import { ObjectId } from "mongodb";
+import { MongoConverter } from "@core/db/mongoConverter";
 
 export class RoleRepositoryMongo implements IRoleRepository {
     private repository: Repository<RoleMongoEntity>;
@@ -14,84 +16,89 @@ export class RoleRepositoryMongo implements IRoleRepository {
     }
 
     async getRoleByField(field: string, value: string): Promise<RoleMongoEntity | null> {
-        // Validate field
-        const allowedFields = ['id', 'name', 'description'];
-        if (!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
+        try {
+            const allowedFields = ['id', 'name', 'description'];
+            if (!allowedFields.includes(field)) throw new Error(`Invalid field: ${field}`);
 
-        // Find role by field
-        const row = await this.repository.findOne({ where: { [field]: value } });
+            const row = await this.repository.findOne({ where: { [field]: value } });
+            if (!row) return null;
 
-        // Validate rows
-        if (!row) return null;
+            if (!row.id || !row.name) {
+                console.error("Invalid role data:", row);
+                throw new Error("RoleMongoEntity data is incomplete.");
+            }
 
-        const role = Array.isArray(row) ? row[0] : row;
-
-        // Verify if all required fields are present
-        if (!role.id || !role.name) {
-            console.error("Invalid role data:", role);
-            throw new Error("RoleMongoEntity data is incomplete.");
+            return row;
+        } catch (error) {
+            console.error("Failed to find role by field:", error);
+            return null;
         }
-
-        return role || null;
     }
 
     async getRoleById(roleId: string): Promise<RoleMongoEntity | null> {
-        if (!roleId) return null;
-        return await this.getRoleByField('id', roleId) || null;
+        try {
+            return await this.repository.findOneBy({ _id: MongoConverter.toObjectId(roleId) }) || null;
+        } catch (error) {
+            console.error("Failed to find role by id:", error);
+            return null;
+        }
     }
 
     async getRoleByName(name: string): Promise<RoleMongoEntity | null> {
-        if (!name) return null;
-        return await this.getRoleByField('name', name) || null;
+        return await this.getRoleByField('name', name);
     }
 
     async getRoles(): Promise<RoleMongoEntity[]> {
-        // Fetch all roles from the database
-        const rawResult: RoleMongoEntity[] = await this.repository.find();
-
-        // Verify if rawResult is an array or a single object
-        const rowsArray = Array.isArray(rawResult) ? rawResult : [rawResult];
-
-        if (rowsArray.length === 0) return [];
-
-        // Return the array of roles
-        return rowsArray;
+        try {
+            return await this.repository.find();
+        } catch (error) {
+            console.error("Failed to find roles:", error);
+            return [];
+        }
     }
 
     async createRole(role: RoleMongoEntity): Promise<RoleMongoEntity | null> {
-        const roleEntity = await createRoleEntity(role);
+        try {
+            const objectId = new ObjectId(role.id);
+            const roleEntity = await createRoleEntity({
+                ...role,
+                id: objectId.toHexString(),
+                _id: objectId,
+            } as RoleMongoEntity);
 
-        // Insert the role in the database
-        const result = await this.repository.save(roleEntity);
-
-        // If the role is not created, return null
-        if (!result) return null;
-
-        // Return the role
-        return this.getRoleById(roleEntity.id) || null;
+            const result = await this.repository.save(roleEntity);
+            return result ? await this.getRoleById(result.id) : null;
+        } catch (error) {
+            console.error("Failed to create role:", error);
+            return null;
+        }
     }
 
     async modifyRole(role: RoleMongoEntity): Promise<RoleMongoEntity | null> {
-        const roleEntity = await createRoleEntity(role);
+        try {
+            role._id = new ObjectId(role.id);
+            const roleEntity = await createRoleEntity(role);
 
-        // Be sure that role exists
-        const existingRole: RoleMongoEntity | null = await this.repository.findOneBy({ id: roleEntity.id });
-        if (!existingRole) return null;
+            const existingRole = await this.repository.findOneBy({ _id: role._id }); // corriger
+            if (!existingRole) return null;
 
-        // Merge role data with existing role data
-        this.repository.merge(existingRole, roleEntity);
+            this.repository.merge(existingRole, roleEntity);
+            await this.repository.save(existingRole);
 
-        // Save the modified role
-        await this.repository.save(existingRole);
-
-        // Return the role
-        return this.getRoleById(roleEntity.id) || null;
+            return await this.getRoleById(roleEntity.id);
+        } catch (error) {
+            console.error("Failed to modify role:", error);
+            return null;
+        }
     }
 
     async deleteRole(roleId: string): Promise<boolean> {
-        const result = await this.repository.delete(roleId);
-
-        // Return true if the role is deleted, false otherwise
-        return !!result.affected;
+        try {
+            const result = await this.repository.delete({ _id: MongoConverter.toObjectId(roleId) });
+            return result.affected ? true : false;
+        } catch (error) {
+            console.error("Failed to delete role:", error);
+            return false;
+        }
     }
 }
