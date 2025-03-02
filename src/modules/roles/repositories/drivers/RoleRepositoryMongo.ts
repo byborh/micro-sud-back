@@ -4,8 +4,6 @@ import { MongoDatabase } from "@db/drivers/mongo.datasource";
 import { IDatabase } from "@db/contract/IDatabase";
 import { createRoleEntity } from "@modules/roles/entity/Role.factory";
 import { RoleMongoEntity } from "@modules/roles/entity/mongo/Role.entity";
-import { ObjectId } from "mongodb";
-import { MongoConverter } from "@core/db/mongoConverter";
 
 export class RoleRepositoryMongo implements IRoleRepository {
     private repository: Repository<RoleMongoEntity>;
@@ -37,7 +35,7 @@ export class RoleRepositoryMongo implements IRoleRepository {
 
     async getRoleById(roleId: string): Promise<RoleMongoEntity | null> {
         try {
-            return await this.repository.findOneBy({ _id: MongoConverter.toObjectId(roleId) }) || null;
+            return await this.repository.findOneBy({ id: roleId }) || null;
         } catch (error) {
             console.error("Failed to find role by id:", error);
             return null;
@@ -59,12 +57,7 @@ export class RoleRepositoryMongo implements IRoleRepository {
 
     async createRole(role: RoleMongoEntity): Promise<RoleMongoEntity | null> {
         try {
-            const objectId = new ObjectId(role.id);
-            const roleEntity = await createRoleEntity({
-                ...role,
-                id: objectId.toHexString(),
-                _id: objectId,
-            } as RoleMongoEntity);
+            const roleEntity = await createRoleEntity(role);
 
             const result = await this.repository.save(roleEntity);
             return result ? await this.getRoleById(result.id) : null;
@@ -76,10 +69,9 @@ export class RoleRepositoryMongo implements IRoleRepository {
 
     async modifyRole(role: RoleMongoEntity): Promise<RoleMongoEntity | null> {
         try {
-            role._id = new ObjectId(role.id);
             const roleEntity = await createRoleEntity(role);
 
-            const existingRole = await this.repository.findOneBy({ _id: role._id }); // corriger
+            const existingRole = await this.repository.findOneBy({ id: role.id });
             if (!existingRole) return null;
 
             this.repository.merge(existingRole, roleEntity);
@@ -94,7 +86,7 @@ export class RoleRepositoryMongo implements IRoleRepository {
 
     async deleteRole(roleId: string): Promise<boolean> {
         try {
-            const result = await this.repository.delete({ _id: MongoConverter.toObjectId(roleId) });
+            const result = await this.repository.delete({ id: roleId });
             return result.affected ? true : false;
         } catch (error) {
             console.error("Failed to delete role:", error);
