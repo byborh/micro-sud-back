@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
 import { lengthRequirementMiddleware } from '@middlewares/lengthRequirementMiddleware';
-import { authMiddleware } from '@middlewares/authMiddleware';
 
 export const UserRoutes = (userController: UserController): express.Router => {
   const router = express.Router();

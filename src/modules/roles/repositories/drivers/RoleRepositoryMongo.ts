@@ -82,7 +82,7 @@ export class RoleRepositoryMongo implements IRoleRepository {
         this.repository.merge(existingRole, roleEntity);
 
         // Save the modified role
-        const result = await this.repository.save(existingRole);
+        await this.repository.save(existingRole);
 
         // Return the role
         return this.getRoleById(roleEntity.id) || null;

@@ -2,8 +2,6 @@ import { CreateToken } from "./createToken";
 import { IRoleRepository } from "@modules/roles/repositories/contract/IRoleRepository";
 import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
 import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
-import { RoleAbstract } from "@modules/roles/entity/Role.abstract";
-import { UserRolesAbstract } from "@modules/user-roles/entity/UserRoles.abstract";
 import { createRoleEntity } from "@modules/roles/entity/Role.factory";
 import { createUserRolesEntity } from "@modules/user-roles/entity/UserRoles.factory";
 import { TRoleName } from "@modules/roles/contracts/TRoleName";

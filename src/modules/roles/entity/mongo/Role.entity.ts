@@ -27,9 +27,6 @@ export class RoleMongoEntity extends RoleAbstract {
         this.description = data?.description ?? null;
     }
     
-    
-    
-
     public getId(): string { return this.id; }
     public getName(): string { return this.name; }
     public getDescription(): string { return this.description; }

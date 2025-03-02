@@ -77,30 +77,6 @@ export class UserMongoEntity extends UserAbstract {
         this.updatedAt = data?.updatedAt ?? new Date();
     }
       
-    // Static constructor
-    // constructor(params?: UserContract) {
-    //     if (params) {
-    //         if (!params.id) throw new Error("ID is required");
-    //         if (!params.email || !params.email.includes('@')) throw new Error("Invalid email");
-
-    //         // Verify the password ONLY at creation
-    //         if (params.password && params.password.length < 8) throw new Error("Password must be at least 8 characters");
-            
-    //         super(params.id, params.email, params.password, params.salt, params.createdAt, params.updatedAt, params.firstname, params.lastname, params.pseudo, params.telnumber);
-
-    //         this.id = params.id;
-    //         this.email = params.email;
-    //         this.password = params.password || "";
-    //         this.salt = params.salt || "";
-    //         this.firstname = params.firstname || null;
-    //         this.lastname = params.lastname || null;
-    //         this.pseudo = params.pseudo || null;
-    //         this.telnumber = params.telnumber || null;
-    //         this.createdAt = params.createdAt || null;
-    //         this.updatedAt = params.updatedAt || null;
-    //     }
-    // }
-
     getId(): string {return this.id;}
     getFirstname(): string | null {return this.firstname;}
     getEmail(): string {return this.email;}
