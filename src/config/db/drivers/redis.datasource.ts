@@ -2,15 +2,17 @@ import { IDatabase } from "@db/contract/IDatabase";
 import { RedisClientType } from "@redis/client";
 import dotenv from "dotenv";
 import { createClient } from "redis";
+import dotenvExpand from "dotenv-expand";
 
-dotenv.config();
+
+dotenvExpand.expand(dotenv.config());
 
 export class RedisDatabase implements IDatabase {
     private client: RedisClientType;
 
     constructor() {
         this.client = createClient({
-            url: process.env.REDIS_URL || "redis://localhost:6379" // redis://:root@redis:6379
+            url: process.env.REDIS_URL || "redis://:root@redis:6379" // redis://:root@redis:6379
         });
     }
 

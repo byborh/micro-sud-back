@@ -22,4 +22,4 @@ rm -f docker-compose.yml
 # Copier le bon fichier docker-compose
 cp "./container/docker-compose/docker-compose.${MY_DB}.yml" "./docker-compose.yml"
 
-echo "✔️ docker-compose.yml mis à jour avec la config pour $MY_DB"
+echo "✔️ docker-compose.yml file updated with $MY_DB configuration"

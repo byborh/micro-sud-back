@@ -4,8 +4,9 @@ import { IChatAIRepository } from "../repositories/contract/IChatAIRepository";
 import { ChatAIAbstract } from "../entity/ChatAI.abstract";
 import { createChatAIEntity } from "../entity/ChatAI.factory";
 const axios = require('axios');
+import dotenvExpand from "dotenv-expand";
 
-dotenv.config();
+dotenvExpand.expand(dotenv.config());
 
 export class ChatAIService {
     private chatAIRepository: IChatAIRepository;

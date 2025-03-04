@@ -34,8 +34,6 @@ export class CreateToken{
         const createdAt: Date = new Date();
         const expiresAt: Date = new Date(createdAt.getTime() + 3600 * 1000); // Expiration dans 1h
 
-        console.log("ALL IS OK FOR THE MOMENT ! - createToken");
-
         // Payload of JWT
         const payload = {
             sub: userId,        // ID of user
@@ -58,8 +56,6 @@ export class CreateToken{
             createdAt: createdAt,
             expiresAt: expiresAt
         } as AuthTokenAbstract;
-
-        console.log("ALL IS OK FOR THE MOMENT ! - createToken");
 
         const authTokenEntity = await createAuthTokenEntity(authToken);
 

@@ -1,4 +1,4 @@
-import "reflect-metadata";
+// import "reflect-metadata";
 import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import { IDatabase } from "@db/contract/IDatabase";
@@ -7,9 +7,9 @@ import { RoleMongoEntity } from "@modules/roles/entity/mongo/Role.entity";
 import { UserRolesMongoEntity } from "@modules/user-roles/entity/mongo/UserRoles.entity";
 import { AuthTokenMongoEntity } from "@modules/auth-token/entity/mongo/AuthToken.entity";
 import { ChatAIMongoEntity } from "@modules/chat-ai/entity/mongo/ChatAI.entity";
+import dotenvExpand from "dotenv-expand";
 
-
-dotenv.config();
+dotenvExpand.expand(dotenv.config());
 
 export class MongoDatabase implements IDatabase {
     private dataSource: DataSource;

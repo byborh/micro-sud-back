@@ -134,21 +134,15 @@ export class UserService {
             // Initialize the Database
             const myDB = await getDatabase();
 
-            console.log("ALL IS OK FOR THE MOMENT ! - UserService");
-
             // Initialize the repository
             // Role repository
             const roleRepository = getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis, RoleRepositoryMongo) as IRoleRepository;
             // UserRoles repository
             const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis, UserRolesRepositoryMongo) as IUserRolesRepository;
-            // AuthToken repository
+            // AuthToken repositoryé&
             const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis, AuthTokenRepositoryMongo) as IAuthTokenRepository;
 
-            console.log("ALL IS OK FOR THE MOMENT ! - UserService");
-
             const createToken = CreateToken.getInstance(authTokenRepository);
-
-            console.log("ALL IS OK FOR THE MOMENT ! - UserService");
 
             // Attribute USER role
             const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance(roleRepository, userRolesRepository, createToken);

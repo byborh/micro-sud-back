@@ -1,4 +1,4 @@
-import "reflect-metadata";
+// import "reflect-metadata";
 import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
@@ -7,9 +7,9 @@ import { AuthTokenSQLEntity } from "@modules/auth-token/entity/sql/AuthToken.ent
 import { ChatAISQLEntity } from "@modules/chat-ai/entity/sql/ChatAI.entity";
 import { IDatabase } from "@db/contract/IDatabase";
 import { UserRolesSQLEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
+import dotenvExpand from "dotenv-expand";
 
-
-dotenv.config();
+dotenvExpand.expand(dotenv.config());
 
 export class SQLDatabase implements IDatabase {
     // Get DataSource instance
@@ -24,9 +24,8 @@ export class SQLDatabase implements IDatabase {
         // Switch between database types
         switch(dbType) {
             case "mysql":
-            case "mariadb":
                 if (!process.env.MYSQL_HOST || !process.env.MYSQL_USER || !process.env.MYSQL_PASSWORD || !process.env.MYSQL_DATABASE) {
-                    throw new Error("Missing MySQL/MariaDB environment variables");
+                    throw new Error("Missing MySQL environment variables");
                 }
                 dbConfig = {
                     type: "mysql",
@@ -36,6 +35,19 @@ export class SQLDatabase implements IDatabase {
                     password: process.env.MYSQL_PASSWORD,
                     database: process.env.MYSQL_DATABASE,
                 };
+                break;
+            case "mariadb":
+                if (!process.env.MARIADB_HOST || !process.env.MARIADB_USER || !process.env.MARIADB_PASSWORD || !process.env.MARIADB_DATABASE) {
+                    throw new Error("Missing MariaDB environment variables");
+                }
+                dbConfig = {
+                    type: "mariadb",
+                    host: process.env.MARIADB_HOST,
+                    port: Number(process.env.MARIADB_PORT) || 3306,
+                    username: process.env.MARIADB_USER,
+                    password: process.env.MARIADB_PASSWORD,
+                    database: process.env.MARIADB_DATABASE,
+                }
                 break;
             case "postgresql":
                 if (!process.env.POSTGRES_HOST || !process.env.POSTGRES_USER || !process.env.POSTGRES_PASSWORD || !process.env.POSTGRES_DB) {
@@ -89,7 +101,7 @@ export class SQLDatabase implements IDatabase {
                 console.log("✅ SQL Database connected");
             }
         } catch (error) {
-            console.error("❌ SQL Connection Error:", error);
+            console.error(`❌ SQL Connection Error in darabase "${process.env.MY_DB}":`, error);
             throw error;
         }
     }

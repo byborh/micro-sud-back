@@ -68,6 +68,11 @@ init-mysql:
 
 
 
+# MariaDB
+mariadb: network
+	@echo "Starting MariaDB container..."
+	@docker compose up -d mariadb
+	@docker network connect datte-network mariadb
 
 # Redis
 REDIS_CMD=docker compose exec redis redis-cli
@@ -199,6 +204,8 @@ clean:
 	@docker container rm $(APP_NAME) || true
 	@docker container stop mysql || true
 	@docker container rm mysql || true
+	@docker container stop mariadb || true
+	@docker container rm mariadb || true
 	@docker container stop redis || true
 	@docker container rm redis || true
 	@docker container stop postgresql || true
@@ -209,7 +216,7 @@ clean:
 	@docker container rm mssql || true
 	@docker container stop mongodb || true
 	@docker container rm mongodb || true
-
+	
 clean-all:
 	@echo "Removing all containers related to $(APP_NAME)..."
 	@docker ps -a | grep $(APP_NAME) | awk '{print $$1}' | xargs -r docker rm -f
