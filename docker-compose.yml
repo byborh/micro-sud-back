@@ -5,34 +5,40 @@ services:
       dockerfile: ./container/dockerfile/Dockerfile.dev
     environment:
       NODE_ENV: $NODE_ENV
-      MONGODB_URL: ${MONGODB_URL}
-      MONGODB_DATABASE: ${MONGODB_DATABASE}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      mongodb:
-        condition: service_started
+      redis:
+        condition: service_healthy
     networks:
-      - mongo-private-tunnel
+      - redis-private-tunnel
     ports:
       - "3000:3000"
     restart: unless-stopped
 
-  mongodb:
-    image: mongo:6.0
-    container_name: mongodb
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    hostname: redis
     restart: always
-    environment:
-      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD} --cluster-enabled no
     networks:
-      - mongo-private-tunnel
+      - redis-private-tunnel
     volumes:
-      - mongo_data:/data/db
+      - redis_data:/data
     # ports:
-    #   - "27017:27017"
+    #   - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
 networks:
-  mongo-private-tunnel:
+  redis-private-tunnel:
     driver: bridge
 
 volumes:
-  mongo_data:
+  redis_data:
     driver: local

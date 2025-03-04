@@ -28,7 +28,7 @@ export class CreateToken{
         
         // Generate an ID for the token
         const idGenerator = IdGenerator.getInstance();
-        const authTokenId: string = idGenerator.generateId(16);
+        const authTokenId: string = idGenerator.generateId(24);
 
         // Definition of dates
         const createdAt: Date = new Date();

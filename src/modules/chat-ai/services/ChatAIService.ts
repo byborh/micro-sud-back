@@ -27,7 +27,7 @@ export class ChatAIService {
             if (!combinedResponse) return null;
 
             const idGenerator = IdGenerator.getInstance();
-            const chatAIId: string = idGenerator.generateId(16);
+            const chatAIId: string = idGenerator.generateId(24);
 
             const chatAI = {
                 id: chatAIId,
