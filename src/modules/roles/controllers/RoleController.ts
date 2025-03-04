@@ -56,7 +56,7 @@ export class RoleController {
             }
 
             const idGenerator = IdGenerator.getInstance();
-            const roleId: string = idGenerator.generateId(24);
+            const roleId: string = idGenerator.generateId();
 
             // Create new role instance
             const role = new RoleSQLEntity({id: roleId, name: name, description: description});

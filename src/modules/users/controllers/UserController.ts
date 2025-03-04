@@ -45,7 +45,7 @@ export class UserController {
             }
 
             const idGenerator = IdGenerator.getInstance();
-            const userId: string = idGenerator.generateId(24);
+            const userId: string = idGenerator.generateId();
 
             const user: UserAbstract = ({
                 id: userId,
