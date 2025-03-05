@@ -6,7 +6,7 @@ import { ITransactionRepository } from './repositories/contract/ITransactionRepo
 import { TransactionRepositorySQL } from './repositories/drivers/TransactionRepositorySQL';
 import { TransactionRepositoryRedis } from './repositories/drivers/TransactionRepostoryRedis';
 import { TransactionController } from './controllers/TransactionController';
-import { transactionRoutes } from './route/TransactionRoutes';
+import { transactionRoutes } from './route/transactionRoutes';
 
 export const createTransactionModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
