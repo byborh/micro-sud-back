@@ -1,31 +1,25 @@
+import Stripe from "stripe";
 import { TransactionAbstract } from "../entity/Transaction.abstract";
 import { ITransactionRepository } from "../repositories/contract/ITransactionRepository";
-import dotenvExpand from "dotenv-expand";
-import dotenv from "dotenv";
-import Stripe from "stripe";
-
-
-dotenvExpand.expand(dotenv.config());
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-    apiVersion: "2025-02-24.acacia"
-})
-
+import { getPaymentProvider } from "@modules/payment/config/payment/PaymentFactory";
 
 export class TransactionService {
-    private transactionRepository: ITransactionRepository;   
+    private transactionRepository: ITransactionRepository; 
+    private paymentProvider = getPaymentProvider();
 
     constructor(transactionRepository: ITransactionRepository) {
         this.transactionRepository = transactionRepository;
+        this.paymentProvider.initialize();
     }
 
 
     public async testTransaction(amount: number, currency: string): Promise<any> {
         try {
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: amount,
-                currency: currency,
-            })
+            const paymentIntent = await this.paymentProvider.charge(
+                amount,
+                currency,
+                "user_id"
+            )
 
             return paymentIntent.client_secret;
         } catch (error) {
@@ -77,7 +71,7 @@ export class TransactionService {
         }
     }
 
-    // Create Transaction
+    // Cancel Transaction
     public async cancelTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
         try {
             return await this.transactionRepository.cancelTransactionById(transactionId);
