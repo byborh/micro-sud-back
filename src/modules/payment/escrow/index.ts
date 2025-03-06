@@ -1,20 +1,20 @@
 import express from 'express';
-import { TransactionService } from './services/TransactionService';
+import { EscrowService } from './services/EscrowService';
 import { getDatabase } from '@db/DatabaseClient';
 import { getRepository } from '@core/db/databaseGuards';
-import { ITransactionRepository } from './repositories/contract/ITransactionRepository';
-import { TransactionRepositorySQL } from './repositories/drivers/TransactionRepositorySQL';
-import { TransactionRepositoryRedis } from './repositories/drivers/TransactionRepostoryRedis';
-import { TransactionController } from './controllers/TransactionController';
-import { transactionRoutes } from './route/transactionRoutes';
+import { IEscrowRepository } from './repositories/contract/IEscrowRepository';
+import { EscrowRepositorySQL } from './repositories/drivers/EscrowRepositorySQL';
+import { EscrowRepositoryRedis } from './repositories/drivers/EscrowRepostoryRedis';
+import { EscrowController } from './controllers/EscrowController';
+import { escrowRoutes } from './route/escrowRoutes';
 
-export const createTransactionModule = async (): Promise<express.Router> => {
+export const createEscrowModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
-  const transactionRepository = getRepository(myDB, TransactionRepositorySQL, TransactionRepositoryRedis, TransactionRepositorySQL) as ITransactionRepository;
+  const escrowRepository = getRepository(myDB, EscrowRepositorySQL, EscrowRepositoryRedis, EscrowRepositorySQL) as IEscrowRepository;
   
-  const transactionService = new TransactionService(transactionRepository);
-  const transactionController = new TransactionController(transactionService);
+  const escrowService = new EscrowService(escrowRepository);
+  const escrowController = new EscrowController(escrowService);
 
-  return transactionRoutes(transactionController);
+  return escrowRoutes(escrowController);
 };
