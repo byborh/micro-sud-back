@@ -1,0 +1,66 @@
+import { Column, Entity, ObjectIdColumn, OneToMany } from "typeorm";
+import { TransactionAbstract } from "../Transaction.abstract";
+import { TransactionContract } from "../../contracts/ITransaction";
+
+@Entity("roles")
+export class TransactionMongoEntity extends TransactionAbstract {
+    @prop({ required: true, unique: true })
+    id!: string;
+
+    @prop({ required: true })
+    amount!: number;
+
+    @prop({ required: true, enum: ['USD', 'EUR', 'GBP'] })
+    currency!: string;
+
+    @prop({ required: true, enum: ['Stripe', 'Paypal', 'BankTransfer'] })
+    payment_method!: string;
+
+    @prop({ required: true })
+    debtor_id!: string;
+
+    @prop({ required: true })
+    beneficiary_id!: string;
+
+    @prop({ required: true, enum: ['pending', 'completed', 'failed'] })
+    status!: string;
+
+    @prop({ required: true })
+    transaction_date!: Date;
+
+    @prop()
+    transaction_ref?: string;
+
+    @prop()
+    description?: string;
+
+    @prop()
+    metadata?: any;
+
+    constructor(data?: Partial<TransactionContract>) {
+        super(
+            data?.id ?? "",
+            data?.amount ?? 0,
+            data?.currency ?? "eur",
+            data?.payment_method ?? "stripe",
+            data?.debtor_id ?? "",
+            data?.beneficiary_id ?? "",
+            data?.status ?? "pending",
+            data?.transaction_date ?? new Date(),
+            data?.description ?? "",
+            data?.transaction_ref ?? "",
+            data?.metadata ?? null
+        );
+        this.id = data?.id ?? "";
+        this.amount = data?.amount ?? 0;
+        this.currency = data?.currency ?? "eur";
+        this.payment_method = data?.payment_method ?? "stripe";
+        this.debtor_id = data?.debtor_id ?? "";
+        this.beneficiary_id = data?.beneficiary_id ?? "";
+        this.status = data?.status ?? "pending";
+        this.transaction_date = data?.transaction_date ?? new Date();
+        this.description = data?.description ?? "";
+        this.transaction_ref = data?.transaction_ref ?? "";
+        this.metadata = data?.metadata ?? null;
+    }
+}
