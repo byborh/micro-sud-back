@@ -1,20 +1,20 @@
 import express from 'express';
-import { TransactionService } from './services/TransactionService';
+import { LogService } from './services/LogService';
 import { getDatabase } from '@db/DatabaseClient';
 import { getRepository } from '@core/db/databaseGuards';
-import { ITransactionRepository } from './repositories/contract/ITransactionRepository';
-import { TransactionRepositorySQL } from './repositories/drivers/TransactionRepositorySQL';
-import { TransactionRepositoryRedis } from './repositories/drivers/TransactionRepostoryRedis';
-import { TransactionController } from './controllers/TransactionController';
-import { transactionRoutes } from './route/transactionRoutes';
+import { ILogRepository } from './repositories/contract/ILogRepository';
+import { LogRepositorySQL } from './repositories/drivers/LogRepositorySQL';
+import { LogRepositoryRedis } from './repositories/drivers/LogRepostoryRedis';
+import { LogController } from './controllers/LogController';
+import { logRoutes } from './route/logRoutes';
 
-export const createTransactionModule = async (): Promise<express.Router> => {
+export const createLogModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();
 
-  const transactionRepository = getRepository(myDB, TransactionRepositorySQL, TransactionRepositoryRedis, TransactionRepositorySQL) as ITransactionRepository;
+  const logRepository = getRepository(myDB, LogRepositorySQL, LogRepositoryRedis, LogRepositorySQL) as ILogRepository;
   
-  const transactionService = new TransactionService(transactionRepository);
-  const transactionController = new TransactionController(transactionService);
+  const logService = new LogService(logRepository);
+  const logController = new LogController(logService);
 
-  return transactionRoutes(transactionController);
+  return logRoutes(logController);
 };
