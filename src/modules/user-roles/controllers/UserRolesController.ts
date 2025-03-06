@@ -2,38 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { UserRolesService } from "../services/UserRolesService";
 import { UserRolesAbstract } from "../entity/UserRoles.abstract";
 
-import dotenvExpand from "dotenv-expand";
-import dotenv from "dotenv";
-import Stripe from "stripe";
-
-dotenvExpand.expand(dotenv.config());
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-    apiVersion: "2025-02-24.acacia"
-})
-
-
 export class UserRolesController {
     private userRolesService: UserRolesService;
 
     constructor(userRolesService: UserRolesService) {
         this.userRolesService = userRolesService;
-    }
-
-
-    public async testTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { amount, currency } = req.body;
-
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: amount,
-                currency: currency,
-            })
-
-            res.status(200).json(paymentIntent.client_secret);
-        } catch(error) {
-            next(error);
-        }
     }
 
     // Get a userRoles by ID

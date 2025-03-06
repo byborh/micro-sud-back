@@ -5,10 +5,6 @@ import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddl
 export const UserRolesRoutes = (userRoutesController: UserRolesController): express.Router => {
     const router = express.Router();
 
-    router.post('/test/',
-        (req: Request, res: Response, next: NextFunction) => userRoutesController.testTransaction(req, res, next)
-    )
-
     router.get('/:user_id/:role_id',
         // authMiddleware(['ADMIN', 'MANAGER']),
         validateAttributeMiddleware('params', 'user_id', 'User_id missing or invalid in request params.'),
