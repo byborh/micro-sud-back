@@ -6,6 +6,10 @@ import { authMiddleware } from '@middlewares/authMiddleware';
 export const transactionRoutes = (roleController: TransactionController): express.Router => {
     const router = express.Router();
 
+    router.post('/',
+        (req: Request, res: Response, next: NextFunction) => roleController.testTransaction(req, res, next)
+    )
+
     router.get('/:id',
         // authMiddleware(['ADMIN', 'MANAGER']),
         validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),

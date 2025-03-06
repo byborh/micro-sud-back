@@ -2,13 +2,24 @@ import { Request, Response, NextFunction } from "express";
 import { TransactionService } from "../services/TransactionService";
 
 export class TransactionController {
-    constructor(private readonly roleService: TransactionService) {}
+    constructor(private readonly transactionService: TransactionService) {}
+
+    public async testTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Retrieve transaction by ID using RoleService
+            const { amount, currency } = req.body;
+            
+            return await this.transactionService.testTransaction(amount, currency);
+        } catch(error) {
+            next(error);
+        }
+    }
 
     // Get a transaction by ID
     public async getTransactionById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Retrieve transaction by ID using RoleService
-            const transaction = await this.roleService.getTransactionById(req.params.id);
+            const transaction = await this.transactionService.getTransactionById(req.params.id);
             
             // If no transaction is found, return 404
             if (!transaction) {
@@ -23,20 +34,20 @@ export class TransactionController {
         }
     }
 
-    // Get all roles
+    // Get all transactions
     public async getTransactions(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Retrieve all roles using RoleService
-            const roles = await this.roleService.getTransactions();
+            // Retrieve all transactions using RoleService
+            const transactions = await this.transactionService.getTransactions();
 
-            // If no roles are found, return 404
-            if (!roles || roles.length === 0) {
-                res.status(404).json({ error: "No roles found" });
+            // If no transactions are found, return 404
+            if (!transactions || transactions.length === 0) {
+                res.status(404).json({ error: "No transactions found" });
                 return;
             }
 
-            // Return all roles data
-            res.status(200).json(roles);
+            // Return all transactions data
+            res.status(200).json(transactions);
         } catch (error) {
             next(error);
         }
@@ -54,7 +65,7 @@ export class TransactionController {
             // }
 
             // Create transaction using RoleService
-            // const createdRole = await this.roleService.createTransaction(transaction);
+            // const createdRole = await this.transactionService.createTransaction(transaction);
 
             // If creation fails, return 400
             // if (!createdRole) {
@@ -81,7 +92,7 @@ export class TransactionController {
             }
 
             // Modify transaction using RoleService
-            const updatedRole = await this.roleService.cancelTransactionById(req.params.id);
+            const updatedRole = await this.transactionService.cancelTransactionById(req.params.id);
 
             // If modification fails, return 404
             if (!updatedRole) {

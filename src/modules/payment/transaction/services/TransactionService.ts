@@ -1,11 +1,37 @@
 import { TransactionAbstract } from "../entity/Transaction.abstract";
 import { ITransactionRepository } from "../repositories/contract/ITransactionRepository";
+import dotenvExpand from "dotenv-expand";
+import dotenv from "dotenv";
+import Stripe from "stripe";
+
+
+dotenvExpand.expand(dotenv.config());
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    apiVersion: "2025-02-24.acacia"
+})
+
 
 export class TransactionService {
-    private transactionRepository: ITransactionRepository;
+    private transactionRepository: ITransactionRepository;   
 
     constructor(transactionRepository: ITransactionRepository) {
         this.transactionRepository = transactionRepository;
+    }
+
+
+    public async testTransaction(amount: number, currency: string): Promise<any> {
+        try {
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: currency,
+            })
+
+            return paymentIntent.client_secret;
+        } catch (error) {
+            console.error("Error finding transaction in TransactionService:", error);
+            throw new Error("Failed to find transaction.");
+        }
     }
 
     // Get Transaction By Id
