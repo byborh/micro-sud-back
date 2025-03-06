@@ -2,17 +2,17 @@ import { Request, Response, NextFunction } from "express";
 import { EscrowService } from "../services/EscrowService";
 
 export class EscrowController {
-    constructor(private readonly roleService: EscrowService) {}
+    constructor(private readonly escrowService: EscrowService) {}
 
     // Get a escrow by ID
     public async getEscrowById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Retrieve escrow by ID using RoleService
-            const escrow = await this.roleService.getEscrowById(req.params.id);
+            // Retrieve escrow by ID using EscrowService
+            const escrow = await this.escrowService.getEscrowById(req.params.id);
             
             // If no escrow is found, return 404
             if (!escrow) {
-                res.status(404).json({ error: "Role not found" });
+                res.status(404).json({ error: "Escrow not found" });
                 return;
             }
 
@@ -23,20 +23,20 @@ export class EscrowController {
         }
     }
 
-    // Get all roles
+    // Get all escrows
     public async getEscrows(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // Retrieve all roles using RoleService
-            const roles = await this.roleService.getEscrows();
+            // Retrieve all escrows using EscrowService
+            const escrows = await this.escrowService.getEscrows();
 
-            // If no roles are found, return 404
-            if (!roles || roles.length === 0) {
-                res.status(404).json({ error: "No roles found" });
+            // If no escrows are found, return 404
+            if (!escrows || escrows.length === 0) {
+                res.status(404).json({ error: "No escrows found" });
                 return;
             }
 
-            // Return all roles data
-            res.status(200).json(roles);
+            // Return all escrows data
+            res.status(200).json(escrows);
         } catch (error) {
             next(error);
         }
@@ -53,17 +53,17 @@ export class EscrowController {
                 // return;
             // }
 
-            // Create escrow using RoleService
-            // const createdRole = await this.roleService.createEscrow(escrow);
+            // Create escrow using EscrowService
+            // const createdEscrow = await this.escrowService.createEscrow(escrow);
 
             // If creation fails, return 400
-            // if (!createdRole) {
-                // res.status(400).json({ error: "Role could not be created." });
+            // if (!createdEscrow) {
+                // res.status(400).json({ error: "Escrow could not be created." });
                 // return;
             // }
 
             // Return the created escrow data
-            // res.status(201).json(createdRole);
+            // res.status(201).json(createdEscrow);
         } catch (error) {
             next(error);
         }
@@ -81,17 +81,17 @@ export class EscrowController {
                 // return;
             // }
 
-            // Create escrow using RoleService
-            // const createdRole = await this.roleService.createEscrow(escrow);
+            // Create escrow using EscrowService
+            // const createdEscrow = await this.escrowService.createEscrow(escrow);
 
             // If creation fails, return 400
-            // if (!createdRole) {
-                // res.status(400).json({ error: "Role could not be created." });
+            // if (!createdEscrow) {
+                // res.status(400).json({ error: "Escrow could not be created." });
                 // return;
             // }
 
             // Return the created escrow data
-            // res.status(201).json(createdRole);
+            // res.status(201).json(createdEscrow);
         } catch (error) {
             next(error);
         }
