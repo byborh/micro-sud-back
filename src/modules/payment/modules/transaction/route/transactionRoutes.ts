@@ -6,14 +6,11 @@ import { authMiddleware } from '@middlewares/authMiddleware';
 export const transactionRoutes = (transactionController: TransactionController): express.Router => {
     const router = express.Router();
 
-    router.post('/',
-        (req: Request, res: Response, next: NextFunction) => transactionController.testTransaction(req, res, next)
-    )
-
     router.post('/create-payment-account', 
         // authMiddleware(['USER', 'MANAGER', 'ADMIN']),
         validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),
         validateAttributeMiddleware('body', 'name', 'Name missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'payment_method', 'Payment Method missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => transactionController.createPaymentAccount(req, res, next)
     );
 

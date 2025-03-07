@@ -13,4 +13,8 @@ export class PaypalPayment implements IPayment {
     async refund(paymentId: string): Promise<any> {
         return { success: true, message: `Refund processed for ${paymentId} via PayPal.` };
     }
+
+    async createCustomerId(email: string): Promise<any> {
+        return { success: true, message: `Customer created for ${email} via PayPal.` };
+    }
 }

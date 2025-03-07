@@ -7,35 +7,6 @@ import { PaymentMethod } from "../contracts/TPaymentMethod";
 export class TransactionController {
     constructor(private readonly transactionService: TransactionService) {}
 
-    public async testTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { amount, currency } = req.body;
-            
-            return await this.transactionService.testTransaction(amount, currency);
-        } catch(error) {
-            next(error);
-        }
-    }
-
-
-    public async createPaymentAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { email, name } = req.body;
-
-            // Validate email and name
-            if (!email || !name) {
-                res.status(400).json({ error: "Email and name are required." });
-                return;
-            }
-
-
-            return await this.transactionService.createPaymentAccount();
-        } catch(error) {
-            next(error);
-        }
-    }
-
-
     // Get a transaction by ID
     public async getTransactionById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
@@ -74,6 +45,31 @@ export class TransactionController {
         }
     }
 
+
+    public async createPaymentAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { email, name, payment_method } = req.body;
+
+            // Validate email and name
+            if (!email || !name || !payment_method) {
+                res.status(400).json({ error: "Email, name and payment method are required." });
+                return;
+            }
+
+            const paymentAccount: string = await this.transactionService.createPaymentAccount(email, payment_method);
+            
+            // If creation fails, return 400
+            if (!paymentAccount) {
+                res.status(400).json({ error: "Payment account could not be created." });
+                return;
+            }
+
+            res.status(200).json(paymentAccount);
+        } catch(error) {
+            next(error);
+        }
+    }
+
     // Create a transaction
     public async createTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
@@ -102,19 +98,8 @@ export class TransactionController {
                 description: description
             } as TransactionAbstract;
 
-            let createdTransaction: TransactionAbstract;
+            const createdTransaction: TransactionAbstract = await this.transactionService.createPaymentTransaction(transaction);;
             
-            switch (payment_method as PaymentMethod) {
-                case "stripe":
-                    // Create transaction using TransactionService
-                    createdTransaction = await this.transactionService.createStripeTransaction(transaction);
-                case "paypal":
-                    console.log("PayPal payment method selected. IT DOES NOT WORK YET. BHAHAHHAHAHHAHAH !!");
-                default:
-                    res.status(400).json({ error: "Invalid payment method." });
-            }
-
-
             // If creation fails, return 400
             if (!createdTransaction) {
                 res.status(400).json({ error: "Transaction could not be created." });
