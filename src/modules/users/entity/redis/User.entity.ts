@@ -14,10 +14,13 @@ export class UserRedisEntity extends UserAbstract {
     createdAt: Date;
     updatedAt: Date;
 
+    stripeCustomerId?: string;
+    paypalCustomerId?: string;
+
     data: Record<string, any> | null;
 
     constructor(data: Partial<UserContract>) {
-        super(data.id!, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt);
+        super(data.id!, data.email, data.password, data.salt, data.firstname, data.lastname, data.pseudo, data.telnumber, data.createdAt, data.updatedAt, data.stripeCustomerId, data.paypalCustomerId);
 
         this.id = data.id!;
         this.email = data.email!;
@@ -29,6 +32,9 @@ export class UserRedisEntity extends UserAbstract {
         this.telnumber = data.telnumber ?? null;
         this.createdAt = data.createdAt ?? new Date();
         this.updatedAt = data.updatedAt ?? new Date();
+
+        this.stripeCustomerId = data.stripeCustomerId ?? null;
+        this.paypalCustomerId = data.paypalCustomerId ?? null
     }
 
     // constructor(data: Partial<UserRedisEntity>) {

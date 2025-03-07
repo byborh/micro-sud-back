@@ -13,7 +13,25 @@ export abstract class UserAbstract implements UserContract {
     createdAt: Date;
     updatedAt: Date;
 
-    constructor(id: string, email: string, password: string, salt: string, firstname?: string, lastname?: string, pseudo?: string, telnumber?: string, createdAt?: Date, updatedAt?: Date) {
+    stripeCustomerId?: string; // Optional
+    paypalCustomerId?: string; // Optional
+    
+    constructor(
+        id: string,
+        email: string,
+        password: string,
+        salt: string,
+        firstname?: string,
+        lastname?: string,
+        pseudo?: string,
+        telnumber?: string,
+        createdAt?: Date,
+        updatedAt?: Date,
+
+        stripeCustomerId?: string,
+        paypalCustomerId?: string
+    )
+    {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -24,6 +42,9 @@ export abstract class UserAbstract implements UserContract {
         this.lastname = lastname;
         this.pseudo = pseudo;
         this.telnumber = telnumber;
+
+        this.stripeCustomerId = stripeCustomerId,
+        this.paypalCustomerId = paypalCustomerId
     }
 
     getId(): string {return this.id;}
@@ -37,6 +58,9 @@ export abstract class UserAbstract implements UserContract {
     getCreatedAt(): Date {return this.createdAt;}
     getUpdatedAt(): Date {return this.updatedAt;}
 
+    getStripeCustomerId(): string | null {return this.stripeCustomerId;}
+    getPaypalCustomerId(): string | null {return this.paypalCustomerId;}
+
     setId(id: string): void {this.id = id;}
     setFirstname(firstname: string): void {this.firstname = firstname;}
     setLastname(lastname: string): void {this.lastname = lastname;}
@@ -47,6 +71,9 @@ export abstract class UserAbstract implements UserContract {
     setTelnumber(telnumber: string): void {this.telnumber = telnumber;}
     setCreatedAt(createdAt: Date): void {this.createdAt = createdAt;}
     setUpdatedAt(updatedAt: Date): void {this.updatedAt = updatedAt;}
+
+    setStripeCustomerId(stripeCustomerId: string): void {this.stripeCustomerId = stripeCustomerId;}
+    setPaypalCustomerId(paypalCustomerId: string): void {this.paypalCustomerId = paypalCustomerId;}
 
     abstract toDto(): UserDTO;
 }

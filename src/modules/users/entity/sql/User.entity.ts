@@ -38,6 +38,12 @@ export class UserSQLEntity extends UserAbstract {
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt: Date;
 
+    @Column({ type: "varchar", length: 255, name: "stripe_customer_id" })
+    stripeCustomerId?: string;
+
+    @Column({ type: "varchar", length: 255, name: "paypal_customer_id" })
+    paypalCustomerId?: string;
+
     @Column("json", { nullable: true })
     data: JSON | null;
 
@@ -76,7 +82,10 @@ export class UserSQLEntity extends UserAbstract {
             data?.pseudo ?? null,
             data?.telnumber ?? null,
             data?.createdAt ?? new Date(),
-            data?.updatedAt ?? new Date()
+            data?.updatedAt ?? new Date(),
+
+            data?.stripeCustomerId ?? null,
+            data?.paypalCustomerId ?? null
         );
     
         this.id = data?.id ?? "";
@@ -89,6 +98,9 @@ export class UserSQLEntity extends UserAbstract {
         this.telnumber = data?.telnumber ?? null;
         this.createdAt = data?.createdAt ?? new Date();
         this.updatedAt = data?.updatedAt ?? new Date();
+
+        this.stripeCustomerId = data?.stripeCustomerId ?? null;
+        this.paypalCustomerId = data?.paypalCustomerId ?? null
     }
       
     // Static constructor

@@ -1,4 +1,3 @@
-import Stripe from "stripe";
 import { TransactionAbstract } from "../entity/Transaction.abstract";
 import { ITransactionRepository } from "../repositories/contract/ITransactionRepository";
 import { getPaymentProvider } from "@modules/payment/config/payment/PaymentFactory";
@@ -27,6 +26,8 @@ export class TransactionService {
             throw new Error("Failed to find transaction.");
         }
     }
+
+    public async createPaymentAccount() {}
 
     // Get Transaction By Id
     public async getTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
@@ -62,7 +63,7 @@ export class TransactionService {
 
 
     // Create Transaction
-    public async createTransaction(transaction: TransactionAbstract): Promise<TransactionAbstract | null> {
+    public async createStripeTransaction(transaction: TransactionAbstract): Promise<TransactionAbstract | null> {
         try {
             return await this.transactionRepository.createTransaction(transaction);
         } catch (error) {

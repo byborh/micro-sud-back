@@ -13,5 +13,8 @@ export interface UserContract {
     createdAt: Date;
     updatedAt: Date;
 
+    stripeCustomerId?: string; // Optional
+    paypalCustomerId?: string; // Optional
+
     toDto(): UserDTO;
 }

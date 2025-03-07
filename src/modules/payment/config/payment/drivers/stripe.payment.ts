@@ -25,4 +25,16 @@ export class StripePayment implements IPayment {
     async refund(paymentId: string): Promise<any> {
         return await this.stripe.refunds.create({ payment_intent: paymentId });
     }
+
+
+    // Create an id stripe for customer
+    async createCustomerId(email: string, name: string): Promise<any> {
+        const customer = await this.stripe.customers.create({
+            email,
+            name
+        })
+
+        return customer;
+        // customer.id
+    }
 }

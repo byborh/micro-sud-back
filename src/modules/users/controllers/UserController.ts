@@ -58,6 +58,9 @@ export class UserController {
                 telnumber,
                 createdAt: new Date(),
                 updatedAt: new Date(),
+
+                stripeCustomerId: null,
+                paypalCustomerId: null
             } as UserAbstract);
             
             const createdUser = await this.userService.createUser(user);
