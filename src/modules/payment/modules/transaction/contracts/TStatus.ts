@@ -1,2 +1,2 @@
 // Status of a transaction
-export type TStatus= 'pending' | 'completed' | 'failed';
+export type TStatus= 'pending' | 'succeeded' | 'failed';

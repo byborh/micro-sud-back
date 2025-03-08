@@ -5,40 +5,40 @@ services:
       dockerfile: ./container/dockerfile/Dockerfile.dev
     environment:
       NODE_ENV: $NODE_ENV
-      MYSQL_USER: $MYSQL_USER
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
-      MYSQL_DATABASE: $MYSQL_DATABASE
-      MYSQL_HOST: mysqldb
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      mysqldb:
+      redis:
         condition: service_healthy
     networks:
-      - mysql-private-tunnel
+      - redis-private-tunnel
     ports:
-      - 3000:3000
+      - "3000:3000"
+    restart: unless-stopped
 
-  mysqldb:
-    image: mysql:5.7
-    container_name: mysql
-    hostname: mysql
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    hostname: redis
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: $MYSQL_PASSWORD
-      MYSQL_DATABASE: $MYSQL_DATABASE
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD} --cluster-enabled no
     networks:
-      - mysql-private-tunnel
+      - redis-private-tunnel
     volumes:
-      - mysql_data:/var/lib/mysql
+      - redis_data:/data
+    # ports:
+    #   - "6379:6379"
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "--connect-timeout", "4"]
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "ping"]
       interval: 5s
       timeout: 10s
       retries: 5
 
 networks:
-  mysql-private-tunnel:
+  redis-private-tunnel:
     driver: bridge
 
 volumes:
-  mysql_data:
+  redis_data:
     driver: local

@@ -7,7 +7,7 @@ export class PaypalPayment implements IPayment {
         console.log("PayPal initialized.");
     }
 
-    async charge(transaction: TransactionAbstract, debitorPaymentId: string, beneficiaryPaymentId: string): Promise<any> {
+    async charge(transaction: TransactionAbstract, beneficiaryPaymentId: string): Promise<any> {
         return { success: true, message: "Payment processed via PayPal." };
     }
 

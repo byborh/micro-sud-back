@@ -2,7 +2,7 @@ import { TransactionAbstract } from "@modules/payment/modules/transaction/entity
 
 export interface IPayment {
     initialize(): void;
-    charge(transaction: TransactionAbstract, debitorPaymentId: string, payment_identifier: string): Promise<any>;
+    charge(transaction: TransactionAbstract, payment_identifier: string): Promise<any>;
     refund(transactionId: string): Promise<any>;
 
     createCustomerId(email: string): Promise<string>;

@@ -15,11 +15,11 @@ export class StripePayment implements IPayment {
         console.log("Stripe initialized.");
     }
 
-    async charge(transaction: TransactionAbstract, debitorPaymentId: string, payment_identifier: string): Promise<any> {
+    async charge(transaction: TransactionAbstract, payment_identifier: string): Promise<any> {
         const paymentIntent = await this.stripe.paymentIntents.create({
             amount: transaction.amount,
             currency: transaction.currency,
-            customer: debitorPaymentId,
+            customer: transaction.transaction_ref,
             payment_method: payment_identifier,
             confirm: true, // Confirm the payment intent
             description: transaction.description,
@@ -30,7 +30,7 @@ export class StripePayment implements IPayment {
                 debtor_email: transaction.debtor_email,
             }
         });
-        
+
         return paymentIntent;
     }
 

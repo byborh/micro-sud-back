@@ -28,9 +28,18 @@ export class TransactionRepositorySQL implements ITransactionRepository {
         throw new Error("Method not implemented.");
     }
     async createTransaction(transaction: TransactionAbstract): Promise<TransactionAbstract | null> {
-        const result = await this.repository.save(transaction);
+        try {
+            if (transaction.metadata && typeof transaction.metadata !== 'object') {
+                throw new Error("Metadata must be a valid JSON object.");
+            }
 
-        return result || null;
+            const result = await this.repository.save(transaction);
+
+            return result || null;
+        } catch(error) {
+            console.error("Error creating transaction in TransactionRepository:", error);
+            throw new Error("Error creating transaction in TransactionRepository.");
+        }
     }
     cancelTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
         throw new Error("Method not implemented.");

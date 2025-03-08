@@ -5,7 +5,7 @@ import { paymentPovider } from "../../contracts/TPaymentProvider";
 import { TStatus } from "../../contracts/TStatus";
 import { TransactionContract } from "../../contracts/ITransaction";
 
-@Entity("roles")
+@Entity("transactions")
 export class TransactionSQLEntity  extends TransactionAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;
@@ -39,7 +39,7 @@ export class TransactionSQLEntity  extends TransactionAbstract {
     @Column({ type: "varchar", length: 255 })
     description?: string;
     
-    @Column({ type: "json" })
+    @Column('json', { nullable: true })
     metadata?: any;
 
 

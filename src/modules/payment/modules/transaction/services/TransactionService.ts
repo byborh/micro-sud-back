@@ -94,14 +94,24 @@ export class TransactionService {
                 debitorPaymentId = await this.paymentProvider.createCustomerId(transaction.debtor_email);
             }
 
+            
             // Create a transaction beetween debitor and creditor !
             const paymentIntent = await this.paymentProvider.charge(
                 transaction,
-                debitorPaymentId,
                 payment_identifier
-            );
+                );
+                
+            // Update Transaction's data
+            transaction.transaction_ref = paymentIntent.id;
+            transaction.status = paymentIntent.status;
+            transaction.metadata = {
+                ...transaction.metadata,
+                payment_method_types: paymentIntent.payment_method_types,
+                client_secret: paymentIntent.client_secret
+            };
 
             console.log("THIS IS THE PAYMENT INTENT:", paymentIntent);
+            console.log("THIS IS THE TRANSACTION:", transaction);
 
             return await this.transactionRepository.createTransaction(transaction);
         } catch (error) {
