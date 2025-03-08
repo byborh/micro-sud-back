@@ -1,6 +1,6 @@
 import { getRepository } from "@core/db/databaseGuards";
 import { getDatabase } from "@db/DatabaseClient";
-import { PaymentMethod } from "@modules/payment/modules/transaction/contracts/TPaymentMethod";
+import { paymentPovider } from "@modules/payment/modules/transaction/contracts/TPaymentProvider";
 import { IUserRepository } from "@modules/users/repositories/contract/IUserRepository";
 import { UserRepositoryMongo } from "@modules/users/repositories/drivers/UserRepositoryMongo";
 import { UserRepositoryRedis } from "@modules/users/repositories/drivers/UserRepositoryRedis";
@@ -16,7 +16,7 @@ export class InterractWithUser {
         return InterractWithUser.instance;
     }
 
-    public async isAccountExist(email: string, payment_method: string): Promise<string | null> {
+    public async isAccountExist(email: string, payment_provider: string): Promise<string | null> {
         try {
             const myDB = await getDatabase();
             const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, UserRepositoryMongo) as IUserRepository;
@@ -25,7 +25,7 @@ export class InterractWithUser {
             if(!user) throw new Error("User not found for this email.");
 
             // Return Payment Account
-            return payment_method as PaymentMethod === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId()
+            return payment_provider as paymentPovider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId()
         } catch (error) {
             console.error("Error finding user in TransactionService:", error);
             throw new Error("Failed to find user.");
@@ -33,7 +33,7 @@ export class InterractWithUser {
     }
     
     
-    public async updateUser(paymentId: string, email: string, payment_method: string): Promise<string | null> {
+    public async updateUserPaymentId(paymentId: string, email: string, payment_provider: string): Promise<string | null> {
         try {
             // Verify if user exists
             const myDB = await getDatabase();
@@ -43,7 +43,7 @@ export class InterractWithUser {
             if(!user) throw new Error("User not found for this email.");
             
             // Update correct payment method's id
-            if(payment_method as PaymentMethod === "stripe") {
+            if(payment_provider as paymentPovider === "stripe") {
                 user.setStripeCustomerId(paymentId);
             } else {
                 user.setPaypalCustomerId(paymentId);
@@ -54,7 +54,7 @@ export class InterractWithUser {
             if(!updatedUser) throw new Error("Failed to update user.");
     
             // Return Payment Account
-            return payment_method as PaymentMethod === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId()
+            return payment_provider as paymentPovider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId()
         } catch (error) {
             console.error("Error finding user in TransactionService:", error);
             throw new Error("Failed to find user.");

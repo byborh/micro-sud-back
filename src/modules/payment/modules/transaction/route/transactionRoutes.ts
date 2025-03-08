@@ -10,7 +10,7 @@ export const transactionRoutes = (transactionController: TransactionController):
         // authMiddleware(['USER', 'MANAGER', 'ADMIN']),
         validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),
         validateAttributeMiddleware('body', 'name', 'Name missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'payment_method', 'Payment Method missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'payment_provider', 'Payment Method missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => transactionController.createPaymentAccount(req, res, next)
     );
 
@@ -29,10 +29,10 @@ export const transactionRoutes = (transactionController: TransactionController):
         // authMiddleware(['ADMIN']),
         validateAttributeMiddleware('body', 'amount', 'Amount missing or invalid in request body'),
         validateAttributeMiddleware('body', 'currency', 'Currency missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'payment_method', 'Payment Method missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'debtor_id', 'Id of debitor missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'beneficiary_id', 'Id of beneficiary missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'transaction_ref', 'Reference of the transaction missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'payment_provider', 'Payment Method missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'debtor_email', 'Email of debitor missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'beneficiary_email', 'Email of beneficiary missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'payment_identifier', 'Payment Method of the transaction missing or invalid in request body'),
         validateAttributeMiddleware('body', 'description', 'Description missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => transactionController.createTransaction(req, res, next)
     );

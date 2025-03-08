@@ -38,10 +38,10 @@ export class UserSQLEntity extends UserAbstract {
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt: Date;
 
-    @Column({ type: "varchar", length: 255, name: "stripe_customer_id" })
+    @Column({ type: "varchar", length: 255, name: "stripe_customer_id", nullable: true })
     stripeCustomerId?: string;
 
-    @Column({ type: "varchar", length: 255, name: "paypal_customer_id" })
+    @Column({ type: "varchar", length: 255, name: "paypal_customer_id", nullable: true })
     paypalCustomerId?: string;
 
     @Column("json", { nullable: true })

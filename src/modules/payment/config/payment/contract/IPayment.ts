@@ -1,10 +1,11 @@
-import { PaymentMethod } from "@modules/payment/modules/transaction/contracts/TPaymentMethod";
+import { TransactionAbstract } from "@modules/payment/modules/transaction/entity/Transaction.abstract";
 
 export interface IPayment {
     initialize(): void;
-    charge(amount: number, currency: string, beneficiary_id: string): Promise<any>;
+    charge(transaction: TransactionAbstract, debitorPaymentId: string, payment_identifier: string): Promise<any>;
     refund(transactionId: string): Promise<any>;
 
     createCustomerId(email: string): Promise<string>;
+    attachPaymentAccount(payment_method: string, customerId: string): Promise<boolean>;
     // ...
 }

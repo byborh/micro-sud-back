@@ -10,7 +10,7 @@ const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql
 export async function createRoleEntity(transaction: Partial<TransactionContract>, dbType: DatabaseType = databaseType): Promise<TransactionAbstract> {
 
     // Validate required fields
-    if (!transaction.id || !transaction.amount || !transaction.currency || !transaction.payment_method || !transaction.debtor_id || !transaction.beneficiary_id || !transaction.status || !transaction.transaction_date) {
+    if (!transaction.id || !transaction.amount || !transaction.currency || !transaction.payment_provider || !transaction.debtor_email || !transaction.beneficiary_email || !transaction.status || !transaction.transaction_date) {
         throw new Error("Missing required fields for Transaction.");
     }
 

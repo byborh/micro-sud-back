@@ -1,5 +1,5 @@
 import { TCurrency } from "../../contracts/TCurrency";
-import { PaymentMethod } from "../../contracts/TPaymentMethod";
+import { paymentPovider } from "../../contracts/TPaymentProvider";
 import { TStatus } from "../../contracts/TStatus";
 import { TransactionAbstract } from "../Transaction.abstract";
 import { TransactionContract } from "../../contracts/ITransaction";
@@ -8,12 +8,12 @@ export class TransactionRedisEntity extends TransactionAbstract {
     id: string;
     amount: number;
     currency: TCurrency;
-    payment_method: PaymentMethod;
-    debtor_id: string;
-    beneficiary_id: string;
+    payment_provider: paymentPovider;
+    debtor_email: string;
+    beneficiary_email: string;
     status: TStatus;
     transaction_date: Date;
-    transaction_ref: string;
+    transaction_ref?: string;
     description?: string;
     metadata?: any;
 
@@ -24,16 +24,26 @@ export class TransactionRedisEntity extends TransactionAbstract {
             data?.id ?? "",
             data?.amount ?? 0,
             data?.currency ?? "eur",
-            data?.payment_method ?? "stripe",
-            data?.debtor_id ?? "",
-            data?.beneficiary_id ?? "",
+            data?.payment_provider ?? "stripe",
+            data?.debtor_email ?? "",
+            data?.beneficiary_email ?? "",
             data?.status ?? "pending",
             data?.transaction_date ?? new Date(),
             data?.description ?? "",
             data?.transaction_ref ?? "",
             data?.metadata ?? null
         );
-        
+        this.id = data?.id ?? "";
+        this.amount = data?.amount ?? 0;
+        this.currency = data?.currency ?? "eur";
+        this.payment_provider = data?.payment_provider ?? "stripe";
+        this.debtor_email = data?.debtor_email ?? "";
+        this.beneficiary_email = data?.beneficiary_email ?? "";
+        this.status = data?.status ?? "pending";
+        this.transaction_date = data?.transaction_date ?? new Date();
+        this.description = data?.description ?? "";
+        this.transaction_ref = data?.transaction_ref ?? "";
+        this.metadata = data?.metadata ?? null;
     }
 
     // Convert object to Redis hash
@@ -42,9 +52,9 @@ export class TransactionRedisEntity extends TransactionAbstract {
             id: this.id,
             amount: this.amount.toString(),
             currency: this.currency,
-            payment_method: this.payment_method.toString(),
-            debtor_id: this.debtor_id,
-            beneficiary_id: this.beneficiary_id,
+            payment_provider: this.payment_provider.toString(),
+            debtor_email: this.debtor_email,
+            beneficiary_email: this.beneficiary_email,
             status: this.status.toString(),
             transaction_date: this.transaction_date.toISOString(),
             transaction_ref: this.transaction_ref,
@@ -59,9 +69,9 @@ export class TransactionRedisEntity extends TransactionAbstract {
             id: hash.id,
             amount: parseFloat(hash.amount),
             currency: hash.currency as TCurrency,
-            payment_method: hash.payment_method as PaymentMethod,
-            debtor_id: hash.debtor_id,
-            beneficiary_id: hash.beneficiary_id,
+            payment_provider: hash.payment_provider as paymentPovider,
+            debtor_email: hash.debtor_email,
+            beneficiary_email: hash.beneficiary_email,
             status: hash.status as TStatus,
             transaction_date: new Date(hash.transaction_date),
             transaction_ref: hash.transaction_ref,

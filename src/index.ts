@@ -8,6 +8,9 @@ import { createAuthTokenModule } from '@modules/auth-token';
 import { createChatAIModule } from '@modules/chat-ai';
 import { getDatabase } from '@db/DatabaseClient';
 
+import { createTransactionModule } from '@modules/payment/modules/transaction';
+
+
 const app = express();
 const port = 3000;
 
@@ -28,7 +31,9 @@ async function loadModules() {
   const chatAIModule = await createChatAIModule();
   // Add other modules HERE
 
-  return { userModule, roleModule, userRolesModule, authTokenModule, chatAIModule };
+  const transactionModule = await createTransactionModule();
+
+  return { userModule, roleModule, userRolesModule, authTokenModule, chatAIModule, transactionModule };
 }
 
 async function startServer() {
@@ -49,6 +54,8 @@ async function startServer() {
     apiRouter.use('/roles', modules.roleModule);
     apiRouter.use('/chatai', modules.chatAIModule);
     // Add other load modules HERE
+
+    apiRouter.use('/transaction', modules.transactionModule);
 
     app.use('/api/v0.0.2', apiRouter);
 

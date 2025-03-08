@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { TransactionAbstract } from "../Transaction.abstract";
 import { TCurrency } from "../../contracts/TCurrency";
-import { PaymentMethod } from "../../contracts/TPaymentMethod";
+import { paymentPovider } from "../../contracts/TPaymentProvider";
 import { TStatus } from "../../contracts/TStatus";
 import { TransactionContract } from "../../contracts/ITransaction";
 
@@ -17,15 +17,15 @@ export class TransactionSQLEntity  extends TransactionAbstract {
     currency: TCurrency;
 
     @Column({ type: "varchar", length: 50 })
-    payment_method: PaymentMethod;
+    payment_provider: paymentPovider;
 
     @Column({ type: "varchar", length: 255 })
 
     @Column({ type: "varchar", length: 255 })
-    debtor_id: string;
+    debtor_email: string;
 
     @Column({ type: "varchar", length: 255 })
-    beneficiary_id: string;
+    beneficiary_email: string;
 
     @Column({ type:"varchar", length: 10 })
     status: TStatus;
@@ -34,7 +34,7 @@ export class TransactionSQLEntity  extends TransactionAbstract {
     transaction_date: Date;
     
     @Column({ type: "varchar", length: 255 })
-    transaction_ref: string;
+    transaction_ref?: string;
 
     @Column({ type: "varchar", length: 255 })
     description?: string;
@@ -48,9 +48,9 @@ export class TransactionSQLEntity  extends TransactionAbstract {
             data?.id ?? "",
             data?.amount ?? 0,
             data?.currency ?? "eur",
-            data?.payment_method ?? "stripe",
-            data?.debtor_id ?? "",
-            data?.beneficiary_id ?? "",
+            data?.payment_provider ?? "stripe",
+            data?.debtor_email ?? "",
+            data?.beneficiary_email ?? "",
             data?.status ?? "pending",
             data?.transaction_date ?? new Date(),
             data?.description ?? "",
@@ -60,9 +60,9 @@ export class TransactionSQLEntity  extends TransactionAbstract {
         this.id = data?.id ?? "";
         this.amount = data?.amount ?? 0;
         this.currency = data?.currency ?? "eur";
-        this.payment_method = data?.payment_method ?? "stripe";
-        this.debtor_id = data?.debtor_id ?? "";
-        this.beneficiary_id = data?.beneficiary_id ?? "";
+        this.payment_provider = data?.payment_provider ?? "stripe";
+        this.debtor_email = data?.debtor_email ?? "";
+        this.beneficiary_email = data?.beneficiary_email ?? "";
         this.status = data?.status ?? "pending";
         this.transaction_date = data?.transaction_date ?? new Date();
         this.description = data?.description ?? "";

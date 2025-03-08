@@ -1,7 +1,7 @@
 import { TransactionAbstract } from "../entity/Transaction.abstract";
 import { ITransactionRepository } from "../repositories/contract/ITransactionRepository";
 import { getPaymentProvider } from "@modules/payment/config/payment/PaymentFactory";
-import { PaymentMethod } from "../contracts/TPaymentMethod";
+import { paymentPovider } from "../contracts/TPaymentProvider";
 import { InterractWithUser } from "@modules/payment/cores/db/interractWithUser";
 
 export class TransactionService {
@@ -57,7 +57,7 @@ export class TransactionService {
             const stripeCustomerId = await this.paymentProvider.createCustomerId(email);
 
             // Return Payment Account
-            return await interractWithUser.updateUser(stripeCustomerId, email, "stripe");
+            return await interractWithUser.updateUserPaymentId(stripeCustomerId, email, "stripe");
         } catch (error) {
             console.error("Error creating stripe account in TransactionService:", error);
             throw new Error("Failed to find transaction.");
@@ -65,17 +65,17 @@ export class TransactionService {
     }
 
 
-    public async createPaymentAccount(email: string, payment_method: PaymentMethod): Promise<string> {
+    public async createPaymentAccount(email: string, payment_provider: paymentPovider): Promise<string> {
         try {
             // Verify if user has already a payment account
-            const account = await InterractWithUser.getInstance().isAccountExist(email, payment_method);
+            const account = await InterractWithUser.getInstance().isAccountExist(email, payment_provider);
             if(account) throw new Error("User already has a payment account.");
 
             // Create Payment Account
             const paymentCustomerId = await this.paymentProvider.createCustomerId(email);
 
             // Return Payment Account
-            return await InterractWithUser.getInstance().updateUser(paymentCustomerId, email, "stripe");
+            return await InterractWithUser.getInstance().updateUserPaymentId(paymentCustomerId, email, "stripe");
         } catch (error) {
             console.error("Error create paypal account in TransactionService:", error);
             throw new Error("Failed to find transaction.");
@@ -84,21 +84,24 @@ export class TransactionService {
 
 
     // Create Transaction
-    public async createPaymentTransaction(transaction: TransactionAbstract): Promise<TransactionAbstract | null> {
+    public async createPaymentTransaction(transaction: TransactionAbstract, payment_identifier: string): Promise<TransactionAbstract | null> {
         try {
-            // Verify if debitor and creditor has a payment account
-            let debitorPaymentId = await InterractWithUser.getInstance().isAccountExist(transaction.debtor_id, transaction.payment_method);
-            let creditorPaymentId = await InterractWithUser.getInstance().isAccountExist(transaction.beneficiary_id, transaction.payment_method);
+            // Verify if debitor has a payment account
+            let debitorPaymentId = await InterractWithUser.getInstance().isAccountExist(transaction.debtor_email, transaction.payment_provider);
             
             // If debitor does not have a payment account, create one
             if(!debitorPaymentId) {
-                debitorPaymentId = await this.paymentProvider.createCustomerId(transaction.debtor_id);
+                debitorPaymentId = await this.paymentProvider.createCustomerId(transaction.debtor_email);
             }
 
-            // If creditor does not have a payment account, create one
-            if(!creditorPaymentId) {
-                creditorPaymentId = await this.createPaymentAccount(transaction.beneficiary_id, transaction.payment_method);
-            }
+            // Create a transaction beetween debitor and creditor !
+            const paymentIntent = await this.paymentProvider.charge(
+                transaction,
+                debitorPaymentId,
+                payment_identifier
+            );
+
+            console.log("THIS IS THE PAYMENT INTENT:", paymentIntent);
 
             return await this.transactionRepository.createTransaction(transaction);
         } catch (error) {

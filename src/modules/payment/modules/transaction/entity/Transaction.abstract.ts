@@ -1,18 +1,18 @@
 import { TransactionContract } from "../contracts/ITransaction";
 import { TCurrency } from "../contracts/TCurrency";
-import { PaymentMethod } from "../contracts/TPaymentMethod";
+import { paymentPovider } from "../contracts/TPaymentProvider";
 import { TStatus } from "../contracts/TStatus";
 
 export abstract class TransactionAbstract implements TransactionContract {
     id: string;
     amount: number;
     currency: TCurrency;
-    payment_method: PaymentMethod;
-    debtor_id: string;
-    beneficiary_id: string;
+    payment_provider: paymentPovider;
+    debtor_email: string;
+    beneficiary_email: string;
     status: TStatus;
     transaction_date: Date;
-    transaction_ref: string;
+    transaction_ref?: string;
     description?: string;
     metadata?: any;
 
@@ -20,21 +20,21 @@ export abstract class TransactionAbstract implements TransactionContract {
         id: string,
         amount: number,
         currency: TCurrency,
-        payment_method: PaymentMethod,
-        debtor_id: string,
-        beneficiary_id: string,
+        payment_provider: paymentPovider,
+        debtor_email: string,
+        beneficiary_email: string,
         status: TStatus,
         transaction_date: Date,
-        description: string,
-        transaction_ref: string,
-        metadata: any
+        description?: string,
+        transaction_ref?: string,
+        metadata?: any
     ) {
         this.id = id,
         this.amount = amount,
         this.currency = currency,
-        this.payment_method = payment_method,
-        this.debtor_id = debtor_id,
-        this.beneficiary_id = beneficiary_id,
+        this.payment_provider = payment_provider,
+        this.debtor_email = debtor_email,
+        this.beneficiary_email = beneficiary_email,
         this.status = status,
         this.transaction_date = transaction_date,
         this.description = description,
@@ -46,9 +46,9 @@ export abstract class TransactionAbstract implements TransactionContract {
     getId(): string { return this.id; }
     getAmount(): number { return this.amount; }
     getCurrency(): TCurrency { return this.currency; }
-    getPaymentMethod(): PaymentMethod { return this.payment_method; }
-    getDebtorId(): string { return this.debtor_id; }
-    getBeneficiaryId(): string { return this.beneficiary_id; }
+    geTPaymentProvider(): paymentPovider { return this.payment_provider; }
+    getdebtorEmail(): string { return this.debtor_email; }
+    getbeneficiaryEmail(): string { return this.beneficiary_email; }
     getStatus(): TStatus { return this.status; }
     getTransactionDate(): Date { return this.transaction_date; }
     getDescription(): string { return this.description; }
@@ -59,9 +59,9 @@ export abstract class TransactionAbstract implements TransactionContract {
     setId(id: string): void { this.id = id; }
     setAmount(amount: number): void { this.amount = amount; }
     setCurrency(currency: TCurrency): void { this.currency = currency; }
-    setPaymentMethod(payment_method: PaymentMethod): void { this.payment_method = payment_method; }
-    setDebtorId(debtor_id: string): void { this.debtor_id = debtor_id; }
-    setBeneficiaryId(beneficiary_id: string): void { this.beneficiary_id = beneficiary_id; }
+    seTPaymentProvider(payment_provider: paymentPovider): void { this.payment_provider = payment_provider; }
+    setdebtorEmail(debtor_email: string): void { this.debtor_email = debtor_email; }
+    setbeneficiaryEmail(beneficiary_email: string): void { this.beneficiary_email = beneficiary_email; }
     setStatus(status: TStatus): void { this.status = status; }
     setTransactionDate(transaction_date: Date): void { this.transaction_date = transaction_date; }
     setDescription(description: string): void { this.description = description; }

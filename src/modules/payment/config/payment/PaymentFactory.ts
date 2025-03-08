@@ -4,7 +4,7 @@ import { PaypalPayment } from "./drivers/paypal.payment";
 import { StripePayment } from "./drivers/stripe.payment";
 
 export const getPaymentProvider = (): IPayment => {
-    const paymentProvider: PaymentProvider = process.env.PAYMENT_METHOD as PaymentProvider || "stripe"; // default to Stripe
+    const paymentProvider: PaymentProvider = process.env.PAYMENT_PROVIDER as PaymentProvider || "stripe"; // default to Stripe
 
     if(paymentProvider === "stripe") {
         return new StripePayment();

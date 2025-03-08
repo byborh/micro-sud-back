@@ -27,8 +27,10 @@ export class TransactionRepositorySQL implements ITransactionRepository {
     getTransactions(): Promise<TransactionAbstract[] | null> {
         throw new Error("Method not implemented.");
     }
-    createTransaction(transaction: TransactionAbstract): Promise<TransactionAbstract | null> {
-        throw new Error("Method not implemented.");
+    async createTransaction(transaction: TransactionAbstract): Promise<TransactionAbstract | null> {
+        const result = await this.repository.save(transaction);
+
+        return result || null;
     }
     cancelTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
         throw new Error("Method not implemented.");

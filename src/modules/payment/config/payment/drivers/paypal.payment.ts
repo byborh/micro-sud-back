@@ -1,3 +1,4 @@
+import { TransactionAbstract } from "@modules/payment/modules/transaction/entity/Transaction.abstract";
 import { IPayment } from "../contract/IPayment";
 
 export class PaypalPayment implements IPayment {
@@ -6,7 +7,7 @@ export class PaypalPayment implements IPayment {
         console.log("PayPal initialized.");
     }
 
-    async charge(amount: number, currency: string, customerId: string): Promise<any> {
+    async charge(transaction: TransactionAbstract, debitorPaymentId: string, beneficiaryPaymentId: string): Promise<any> {
         return { success: true, message: "Payment processed via PayPal." };
     }
 
@@ -16,5 +17,9 @@ export class PaypalPayment implements IPayment {
 
     async createCustomerId(email: string): Promise<any> {
         return { success: true, message: `Customer created for ${email} via PayPal.` };
+    }
+
+    attachPaymentAccount(payment_method: string, customerId: string): Promise<boolean> {
+        throw new Error("Method not implemented.");
     }
 }

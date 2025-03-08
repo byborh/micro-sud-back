@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { TransactionService } from "../services/TransactionService";
 import { TransactionAbstract } from "../entity/Transaction.abstract";
 import { IdGenerator } from "@core/idGenerator";
-import { PaymentMethod } from "../contracts/TPaymentMethod";
+import { paymentPovider } from "../contracts/TPaymentProvider";
 
 export class TransactionController {
     constructor(private readonly transactionService: TransactionService) {}
@@ -48,15 +48,15 @@ export class TransactionController {
 
     public async createPaymentAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { email, name, payment_method } = req.body;
+            const { email, name, payment_provider } = req.body;
 
             // Validate email and name
-            if (!email || !name || !payment_method) {
+            if (!email || !name || !payment_provider) {
                 res.status(400).json({ error: "Email, name and payment method are required." });
                 return;
             }
 
-            const paymentAccount: string = await this.transactionService.createPaymentAccount(email, payment_method);
+            const paymentAccount: string = await this.transactionService.createPaymentAccount(email, payment_provider);
             
             // If creation fails, return 400
             if (!paymentAccount) {
@@ -73,10 +73,10 @@ export class TransactionController {
     // Create a transaction
     public async createTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-           const { amount, currency, payment_method, debtor_id, beneficiary_id, transaction_ref, description } = req.body;
+           const { amount, currency, payment_provider, debtor_email, beneficiary_email, payment_identifier, description } = req.body;
 
             // Check if required fields are provided
-            if (!amount || !currency || !payment_method || !debtor_id || !beneficiary_id || !transaction_ref || !description) {
+            if (!amount || !currency || !payment_provider || !debtor_email || !beneficiary_email || !payment_identifier || !description) {
                 res.status(400).json({ error: "Required fields are missing." });
                 return;
             }
@@ -89,16 +89,15 @@ export class TransactionController {
                 id: id,
                 amount: amount,
                 currency: currency,
-                payment_method: payment_method,
-                debtor_id: debtor_id,
-                beneficiary_id: beneficiary_id,
+                payment_provider: payment_provider,
+                debtor_email: debtor_email,
+                beneficiary_email: beneficiary_email,
                 status: "pending", // Set the status to "pending" for the moment
                 transaction_date: new Date(),
-                transaction_ref: transaction_ref,
                 description: description
             } as TransactionAbstract;
 
-            const createdTransaction: TransactionAbstract = await this.transactionService.createPaymentTransaction(transaction);;
+            const createdTransaction: TransactionAbstract = await this.transactionService.createPaymentTransaction(transaction, payment_identifier);
             
             // If creation fails, return 400
             if (!createdTransaction) {
