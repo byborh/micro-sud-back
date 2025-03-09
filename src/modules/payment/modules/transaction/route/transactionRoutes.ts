@@ -32,7 +32,8 @@ export const transactionRoutes = (transactionController: TransactionController):
         validateAttributeMiddleware('body', 'payment_provider', 'Payment Method missing or invalid in request body'),
         validateAttributeMiddleware('body', 'debtor_email', 'Email of debitor missing or invalid in request body'),
         validateAttributeMiddleware('body', 'beneficiary_email', 'Email of beneficiary missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'payment_identifier', 'Payment Method of the transaction missing or invalid in request body'),
+        // validateAttributeMiddleware('body', 'payment_identifier', 'Payment Method of the transaction missing or invalid in request body'),
+        // Payment identifier is optional, because user can pay directly with payment identifier about bank informations or receive an url to pay
         validateAttributeMiddleware('body', 'description', 'Description missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => transactionController.createTransaction(req, res, next)
     );

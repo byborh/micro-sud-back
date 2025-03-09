@@ -84,7 +84,7 @@ export class TransactionService {
 
 
     // Create Transaction
-    public async createPaymentTransaction(transaction: TransactionAbstract, payment_identifier: string): Promise<TransactionAbstract | null> {
+    public async createPaymentTransaction(transaction: TransactionAbstract, payment_identifier?: string): Promise<TransactionAbstract | null> {
         try {
             // Verify if debitor has a payment account
             let debitorPaymentId = await InterractWithUser.getInstance().isAccountExist(transaction.debtor_email, transaction.payment_provider);
@@ -94,12 +94,17 @@ export class TransactionService {
                 debitorPaymentId = await this.paymentProvider.createCustomerId(transaction.debtor_email);
             }
 
-            
-            // Create a transaction beetween debitor and creditor !
-            const paymentIntent = await this.paymentProvider.charge(
-                transaction,
-                payment_identifier
+            let paymentIntent;
+
+            if(payment_identifier) {
+                // Create a transaction beetween debitor and creditor !
+                paymentIntent = await this.paymentProvider.charge(
+                    transaction,
+                    payment_identifier
                 );
+            } else { paymentIntent = await this.paymentProvider.charge(transaction); }
+            
+            
                 
             // Update Transaction's data
             transaction.transaction_ref = paymentIntent.id;
@@ -109,6 +114,14 @@ export class TransactionService {
                 payment_method_types: paymentIntent.payment_method_types,
                 client_secret: paymentIntent.client_secret
             };
+
+            // Verify if stripe has a redirect url
+            if (!paymentIntent.confirm && paymentIntent.next_action?.redirect_to_url) {
+                transaction.metadata =  {
+                    ...transaction.metadata,
+                    redirect_url: paymentIntent.next_action.redirect_to_url.url
+                };
+            }
 
             console.log("THIS IS THE PAYMENT INTENT:", paymentIntent);
             console.log("THIS IS THE TRANSACTION:", transaction);

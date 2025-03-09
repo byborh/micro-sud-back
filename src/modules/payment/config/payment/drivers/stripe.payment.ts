@@ -15,13 +15,15 @@ export class StripePayment implements IPayment {
         console.log("Stripe initialized.");
     }
 
-    async charge(transaction: TransactionAbstract, payment_identifier: string): Promise<any> {
+    async charge(transaction: TransactionAbstract, payment_identifier?: string): Promise<any> {
+        const stateConfirm: boolean = !!payment_identifier;
+
         const paymentIntent = await this.stripe.paymentIntents.create({
             amount: transaction.amount,
             currency: transaction.currency,
             customer: transaction.transaction_ref,
             payment_method: payment_identifier,
-            confirm: true, // Confirm the payment intent
+            confirm: stateConfirm,
             description: transaction.description,
             return_url: "https://example.com/return",
             metadata: {

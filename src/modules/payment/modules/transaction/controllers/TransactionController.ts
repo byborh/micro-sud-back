@@ -76,7 +76,7 @@ export class TransactionController {
            const { amount, currency, payment_provider, debtor_email, beneficiary_email, payment_identifier, description } = req.body;
 
             // Check if required fields are provided
-            if (!amount || !currency || !payment_provider || !debtor_email || !beneficiary_email || !payment_identifier || !description) {
+            if (!amount || !currency || !payment_provider || !debtor_email || !beneficiary_email || !description) {
                 res.status(400).json({ error: "Required fields are missing." });
                 return;
             }
