@@ -15,25 +15,63 @@ export class StripePayment implements IPayment {
         console.log("Stripe initialized.");
     }
 
-    async charge(transaction: TransactionAbstract, payment_identifier?: string): Promise<any> {
-        const stateConfirm: boolean = !!payment_identifier;
+    async directPayment(transaction: TransactionAbstract, payment_identifier: string): Promise<any> {
+
+        const returnUrl = process.env.NODE_ENV === 'production'
+        ? 'https://your-production-app.com/payment/return' // URL de production
+        : 'https://your-development-app.com/payment/return'; // URL de développement
 
         const paymentIntent = await this.stripe.paymentIntents.create({
             amount: transaction.amount,
             currency: transaction.currency,
             customer: transaction.transaction_ref,
             payment_method: payment_identifier,
-            confirm: stateConfirm,
+            confirm: true,
             description: transaction.description,
-            return_url: "https://example.com/return",
             metadata: {
                 transaction_id: transaction.id,
                 beneficiary_email: transaction.beneficiary_email,
                 debtor_email: transaction.debtor_email,
-            }
+            },
+            return_url: "https://example.com/return"
         });
 
         return paymentIntent;
+    }
+
+
+    async generateLinkForPayment(transaction: TransactionAbstract): Promise<any> {
+        const returnUrl = process.env.NODE_ENV === 'production'
+        ? 'https://your-production-app.com/payment/return' // URL de production
+        : 'https://your-development-app.com/payment/return'; // URL de développement
+        
+        const session = await this.stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            mode: 'payment',
+            customer_email: transaction.debtor_email,
+            line_items: [
+                {
+                    price_data: {
+                        currency: transaction.currency,
+                        product_data: {
+                            name: transaction.description,
+                        },
+                        unit_amount: transaction.amount,
+                    },
+                    quantity: 1,
+                },
+            ],
+            success_url: returnUrl + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: returnUrl + '?canceled=true',
+            metadata: {
+                transaction_id: transaction.id,
+                beneficiary_email: transaction.beneficiary_email,
+                debtor_email: transaction.debtor_email,
+            },
+        });
+
+        return session;
+        
     }
 
     async refund(paymentId: string): Promise<any> {

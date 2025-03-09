@@ -21,7 +21,7 @@ export class TransactionRepositorySQL implements ITransactionRepository {
     getTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
         throw new Error("Method not implemented.");
     }
-    getTransactionByUserId(userId: string): Promise<TransactionAbstract | null> {
+    getTransactionsByDebtorEmail(userId: string): Promise<TransactionAbstract[] | null> {
         throw new Error("Method not implemented.");
     }
     getTransactions(): Promise<TransactionAbstract[] | null> {
@@ -41,7 +41,7 @@ export class TransactionRepositorySQL implements ITransactionRepository {
             throw new Error("Error creating transaction in TransactionRepository.");
         }
     }
-    cancelTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
+    cancelTransactionById(transactionId: string): Promise<boolean | null> {
         throw new Error("Method not implemented.");
     }
 }

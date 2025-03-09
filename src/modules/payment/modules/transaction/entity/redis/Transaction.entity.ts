@@ -3,6 +3,7 @@ import { paymentPovider } from "../../contracts/TPaymentProvider";
 import { TStatus } from "../../contracts/TStatus";
 import { TransactionAbstract } from "../Transaction.abstract";
 import { TransactionContract } from "../../contracts/ITransaction";
+import { PaymentProvider } from "@modules/payment/config/payment/contract/TPaymentProvider";
 
 export class TransactionRedisEntity extends TransactionAbstract {
     id: string;
@@ -67,16 +68,16 @@ export class TransactionRedisEntity extends TransactionAbstract {
     static fromRedisHash(hash: { [key: string]: string }): TransactionRedisEntity {
         return new TransactionRedisEntity({
             id: hash.id,
-            amount: parseFloat(hash.amount),
+            amount: parseFloat(hash.amount), // Convertir en nombre
             currency: hash.currency as TCurrency,
-            payment_provider: hash.payment_provider as paymentPovider,
+            payment_provider: hash.payment_provider as PaymentProvider,
             debtor_email: hash.debtor_email,
             beneficiary_email: hash.beneficiary_email,
             status: hash.status as TStatus,
             transaction_date: new Date(hash.transaction_date),
-            transaction_ref: hash.transaction_ref,
-            description: hash.description,
-            metadata: hash.metadata
+            transaction_ref: hash.transaction_ref || undefined,
+            description: hash.description || undefined,
+            metadata: JSON.parse(hash.metadata || '{}'),
         })
     }
 }

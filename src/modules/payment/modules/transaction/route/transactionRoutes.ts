@@ -18,7 +18,13 @@ export const transactionRoutes = (transactionController: TransactionController):
         // authMiddleware(['ADMIN', 'MANAGER']),
         validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
         (req: Request, res: Response, next: NextFunction) => transactionController.getTransactionById(req, res, next)    
-    )
+    );
+
+    router.get('/:debtorEmail',
+        // authMiddleware(['ADMIN', 'MANAGER']),
+        validateAttributeMiddleware('params', 'debtorEmail', 'Debtor Id missing or invalid in request params.'),
+        (req: Request, res: Response, next: NextFunction) => transactionController.getTransactionById(req, res, next)    
+    );
 
     router.get('/',
         // authMiddleware(['ADMIN', 'MANAGER']),

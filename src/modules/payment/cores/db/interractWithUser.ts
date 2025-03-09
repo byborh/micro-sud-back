@@ -25,7 +25,9 @@ export class InterractWithUser {
             if(!user) throw new Error("User not found for this email.");
 
             // Return Payment Account
-            return payment_provider as paymentPovider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId()
+            const paymentId = payment_provider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId();
+            console.log(`Found paymentId for ${email} with provider ${payment_provider}:`, paymentId);
+            return paymentId ?? null;
         } catch (error) {
             console.error("Error finding user in TransactionService:", error);
             throw new Error("Failed to find user.");
@@ -52,9 +54,14 @@ export class InterractWithUser {
             // Modify User in db
             const updatedUser = await userRepository.modifyUser(user);
             if(!updatedUser) throw new Error("Failed to update user.");
+
+            console.log("Voici mon user qui est mis à jour correctement !", updatedUser);
     
+            if(payment_provider === "stripe") user.setStripeCustomerId(paymentId);
+            else user.setPaypalCustomerId(paymentId);
+            
             // Return Payment Account
-            return payment_provider as paymentPovider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId()
+            return payment_provider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId();
         } catch (error) {
             console.error("Error finding user in TransactionService:", error);
             throw new Error("Failed to find user.");

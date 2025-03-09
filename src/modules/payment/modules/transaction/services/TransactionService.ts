@@ -25,9 +25,15 @@ export class TransactionService {
 
 
     // Get Transaction By User Id
-    public async getTransactionByUserId(userId: string): Promise<TransactionAbstract | null> {
+    public async getTransactionsByDebtorEmail(email: string): Promise<TransactionAbstract[] | null> {
         try {
-            return await this.transactionRepository.getTransactionById(userId);
+            const transactions: TransactionAbstract[] = await this.transactionRepository.getTransactionsByDebtorEmail(email);
+
+            if(!transactions) {
+                throw new Error("Failed to find transactions.");
+            }
+
+            return transactions;
         } catch (error) {
             console.error("Error finding transaction in TransactionService:", error);
             throw new Error("Failed to find transaction.");
@@ -45,37 +51,20 @@ export class TransactionService {
         }
     }
 
-    public async createStripeAccount(email: string): Promise<string> {
-        try {
-            const interractWithUser = InterractWithUser.getInstance();
-
-            // Verify if user has already a stripe account
-            const account = await interractWithUser.isAccountExist(email, "stripe");
-            if(account) throw new Error("User already has a stripe account.");
-
-            // Create Stripe Account
-            const stripeCustomerId = await this.paymentProvider.createCustomerId(email);
-
-            // Return Payment Account
-            return await interractWithUser.updateUserPaymentId(stripeCustomerId, email, "stripe");
-        } catch (error) {
-            console.error("Error creating stripe account in TransactionService:", error);
-            throw new Error("Failed to find transaction.");
-        }
-    }
-
 
     public async createPaymentAccount(email: string, payment_provider: paymentPovider): Promise<string> {
         try {
             // Verify if user has already a payment account
-            const account = await InterractWithUser.getInstance().isAccountExist(email, payment_provider);
-            if(account) throw new Error("User already has a payment account.");
+            let account: string = await InterractWithUser.getInstance().isAccountExist(email, payment_provider);
+            if(!account) {
+                // Create Payment Account
+                const paymentCustomerId = await this.paymentProvider.createCustomerId(email);
 
-            // Create Payment Account
-            const paymentCustomerId = await this.paymentProvider.createCustomerId(email);
+                // Return Payment Account
+                account =  await InterractWithUser.getInstance().updateUserPaymentId(paymentCustomerId, email, "stripe");
+            }
 
-            // Return Payment Account
-            return await InterractWithUser.getInstance().updateUserPaymentId(paymentCustomerId, email, "stripe");
+            return account;
         } catch (error) {
             console.error("Error create paypal account in TransactionService:", error);
             throw new Error("Failed to find transaction.");
@@ -96,13 +85,13 @@ export class TransactionService {
 
             let paymentIntent;
 
+            // Create a transaction beetween debitor and creditor !
             if(payment_identifier) {
-                // Create a transaction beetween debitor and creditor !
-                paymentIntent = await this.paymentProvider.charge(
+                paymentIntent = await this.paymentProvider.directPayment(
                     transaction,
                     payment_identifier
                 );
-            } else { paymentIntent = await this.paymentProvider.charge(transaction); }
+            } else { paymentIntent = await this.paymentProvider.generateLinkForPayment(transaction); }
             
             
                 
@@ -119,7 +108,7 @@ export class TransactionService {
             if (!paymentIntent.confirm && paymentIntent.next_action?.redirect_to_url) {
                 transaction.metadata =  {
                     ...transaction.metadata,
-                    redirect_url: paymentIntent.next_action.redirect_to_url.url
+                    return_url: paymentIntent.next_action.redirect_to_url.url
                 };
             }
 
@@ -134,7 +123,7 @@ export class TransactionService {
     }
 
     // Cancel Transaction
-    public async cancelTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
+    public async cancelTransactionById(transactionId: string): Promise<boolean | null> {
         try {
             return await this.transactionRepository.cancelTransactionById(transactionId);
         } catch (error) {

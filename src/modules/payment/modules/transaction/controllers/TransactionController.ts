@@ -10,8 +10,40 @@ export class TransactionController {
     // Get a transaction by ID
     public async getTransactionById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const id = req.params.id;
+            if(id === '') {
+                res.status(400).json({ error: "Debtor Email is void actually." });
+                return;
+            }
+
             // Retrieve transaction by ID using TransactionService
-            const transaction = await this.transactionService.getTransactionById(req.params.id);
+            const transaction = await this.transactionService.getTransactionById(id);
+            
+            // If no transaction is found, return 404
+            if (!transaction) {
+                res.status(404).json({ error: "Transaction not found" });
+                return;
+            }
+
+            // Return the transaction data
+            res.status(200).json(transaction);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    // Get a transaction by debtor email
+    public async getTransactionsByDebtorEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const debtorEmail = req.params.debtorEmail;
+            if(debtorEmail === '') {
+                res.status(400).json({ error: "Debtor Email is void actually." });
+                return;
+            }
+
+            // Retrieve transaction by ID using TransactionService
+            const transaction = await this.transactionService.getTransactionsByDebtorEmail(debtorEmail);
             
             // If no transaction is found, return 404
             if (!transaction) {
@@ -81,8 +113,7 @@ export class TransactionController {
                 return;
             }
 
-            const idGenrator = IdGenerator.getInstance();
-            const id = idGenrator.generateId();
+            const id = IdGenerator.getInstance().generateId();
 
             // Create transaction object
             const transaction = {

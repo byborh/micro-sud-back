@@ -26,15 +26,64 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
     getTransactionByField(field: string, value: string): Promise<TransactionAbstract | null> {
         throw new Error("Method not implemented.");
     }
-    getTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
-        throw new Error("Method not implemented.");
+    
+    
+    async getTransactionById(id: string): Promise<TransactionRedisEntity | null> {
+        try {
+            // Récupérer le hash de la transaction
+            const transactionHash = await this.client.hGetAll(`transaction:${id}`);
+        
+            if (!transactionHash || Object.keys(transactionHash).length === 0) return null;
+            
+            // Convertir le hash en objet TransactionRedisEntity
+            return TransactionRedisEntity.fromRedisHash(transactionHash);
+        } catch (error) {
+          console.error("Failed to retrieve transaction:", error);
+          throw error;
+        }
     }
-    getTransactionByUserId(userId: string): Promise<TransactionAbstract | null> {
-        throw new Error("Method not implemented.");
-    }
-    getTransactions(): Promise<TransactionAbstract[] | null> {
-        throw new Error("Method not implemented.");
-    }
+
+
+
+    async getTransactionsByDebtorEmail(email: string): Promise<TransactionRedisEntity[]> {
+        try {
+            await this.initialize();
+    
+            // Récupérer tous les IDs des transactions associées à cet email
+            const transactionIds = await this.client.sMembers(`debtor_transactions:${email}`);
+    
+            // Charger toutes les transactions en parallèle
+            const transactions = await Promise.all(
+                transactionIds.map(transactionId => this.getTransactionById(transactionId))
+            );
+    
+            // Filtrer les résultats pour exclure les transactions nulles
+            return transactions.filter(transaction => transaction !== null);
+        } catch (error) {
+            console.error("Failed to retrieve transactions by debtor email:", error);
+            throw error;
+        }
+    }    
+
+    async getTransactions(): Promise<TransactionRedisEntity[]> {
+        try {
+            await this.initialize();
+    
+            // Récupérer toutes les clés des transactions stockées
+            const transactionKeys = await this.client.sMembers('transaction_index');
+    
+            // Charger toutes les transactions en parallèle
+            const transactions = await Promise.all(
+                transactionKeys.map(transactionId => this.getTransactionById(transactionId))
+            );
+    
+            // Filtrer les résultats pour exclure les transactions nulles
+            return transactions.filter(transaction => transaction !== null);
+        } catch (error) {
+            console.error("Failed to retrieve transactions:", error);
+            throw error;
+        }
+    }    
 
 
     async createTransaction(transaction: TransactionRedisEntity): Promise<TransactionRedisEntity | null> {
@@ -69,11 +118,34 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
             console.error("Failed to create transaction:", error);
             throw error;
         }
-      }
+    }
+
     
 
 
-    cancelTransactionById(transactionId: string): Promise<TransactionAbstract | null> {
+    cancelTransactionById1(transactionId: string): Promise<TransactionAbstract | null> {
         throw new Error("Method not implemented.");
-    }    
+    }
+
+
+    async cancelTransactionById(id: string): Promise<boolean> {
+        try {
+          // Récupérer l'email du débiteur avant de supprimer la transaction
+          const transaction = await this.getTransactionById(id);
+          if (!transaction) {
+            return false; // La transaction n'existe pas
+          }
+      
+          // Supprimer la transaction
+          await this.client.del(`transaction:${id}`);
+      
+          // Supprimer l'entrée de l'index
+          await this.client.hDel('transaction_index', `debtor_email:${transaction.debtor_email}`);
+      
+          return true;
+        } catch (error) {
+          console.error("Failed to delete transaction:", error);
+          throw error;
+        }
+    }
 }
