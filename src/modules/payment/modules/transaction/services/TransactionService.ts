@@ -56,7 +56,7 @@ export class TransactionService {
         try {
             // Verify if user has already a payment account
             let account: string = await InterractWithUser.getInstance().isAccountExist(email, payment_provider);
-            if(!account) {
+            if(!account || account === "") {
                 // Create Payment Account
                 const paymentCustomerId = await this.paymentProvider.createCustomerId(email);
 
@@ -66,8 +66,8 @@ export class TransactionService {
 
             return account;
         } catch (error) {
-            console.error("Error create paypal account in TransactionService:", error);
-            throw new Error("Failed to find transaction.");
+            console.error("Error create payment account in TransactionService:", error);
+            throw new Error("Error create payment account.");
         }
     }
 
@@ -111,9 +111,6 @@ export class TransactionService {
                     return_url: paymentIntent.next_action.redirect_to_url.url
                 };
             }
-
-            console.log("THIS IS THE PAYMENT INTENT:", paymentIntent);
-            console.log("THIS IS THE TRANSACTION:", transaction);
 
             return await this.transactionRepository.createTransaction(transaction);
         } catch (error) {

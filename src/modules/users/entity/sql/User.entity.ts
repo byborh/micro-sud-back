@@ -127,28 +127,33 @@ export class UserSQLEntity extends UserAbstract {
     //     }
     // }
 
-    getId(): string {return this.id;}
-    getFirstname(): string | null {return this.firstname;}
-    getEmail(): string {return this.email;}
-    getPassword(): string {return this.password;}
-    getSalt(): string | null {return this.salt;}
-    getPseudo(): string | null {return this.pseudo;}
-    getLastname(): string | null {return this.lastname;}
-    getTelnumber(): string | null {return this.telnumber;}
-    getCreatedAt(): Date {return this.createdAt;}
-    getUpdatedAt(): Date {return this.updatedAt;}
+    // getId(): string {return this.id;}
+    // getFirstname(): string | null {return this.firstname;}
+    // getEmail(): string {return this.email;}
+    // getPassword(): string {return this.password;}
+    // getSalt(): string | null {return this.salt;}
+    // getPseudo(): string | null {return this.pseudo;}
+    // getLastname(): string | null {return this.lastname;}
+    // getTelnumber(): string | null {return this.telnumber;}
+    // getCreatedAt(): Date {return this.createdAt;}
+    // getUpdatedAt(): Date {return this.updatedAt;}
     
-    
-    setId(id: string): void {this.id = id;}
-    setEmail(email: string): void {this.email = email;}
-    setPassword(password: string): void {this.password = password;}
-    setSalt(salt: string): void {this.salt = salt;}
-    setPseudo(pseudo: string): void {this.pseudo = pseudo;}
-    setFirstname(firstname: string): void {this.firstname = firstname;}
-    setLastname(lastname: string): void {this.lastname = lastname;}
-    setTelnumber(telnumber: string): void {this.telnumber = telnumber;}
-    setCreatedAt(date: Date): void {this.createdAt = date;}
-    setUpdatedAt(date: Date): void {this.updatedAt = date;}
+    // getStripeCustomerId(): string | null {return this.stripeCustomerId;}
+    // getPaypalCustomerId(): string | null {return this.paypalCustomerId}
+
+    // setId(id: string): void {this.id = id;}
+    // setEmail(email: string): void {this.email = email;}
+    // setPassword(password: string): void {this.password = password;}
+    // setSalt(salt: string): void {this.salt = salt;}
+    // setPseudo(pseudo: string): void {this.pseudo = pseudo;}
+    // setFirstname(firstname: string): void {this.firstname = firstname;}
+    // setLastname(lastname: string): void {this.lastname = lastname;}
+    // setTelnumber(telnumber: string): void {this.telnumber = telnumber;}
+    // setCreatedAt(date: Date): void {this.createdAt = date;}
+    // setUpdatedAt(date: Date): void {this.updatedAt = date;}
+
+    // setStripeCustomerId(stripeCustomerId: string): void {this.stripeCustomerId = stripeCustomerId;}
+    // setPaypalCustomerId(paypalCustomerId: string): void {this.paypalCustomerId = paypalCustomerId;}
 
     toDto(): UserDTO {
         return {
@@ -159,7 +164,9 @@ export class UserSQLEntity extends UserAbstract {
             pseudo: this.pseudo,
             telnumber: this.telnumber,
             createdAt: this.createdAt,
-            updatedAt: this.updatedAt
+            updatedAt: this.updatedAt,
+            stripeCustomerId: this.stripeCustomerId,
+            paypalCustomerId: this.paypalCustomerId
         }
     }
 }

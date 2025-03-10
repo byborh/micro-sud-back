@@ -7,4 +7,6 @@ export interface UserDTO  {
     telnumber: string;
     createdAt: Date;
     updatedAt: Date;
+    stripeCustomerId: string;
+    paypalCustomerId: string
 }

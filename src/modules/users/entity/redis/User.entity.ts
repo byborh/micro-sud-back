@@ -54,7 +54,9 @@ export class UserRedisEntity extends UserAbstract {
             firstname: this.firstname ?? "",
             lastname: this.lastname ?? "",
             pseudo: this.pseudo ?? "",
-            telnumber: this.telnumber ?? ""
+            telnumber: this.telnumber ?? "",
+            stripeCustomerId: this.stripeCustomerId ?? "",
+            paypalCustomerId: this.paypalCustomerId ?? ""
         };
     }
 
@@ -71,31 +73,39 @@ export class UserRedisEntity extends UserAbstract {
             firstname: hash.firstname || null,
             lastname: hash.lastname || null,
             pseudo: hash.pseudo || null,
-            telnumber: hash.telnumber || null
+            telnumber: hash.telnumber || null,
+            stripeCustomerId: hash.stripeCustomerId || null,
+            paypalCustomerId: hash.paypalCustomerId || null
         });
     }
 
-    getId(): string {return this.id;}
-    getFirstname(): string | null {return this.firstname;}
-    getLastname(): string | null {return this.lastname;}
-    getPseudo(): string | null {return this.pseudo;}
-    getEmail(): string {return this.email;}
-    getPassword(): string {return this.password;}
-    getTelnumber(): string | null {return this.telnumber;}
-    getSalt(): string | null {return this.salt;}
-    getCreatedAt(): Date {return this.createdAt;}
-    getUpdatedAt(): Date {return this.updatedAt;}
+    // getId(): string {return this.id;}
+    // getFirstname(): string | null {return this.firstname;}
+    // getLastname(): string | null {return this.lastname;}
+    // getPseudo(): string | null {return this.pseudo;}
+    // getEmail(): string {return this.email;}
+    // getPassword(): string {return this.password;}
+    // getTelnumber(): string | null {return this.telnumber;}
+    // getSalt(): string | null {return this.salt;}
+    // getCreatedAt(): Date {return this.createdAt;}
+    // getUpdatedAt(): Date {return this.updatedAt;}
+
+    // getStripeCustomerId(): string | null {return this.stripeCustomerId;}
+    // getPaypalCustomerId(): string | null {return this.paypalCustomerId;}
     
-    setId(id: string): void {this.id = id;}
-    setFirstname(firstname: string): void {this.firstname = firstname;}
-    setLastname(lastname: string): void {this.lastname = lastname;}
-    setPseudo(pseudo: string): void {this.pseudo = pseudo;}
-    setEmail(email: string): void {this.email = email;}
-    setPassword(password: string): void {this.password = password;}
-    setTelnumber(telnumber: string): void {this.telnumber = telnumber;}
-    setSalt(salt: string): void {this.salt = salt;}
-    setCreatedAt(date: Date): void {this.createdAt = date;}
-    setUpdatedAt(date: Date): void {this.updatedAt = date;}
+    // setId(id: string): void {this.id = id;}
+    // setFirstname(firstname: string): void {this.firstname = firstname;}
+    // setLastname(lastname: string): void {this.lastname = lastname;}
+    // setPseudo(pseudo: string): void {this.pseudo = pseudo;}
+    // setEmail(email: string): void {this.email = email;}
+    // setPassword(password: string): void {this.password = password;}
+    // setTelnumber(telnumber: string): void {this.telnumber = telnumber;}
+    // setSalt(salt: string): void {this.salt = salt;}
+    // setCreatedAt(date: Date): void {this.createdAt = date;}
+    // setUpdatedAt(date: Date): void {this.updatedAt = date;}
+
+    // setStripeCustomerId(stripeCustomerId: string): void {this.stripeCustomerId = stripeCustomerId;}
+    // setPaypalCustomerId(paypalCustomerId: string): void {this.paypalCustomerId = paypalCustomerId;}
 
     toDto(): UserDTO {
         return {
@@ -106,7 +116,9 @@ export class UserRedisEntity extends UserAbstract {
             pseudo: this.pseudo || null,
             telnumber: this.telnumber || null,
             createdAt: this.createdAt,
-            updatedAt: this.updatedAt
+            updatedAt: this.updatedAt,
+            stripeCustomerId: this.stripeCustomerId || null,
+            paypalCustomerId: this.paypalCustomerId || null
         }
     }
 }

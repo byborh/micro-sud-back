@@ -113,6 +113,11 @@ export class TransactionController {
                 return;
             }
 
+            if(debtor_email === beneficiary_email) {
+                res.status(400).json({ error: "Debtor and beneficiary emails must be different." });
+                return;
+            }
+
             const id = IdGenerator.getInstance().generateId();
 
             // Create transaction object

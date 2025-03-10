@@ -44,7 +44,9 @@ export class UserMapper {
             pseudo: dto.pseudo || null,
             telnumber: dto.telnumber || null,
             createdAt: dto.createdAt,
-            updatedAt: dto.updatedAt
+            updatedAt: dto.updatedAt,
+            stripeCustomerId: dto.stripeCustomerId || null,
+            paypalCustomerId: dto.paypalCustomerId || null
         } as UserAbstract);
     }
 
@@ -69,8 +71,10 @@ export class UserMapper {
             pseudo: userDTO.pseudo || null,
             telnumber: userDTO.telnumber || null,
             createdAt: userDTO.createdAt,
-            updatedAt: userDTO.updatedAt
-    });
+            updatedAt: userDTO.updatedAt,
+            stripeCustomerId: userDTO.stripeCustomerId || null,
+            paypalCustomerId: userDTO.paypalCustomerId || null
+        });
     }
 
 

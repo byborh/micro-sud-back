@@ -55,7 +55,7 @@ async function startServer() {
     apiRouter.use('/chatai', modules.chatAIModule);
     // Add other load modules HERE
 
-    apiRouter.use('/transaction', modules.transactionModule);
+    apiRouter.use('/transactions', modules.transactionModule);
 
     app.use('/api/v0.0.2', apiRouter);
 

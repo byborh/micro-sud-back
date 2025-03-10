@@ -21,13 +21,20 @@ export class InterractWithUser {
             const myDB = await getDatabase();
             const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, UserRepositoryMongo) as IUserRepository;
             const user = await userRepository.findUserByEmail(email);
-
-            if(!user) throw new Error("User not found for this email.");
-
-            // Return Payment Account
+    
+            if (!user) {
+                throw new Error("User not found for this email.");
+            }
+    
+            // Récupérer l'ID de paiement en fonction du fournisseur
             const paymentId = payment_provider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId();
-            console.log(`Found paymentId for ${email} with provider ${payment_provider}:`, paymentId);
-            return paymentId ?? null;
+    
+            // Vérifier que paymentId est une chaîne non vide
+            if (paymentId && typeof paymentId === "string" && paymentId.trim() !== "") {
+                return paymentId;
+            }
+    
+            return null;
         } catch (error) {
             console.error("Error finding user in TransactionService:", error);
             throw new Error("Failed to find user.");
@@ -43,7 +50,7 @@ export class InterractWithUser {
             const user = await userRepository.findUserByEmail(email);
     
             if(!user) throw new Error("User not found for this email.");
-            
+
             // Update correct payment method's id
             if(payment_provider as paymentPovider === "stripe") {
                 user.setStripeCustomerId(paymentId);
@@ -55,16 +62,11 @@ export class InterractWithUser {
             const updatedUser = await userRepository.modifyUser(user);
             if(!updatedUser) throw new Error("Failed to update user.");
 
-            console.log("Voici mon user qui est mis à jour correctement !", updatedUser);
-    
-            if(payment_provider === "stripe") user.setStripeCustomerId(paymentId);
-            else user.setPaypalCustomerId(paymentId);
-            
             // Return Payment Account
             return payment_provider === "stripe" ? user.getStripeCustomerId() : user.getPaypalCustomerId();
         } catch (error) {
-            console.error("Error finding user in TransactionService:", error);
-            throw new Error("Failed to find user.");
+            console.error("Error updating user in interractWithUser:", error);
+            throw new Error("Failed to update user.");
         }
     }
 

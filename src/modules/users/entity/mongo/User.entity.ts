@@ -109,7 +109,9 @@ export class UserMongoEntity extends UserAbstract {
             pseudo: this.pseudo,
             telnumber: this.telnumber,
             createdAt: this.createdAt,
-            updatedAt: this.updatedAt
+            updatedAt: this.updatedAt,
+            stripeCustomerId: this.stripeCustomerId,
+            paypalCustomerId: this.paypalCustomerId
         }
     }
 }

@@ -50,7 +50,7 @@ export class UserService {
             return userDTO;
         } catch (error) {
             console.error("Error finding user in UserService:", error);
-            throw new Error("Failed to find user.");
+            throw new Error("Failed to find user by id.");
         }
     }
 
