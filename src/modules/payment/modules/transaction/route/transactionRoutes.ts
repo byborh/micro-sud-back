@@ -9,7 +9,6 @@ export const transactionRoutes = (transactionController: TransactionController):
     router.post('/create-payment-account', 
         // authMiddleware(['USER', 'MANAGER', 'ADMIN']),
         validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'name', 'Name missing or invalid in request body'),
         validateAttributeMiddleware('body', 'payment_provider', 'Payment Method missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => transactionController.createPaymentAccount(req, res, next)
     );
@@ -20,10 +19,10 @@ export const transactionRoutes = (transactionController: TransactionController):
         (req: Request, res: Response, next: NextFunction) => transactionController.getTransactionById(req, res, next)    
     );
 
-    router.get('/:debtorEmail',
+    router.get('/email/:debtorEmail',
         // authMiddleware(['ADMIN', 'MANAGER']),
         validateAttributeMiddleware('params', 'debtorEmail', 'Debtor Id missing or invalid in request params.'),
-        (req: Request, res: Response, next: NextFunction) => transactionController.getTransactionById(req, res, next)    
+        (req: Request, res: Response, next: NextFunction) => transactionController.getTransactionsByDebtorEmail(req, res, next)    
     );
 
     router.get('/',
@@ -44,9 +43,9 @@ export const transactionRoutes = (transactionController: TransactionController):
         (req: Request, res: Response, next: NextFunction) => transactionController.createTransaction(req, res, next)
     );
 
-    router.post('/:id',
+    router.post('/cancel/:transactionId',
         // authMiddleware(['ADMIN']),
-        validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
+        validateAttributeMiddleware('params', 'transactionId', 'Id missing or invalid in request params.'),
         (req: Request, res: Response, next: NextFunction) => transactionController.cancelTransactionById(req, res, next)
     );
 

@@ -51,7 +51,7 @@ export class TransactionSQLEntity  extends TransactionAbstract {
             data?.payment_provider ?? "stripe",
             data?.debtor_email ?? "",
             data?.beneficiary_email ?? "",
-            data?.status ?? "pending",
+            data?.status ?? "processing",
             data?.transaction_date ?? new Date(),
             data?.description ?? "",
             data?.transaction_ref ?? "",
@@ -63,7 +63,7 @@ export class TransactionSQLEntity  extends TransactionAbstract {
         this.payment_provider = data?.payment_provider ?? "stripe";
         this.debtor_email = data?.debtor_email ?? "";
         this.beneficiary_email = data?.beneficiary_email ?? "";
-        this.status = data?.status ?? "pending";
+        this.status = data?.status ?? "processing";
         this.transaction_date = data?.transaction_date ?? new Date();
         this.description = data?.description ?? "";
         this.transaction_ref = data?.transaction_ref ?? "";

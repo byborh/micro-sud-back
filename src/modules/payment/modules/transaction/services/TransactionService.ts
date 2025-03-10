@@ -122,10 +122,17 @@ export class TransactionService {
     // Cancel Transaction
     public async cancelTransactionById(transactionId: string): Promise<boolean | null> {
         try {
+            // if(transactionId !== "") throw new Error("Transaction ID is required.");
+
+            // Cancel Transaction
+            const isCancelled = await this.paymentProvider.cancelTransaction(transactionId);
+
+            if(!isCancelled) throw new Error("Failed to cancel transaction.");
+
             return await this.transactionRepository.cancelTransactionById(transactionId);
         } catch (error) {
-            console.error("Error creating transaction in TransactionService:", error);
-            throw new Error("Failed to create transaction.");
+            console.error("Error cancelling transaction in TransactionService:", error);
+            throw new Error("Failed to cancel transaction.");
         }
     }
 }

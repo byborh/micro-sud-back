@@ -40,20 +40,25 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
     }
 
 
-
     async getTransactionsByDebtorEmail(email: string): Promise<TransactionRedisEntity[]> {
         try {
             await this.initialize();
+            
+            // Get transaction's id from their email
             const transactionIds = await this.client.sMembers(`debtor_transactions:${email}`);
+            
+            // Get transactions
             const transactions = await Promise.all(
                 transactionIds.map(transactionId => this.getTransactionById(transactionId))
             );
-            return transactions.filter(transaction => transaction !== null);
+
+            // Filter transactions no nul
+            return transactions.filter(transaction => transaction !== null) as TransactionRedisEntity[];
         } catch (error) {
             console.error("Failed to retrieve transactions by debtor email:", error);
             throw error;
         }
-    } 
+    }
 
     async getTransactions(): Promise<TransactionRedisEntity[]> {
         try {
@@ -90,7 +95,7 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
 
             await this.client.hSet(`transaction:${transaction.id}`, transactionHash);
             await this.client.sAdd('transaction_index', transaction.id);
-            await this.client.sAdd(`debtor_transactions:${transaction.debtor_email}`, transaction.debtor_email);
+            await this.client.sAdd(`debtor_transactions:${transaction.debtor_email}`, transaction.id);
 
             const exists = await this.client.exists(`transaction:${transaction.id}`);
             return exists === 1 ? transaction : null;
@@ -101,28 +106,17 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
     }
 
     
-
-
-    cancelTransactionById1(transactionId: string): Promise<TransactionAbstract | null> {
-        throw new Error("Method not implemented.");
-    }
-
-
-    async cancelTransactionById(id: string): Promise<boolean> {
+    async cancelTransactionById(transactionId: string): Promise<boolean> {
         try {
-          // Récupérer l'email du débiteur avant de supprimer la transaction
-          const transaction = await this.getTransactionById(id);
-          if (!transaction) {
-            return false; // La transaction n'existe pas
-          }
-      
-          // Supprimer la transaction
-          await this.client.del(`transaction:${id}`);
-      
-          // Supprimer l'entrée de l'index
-          await this.client.hDel('transaction_index', `debtor_email:${transaction.debtor_email}`);
-      
-          return true;
+            // Get transaction by id
+            const transaction = await this.getTransactionById(transactionId);
+            if (!transaction) {
+                return false;
+            }
+        
+            await this.client.hSet(`transaction:${transactionId}`, { status: 'cancelled' });
+        
+            return true;
         } catch (error) {
           console.error("Failed to delete transaction:", error);
           throw error;

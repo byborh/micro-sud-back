@@ -2,6 +2,9 @@ import { TransactionAbstract } from "@modules/payment/modules/transaction/entity
 import { IPayment } from "../contract/IPayment";
 
 export class PaypalPayment implements IPayment {
+    cancelTransaction(paymentIntentId: string): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
 
     async initialize(): Promise<void> {
         console.log("PayPal initialized.");

@@ -1,2 +1,2 @@
 // Status of a transaction
-export type TStatus= 'requires_payment_method' | 'requires_confirmation' | 'requires_action' | 'processing' | 'succeeded' | 'requires_capture' | 'canceled';
+export type TStatus= 'requires_payment_method' | 'requires_confirmation' | 'requires_action' | 'processing' | 'succeeded' | 'failed' | 'requires_capture' | 'cancelled';

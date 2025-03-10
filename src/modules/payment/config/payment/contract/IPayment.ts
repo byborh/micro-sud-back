@@ -8,5 +8,6 @@ export interface IPayment {
 
     createCustomerId(email: string): Promise<string>;
     attachPaymentAccount(payment_method: string, customerId: string): Promise<boolean>;
+    cancelTransaction(paymentIntentId: string): Promise<boolean>;
     // ...
 }

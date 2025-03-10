@@ -15,6 +15,13 @@ export class StripePayment implements IPayment {
         console.log("Stripe initialized.");
     }
 
+    /**
+     * Creates a Payment Intent for the given transaction and payment method.
+     * This should be used when the user has chosen to pay directly with a saved payment method.
+     * @param transaction The transaction object to create the Payment Intent for.
+     * @param payment_identifier The identifier for the payment method to use for the payment.
+     * @returns The created Payment Intent.
+     */
     async directPayment(transaction: TransactionAbstract, payment_identifier: string): Promise<any> {
 
         const returnUrl = process.env.NODE_ENV === 'production'
@@ -33,13 +40,18 @@ export class StripePayment implements IPayment {
                 beneficiary_email: transaction.beneficiary_email,
                 debtor_email: transaction.debtor_email,
             },
-            return_url: "https://example.com/return"
+            return_url: returnUrl
         });
 
         return paymentIntent;
     }
 
 
+    /**
+     * Generates a link for a payment, to be redirected to Stripe's Checkout UI.
+     * @param transaction The transaction object to generate the link for.
+     * @returns An object with a `url` property pointing to the Stripe Checkout UI.
+     */
     async generateLinkForPayment(transaction: TransactionAbstract): Promise<any> {
         const returnUrl = process.env.NODE_ENV === 'production'
         ? 'https://your-production-app.com/payment/return' // URL de production
@@ -74,9 +86,18 @@ export class StripePayment implements IPayment {
         
     }
 
-    async refund(paymentId: string): Promise<any> {
-        return await this.stripe.refunds.create({ payment_intent: paymentId });
+    // à modifier !
+    async refund(paymentIntentId: string): Promise<string> {
+        try {
+            const refund = await this.stripe.refunds.create({ payment_intent: paymentIntentId });
+            console.log(`Paiement remboursé avec succès, refund ID: ${refund.id}`);
+            return refund.id;
+        } catch (error) {
+            console.error("Erreur lors du remboursement:", error);
+            throw error;
+        }
     }
+    
 
 
     /**
@@ -91,8 +112,6 @@ export class StripePayment implements IPayment {
             console.error("Error creating user's Stripe account:", error);
         }
     }
-
-
 
     /**
      * Attaches a payment method to a Stripe customer and sets it as the default.
@@ -115,4 +134,28 @@ export class StripePayment implements IPayment {
             console.error("Error attaching payment method to user's Stripe account:", error);
         }
     }
+
+
+    async cancelTransaction(paymentIntentId: string): Promise<boolean> {
+        try {
+            const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+    
+            // Vérifier si le paiement peut être annulé
+            if (paymentIntent.status === 'requires_payment_method' || 
+                paymentIntent.status === 'requires_confirmation' || 
+                paymentIntent.status === 'processing') {
+    
+                await this.stripe.paymentIntents.cancel(paymentIntentId);
+                console.log(`PaymentIntent ${paymentIntentId} annulé.`);
+                return true;
+            }
+    
+            console.warn(`Impossible d'annuler PaymentIntent ${paymentIntentId} (statut : ${paymentIntent.status}).`);
+            return false;
+    
+        } catch (error) {
+            console.error("Erreur lors de l'annulation du paiement:", error);
+            throw error;
+        }
+    }    
 }

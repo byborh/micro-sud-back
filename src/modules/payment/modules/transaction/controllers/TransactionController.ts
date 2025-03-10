@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { TransactionService } from "../services/TransactionService";
 import { TransactionAbstract } from "../entity/Transaction.abstract";
 import { IdGenerator } from "@core/idGenerator";
-import { paymentPovider } from "../contracts/TPaymentProvider";
 
 export class TransactionController {
     constructor(private readonly transactionService: TransactionService) {}
@@ -11,17 +10,13 @@ export class TransactionController {
     public async getTransactionById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const id = req.params.id;
-            if(id === '') {
-                res.status(400).json({ error: "Debtor Email is void actually." });
-                return;
-            }
 
             // Retrieve transaction by ID using TransactionService
             const transaction = await this.transactionService.getTransactionById(id);
             
             // If no transaction is found, return 404
             if (!transaction) {
-                res.status(404).json({ error: "Transaction not found" });
+                res.status(404).json({ error: "Transaction not found by id" });
                 return;
             }
 
@@ -37,17 +32,13 @@ export class TransactionController {
     public async getTransactionsByDebtorEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const debtorEmail = req.params.debtorEmail;
-            if(debtorEmail === '') {
-                res.status(400).json({ error: "Debtor Email is void actually." });
-                return;
-            }
 
             // Retrieve transaction by ID using TransactionService
             const transaction = await this.transactionService.getTransactionsByDebtorEmail(debtorEmail);
-            
+
             // If no transaction is found, return 404
             if (!transaction) {
-                res.status(404).json({ error: "Transaction not found" });
+                res.status(404).json({ error: "Transaction not found by email" });
                 return;
             }
 
@@ -80,13 +71,7 @@ export class TransactionController {
 
     public async createPaymentAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { email, name, payment_provider } = req.body;
-
-            // Validate email and name
-            if (!email || !name || !payment_provider) {
-                res.status(400).json({ error: "Email, name and payment method are required." });
-                return;
-            }
+            const { email, payment_provider } = req.body;
 
             const paymentAccount: string = await this.transactionService.createPaymentAccount(email, payment_provider);
             
@@ -107,12 +92,6 @@ export class TransactionController {
         try {
            const { amount, currency, payment_provider, debtor_email, beneficiary_email, payment_identifier, description } = req.body;
 
-            // Check if required fields are provided
-            if (!amount || !currency || !payment_provider || !debtor_email || !beneficiary_email || !description) {
-                res.status(400).json({ error: "Required fields are missing." });
-                return;
-            }
-
             if(debtor_email === beneficiary_email) {
                 res.status(400).json({ error: "Debtor and beneficiary emails must be different." });
                 return;
@@ -128,7 +107,7 @@ export class TransactionController {
                 payment_provider: payment_provider,
                 debtor_email: debtor_email,
                 beneficiary_email: beneficiary_email,
-                status: "processing", // Set the status to "pending" for the moment
+                status: "processing", // Set the status to "processing" for the moment
                 transaction_date: new Date(),
                 description: description
             } as TransactionAbstract;
@@ -151,20 +130,20 @@ export class TransactionController {
     // Modify a transaction
     public async cancelTransactionById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { name, description } = req.body;
+            const transactionId = req.params.transactionId;
 
             // Check if transaction ID is provided
-            if (!req.params.id) {
-                res.status(400).json({ error: "Transaction ID is required." });
+            if (!transactionId.startsWith("pi_")) {
+                res.status(400).json({ error: "Transaction ID is not valid." });
                 return;
             }
 
             // Modify transaction using TransactionService
-            const updatedTransaction = await this.transactionService.cancelTransactionById(req.params.id);
+            const updatedTransaction = await this.transactionService.cancelTransactionById(transactionId);
 
             // If modification fails, return 404
             if (!updatedTransaction) {
-                res.status(404).json({ error: "Transaction could not be modified." });
+                res.status(404).json({ error: "Transaction could not be cancelled." });
                 return;
             }
 
