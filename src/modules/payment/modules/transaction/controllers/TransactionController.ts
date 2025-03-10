@@ -128,7 +128,7 @@ export class TransactionController {
                 payment_provider: payment_provider,
                 debtor_email: debtor_email,
                 beneficiary_email: beneficiary_email,
-                status: "pending", // Set the status to "pending" for the moment
+                status: "processing", // Set the status to "pending" for the moment
                 transaction_date: new Date(),
                 description: description
             } as TransactionAbstract;
