@@ -31,7 +31,7 @@ export class MongoDatabase implements IDatabase {
     async connect(): Promise<void> {
         try {
             if (!this.dataSource.isInitialized) {
-                await this.dataSource.initialized();
+                await this.dataSource.initialize();
                 console.log("✅ Mongo Database connected");
             }
         } catch (error) {
