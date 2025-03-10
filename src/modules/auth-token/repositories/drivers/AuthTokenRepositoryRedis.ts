@@ -10,10 +10,10 @@ export class AuthTokenRepositoryRedis implements IAuthTokenRepository {
 
     constructor(private db: IDatabase) {
         this.client = db.getDataSource() as RedisClientType;
-        this.isInitialized = this.initialize();
+        this.isInitialized = this.initialized();
     }
 
-    async initialize(): Promise<void> {
+    async initialized(): Promise<void> {
         try {
             if(!this.client.isOpen) {
                 await this.client.connect();

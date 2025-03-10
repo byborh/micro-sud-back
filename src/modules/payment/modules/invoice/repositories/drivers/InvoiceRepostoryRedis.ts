@@ -11,7 +11,7 @@ export class InvoiceRepositoryRedis implements IInvoiceRepository {
         this.client = db.getDataSource() as RedisClientType;
     }    
 
-    async initialize(): Promise<void> {
+    async initialized(): Promise<void> {
         try {
             if(!this.client.isOpen) {
                 await this.client.connect();

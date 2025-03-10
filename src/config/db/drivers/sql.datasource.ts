@@ -97,7 +97,7 @@ export class SQLDatabase implements IDatabase {
     async connect(): Promise<void> {
         try {
             if(!this.dataSource.isInitialized) {
-                await this.dataSource.initialize();
+                await this.dataSource.initialized();
                 console.log("✅ SQL Database connected");
             }
         } catch (error) {

@@ -11,7 +11,7 @@ export class StripePayment implements IPayment {
         })
     }
 
-    initialize(): void {
+    async isInitialize(): Promise<void> {
         console.log("Stripe initialized.");
     }
 

@@ -6,7 +6,7 @@ export class PaypalPayment implements IPayment {
         throw new Error("Method not implemented.");
     }
 
-    async initialize(): Promise<void> {
+    async isInitialize(): Promise<void> {
         console.log("PayPal initialized.");
     }
 

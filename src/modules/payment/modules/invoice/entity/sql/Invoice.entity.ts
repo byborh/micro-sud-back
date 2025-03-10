@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 import { InvoiceAbstract } from "../Invoice.abstract";
 import { InvoiceContract } from "../../contracts/IInvoice";
 
-@Entity("roles")
+@Entity("invoices")
 export class InvoiceSQLEntity  extends InvoiceAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;

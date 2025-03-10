@@ -1,7 +1,7 @@
 import { IRefundRepository } from "../contract/IRefundRepository";
 import { RedisClientType } from "@redis/client";
 import { IDatabase } from "@db/contract/IDatabase";
-import { RefundAbstract } from "../../entity/Refund.abstract";
+import { RefundRedisEntity } from "../../entity/redis/Refund.entity";
 
 export class RefundRepositoryRedis implements IRefundRepository {
     private client: RedisClientType;
@@ -11,7 +11,7 @@ export class RefundRepositoryRedis implements IRefundRepository {
         this.client = db.getDataSource() as RedisClientType;
     }
 
-    async initialize(): Promise<void> {
+    async initialized(): Promise<void> {
         try {
             if(!this.client.isOpen) {
                 await this.client.connect();
@@ -22,13 +22,54 @@ export class RefundRepositoryRedis implements IRefundRepository {
         }
     }
 
-    getRefundById(refundId: string): Promise<RefundAbstract | null> {
-        throw new Error("Method not implemented.");
+    /**
+     * Retrieves a refund by its ID from Redis.
+     * 
+     * @param refundId - The ID of the refund to retrieve.
+     * @returns A promise that resolves to a RefundRedisEntity object if found, otherwise null.
+     * @throws An error if there is an issue retrieving the refund from Redis.
+     */
+
+    async getRefundById(refundId: string): Promise<RefundRedisEntity | null> {
+        try {
+            await this.initialized();
+
+            const refund = await this.client.hGetAll(`refund:${refundId}`);
+            if(!refund || Object.keys(refund).length === 0) return null;
+            return RefundRedisEntity.fromRedisHash(refund);
+        } catch(error) {
+            console.error("Error finding refund by id in RefundRepositoryRedis: ", error);
+            throw new Error("Failed to find refund by id.");
+        }
     }
-    getRefunds(): Promise<RefundAbstract[] | null> {
-        throw new Error("Method not implemented.");
+
+    async getRefunds(): Promise<RefundRedisEntity[] | null> {
+        try {
+            await this.initialized();
+            const refundKeys = await this.client.sMembers('refund_index');
+            const refunds = await Promise.all(
+                refundKeys.map(refundId => this.getRefundById(refundId))
+            );
+            return refunds.filter(refund => refund !== null);
+        } catch(error) {
+            console.error("Error finding refunds in RefundRepositoryRedis: ", error);
+            throw new Error("Failed to find refunds by id.");
+        }
     }
-    createRefund(refund: RefundAbstract): Promise<RefundAbstract | null> {
-        throw new Error("Method not implemented.");
+
+
+    async createRefund(refund: RefundRedisEntity): Promise<RefundRedisEntity | null> {
+        try {
+            await this.initialized();
+            
+            await this.client.hSet(`refund:${refund.id}`, refund.toRedisHash());
+            await this.client.sAdd('refund_index', refund.id);
+
+            const exists = await this.client.exists(`refund:${refund.id}`);
+            return exists === 1 ? refund : null;
+        } catch(error) {
+            console.error("Error creating refund in RefundRepositoryRedis: ", error);
+            throw new Error("Failed to create refund.");
+        }
     }  
 }

@@ -10,7 +10,7 @@ export class TransactionService {
 
     constructor(transactionRepository: ITransactionRepository) {
         this.transactionRepository = transactionRepository;
-        this.paymentProvider.initialize();
+        this.paymentProvider.isInitialize();
     }
 
     // Get Transaction By Id

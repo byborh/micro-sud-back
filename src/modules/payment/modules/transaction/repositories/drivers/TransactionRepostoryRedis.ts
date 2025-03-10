@@ -12,7 +12,7 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
         this.client = db.getDataSource() as RedisClientType;
     }
 
-    async initialize(): Promise<void> {
+    async initialized(): Promise<void> {
         try {
             if(!this.client.isOpen) {
                 await this.client.connect();
@@ -30,6 +30,8 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
     
     async getTransactionById(id: string): Promise<TransactionRedisEntity | null> {
         try {
+            await this.initialized();
+
             const transactionHash = await this.client.hGetAll(`transaction:${id}`);
             if (!transactionHash || Object.keys(transactionHash).length === 0) return null;
             return TransactionRedisEntity.fromRedisHash(transactionHash);
@@ -42,7 +44,7 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
 
     async getTransactionsByDebtorEmail(email: string): Promise<TransactionRedisEntity[]> {
         try {
-            await this.initialize();
+            await this.initialized();
             
             // Get transaction's id from their email
             const transactionIds = await this.client.sMembers(`debtor_transactions:${email}`);
@@ -62,7 +64,7 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
 
     async getTransactions(): Promise<TransactionRedisEntity[]> {
         try {
-            await this.initialize();
+            await this.initialized();
             const transactionKeys = await this.client.sMembers('transaction_index');
             const transactions = await Promise.all(
                 transactionKeys.map(transactionId => this.getTransactionById(transactionId))
@@ -77,7 +79,7 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
 
     async createTransaction(transaction: TransactionRedisEntity): Promise<TransactionRedisEntity | null> {
         try {
-            await this.initialize();
+            await this.initialized();
 
             const transactionHash = {
                 id: transaction.id,
@@ -108,6 +110,8 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
     
     async cancelTransactionById(transactionId: string): Promise<boolean> {
         try {
+            await this.initialized();
+
             // Get transaction by id
             const transaction = await this.getTransactionById(transactionId);
             if (!transaction) {

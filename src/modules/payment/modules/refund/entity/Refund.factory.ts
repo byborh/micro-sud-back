@@ -7,7 +7,7 @@ import { RefundSQLEntity } from "./sql/Refund.entity";
 const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
 
 
-export async function createRoleEntity(refund: Partial<RefundContract>, dbType: DatabaseType = databaseType): Promise<RefundAbstract> {
+export async function createRefundEntity(refund: Partial<RefundContract>, dbType: DatabaseType = databaseType): Promise<RefundAbstract> {
 
     // Validate required fields
     if (!refund.id || !refund.transaction_id || !refund.amount || !refund.status) {

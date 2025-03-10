@@ -6,7 +6,7 @@ import { IRefundRepository } from './repositories/contract/IRefundRepository';
 import { RefundRepositorySQL } from './repositories/drivers/RefundRepositorySQL';
 import { RefundRepositoryRedis } from './repositories/drivers/RefundRepostoryRedis';
 import { RefundController } from './controllers/RefundController';
-import { refundRoutes } from './route/RefundRoutes';
+import { refundRoutes } from './route/refundRoutes';
 
 export const createRefundModule = async (): Promise<express.Router> => {
   const myDB = await getDatabase();

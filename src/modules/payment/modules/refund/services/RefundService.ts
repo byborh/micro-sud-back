@@ -32,6 +32,16 @@ export class RefundService {
     // Create Refund
     public async createRefund(refund: RefundAbstract): Promise<RefundAbstract | null> {
         try {
+            // La logique de remboursement.
+
+            // Verify if transaction existe:
+            // --- Or juste get a transaction by id n if it's nil, so, return error
+
+            // Compare amounts beetween transaction one n a refund one
+
+            // do a transaction with using a class from payment/cores/payment !
+            
+            // create refund in db and return it
             return await this.refundRepository.createRefund(refund);
         } catch (error) {
             console.error("Error creating refund in RefundService:", error);

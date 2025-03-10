@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 import { LogAbstract } from "../Log.abstract";
 import { LogContract } from "../../contracts/ILog";
 
-@Entity("roles")
+@Entity("logs")
 export class LogSQLEntity extends LogAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;

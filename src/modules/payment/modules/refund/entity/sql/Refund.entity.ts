@@ -1,9 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { RefundAbstract } from "../Refund.abstract";
 import { TStatus } from "../../contracts/TStatus";
 import { RefundContract } from "../../contracts/IRefund";
 
-@Entity("roles")
+@Entity("refunds")
 export class RefundSQLEntity  extends RefundAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;

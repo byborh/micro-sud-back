@@ -3,7 +3,7 @@ import { EscrowAbstract } from "../Escrow.abstract";
 import { TStatus } from "../../contracts/TStatus";
 import { EscrowContract } from "../../contracts/IEscrow";
 
-@Entity("roles")
+@Entity("escrows")
 export class EscrowSQLEntity  extends EscrowAbstract {
     @PrimaryColumn({ type: "varchar", length: 255 })
     id: string;

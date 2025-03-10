@@ -9,6 +9,7 @@ import { createChatAIModule } from '@modules/chat-ai';
 import { getDatabase } from '@db/DatabaseClient';
 
 import { createTransactionModule } from '@modules/payment/modules/transaction';
+import { createRefundModule } from '@modules/payment/modules/refund';
 
 
 const app = express();
@@ -32,8 +33,17 @@ async function loadModules() {
   // Add other modules HERE
 
   const transactionModule = await createTransactionModule();
+  const refundModule = await createRefundModule();
 
-  return { userModule, roleModule, userRolesModule, authTokenModule, chatAIModule, transactionModule };
+  return {
+    userModule,
+    roleModule,
+    userRolesModule,
+    authTokenModule,
+    chatAIModule,
+    transactionModule,
+    refundModule
+  };
 }
 
 async function startServer() {
@@ -56,6 +66,7 @@ async function startServer() {
     // Add other load modules HERE
 
     apiRouter.use('/transactions', modules.transactionModule);
+    apiRouter.use('/refunds', modules.refundModule);
 
     app.use('/api/v0.0.2', apiRouter);
 
