@@ -3,6 +3,7 @@ import { TStatus } from "./TStatus";
 export interface RefundContract {
   id: string;
   transaction_id: string;
-  amount: number;
+  amount?: number;
+  currency: string;
   status: TStatus;
 }

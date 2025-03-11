@@ -14,6 +14,9 @@ export class RefundSQLEntity  extends RefundAbstract {
     @Column({ type: "int", length: 8 })
     amount: number;
 
+    @Column({ type: "varchar", length: 3 })
+    currency: string;
+
     @Column({ type: "varchar", length: 10 })
     status: TStatus;
 
@@ -22,12 +25,14 @@ export class RefundSQLEntity  extends RefundAbstract {
         super(
             data?.id ?? "",
             data?.transaction_id ?? "",
+            data?.status ?? "pending",
+            data?.currency ?? "eur",
             data?.amount ?? 0,
-            data?.status ?? "pending"
         );
         this.id = data?.id ?? "",
         this.transaction_id = data?.transaction_id ?? "",
         this.amount = data?.amount ?? 0,
+        this.currency = data?.currency ?? "eur",
         this.status = data?.status ?? "pending"
     }
 }

@@ -47,13 +47,14 @@ export class RefundController {
     // Create a refund
     public async createRefund(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { transaction_id, amount } = req.body;
-
+            const { transaction_id, currency, amount } = req.body;
+            if(amount === 0) res.status(400).json({ error: "Amount must be greater than 0" });
 
             const refund = {
-                id: "id-datte",
+                id: "id-didn't-attributed",
                 transaction_id: transaction_id,
-                amount: amount,
+                amount: amount as number,
+                currency: currency as string,
                 status: "pending" as TStatus
             } as RefundAbstract;
 

@@ -101,7 +101,8 @@ export class TransactionService {
             transaction.metadata = {
                 ...transaction.metadata,
                 payment_method_types: paymentIntent.payment_method_types,
-                client_secret: paymentIntent.client_secret
+                client_secret: paymentIntent.client_secret,
+                charge_id: paymentIntent.charges?.data?.find((ch: { status: string; }) => ch.status === "succeeded")?.id || null
             };
 
             // Verify if stripe has a redirect url

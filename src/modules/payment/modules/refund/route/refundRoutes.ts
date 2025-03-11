@@ -20,7 +20,7 @@ export const refundRoutes = (roleController: RefundController): express.Router =
     router.post('/',
         // authMiddleware(['ADMIN']),
         validateAttributeMiddleware('body', 'transaction_id', 'Transaction id missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'amount', 'Amount missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'currency', 'Currency missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => roleController.createRefund(req, res, next)
     );
 

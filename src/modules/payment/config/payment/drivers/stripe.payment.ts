@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { IPayment } from "../contract/IPayment";
 import { TransactionAbstract } from "@modules/payment/modules/transaction/entity/Transaction.abstract";
+import { RefundAbstract } from "@modules/payment/modules/refund/entity/Refund.abstract";
 
 export class StripePayment implements IPayment {
     private stripe: Stripe;
@@ -87,12 +88,21 @@ export class StripePayment implements IPayment {
     }
 
     // à modifier !
-    async refund(paymentIntentId: string): Promise<string> {
+    async refund(refund: RefundAbstract): Promise<any> {
         try {
-            const refundComplete = await this.stripe.refunds.create({ payment_intent: paymentIntentId }); // Remboursement complet !
-            const refundPartial = await this.stripe.refunds.create({ payment_intent: paymentIntentId, amount: 100 }); // Remboursement complet !
+            console.log("Voici ma transaction dans stripe.payment :", refund);
+
+            const refundComplete = await this.stripe.refunds.create({
+                charge: refund.id,
+                currency: refund.currency,
+                payment_intent: refund.transaction_id,
+                amount: refund.amount
+                // currency !
+            }); // Remboursement complet !
+            
             console.log(`Paiement remboursé avec succès, refund ID: ${refundComplete.id}`);
-            return refundComplete.id;
+
+            return refundComplete;
         } catch (error) {
             console.error("Erreur lors du remboursement:", error);
             throw error;

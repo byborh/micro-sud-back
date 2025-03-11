@@ -2,10 +2,15 @@ import { getPaymentProvider } from "@modules/payment/config/payment/PaymentFacto
 import { ITransactionRepository } from "../../transaction/repositories/contract/ITransactionRepository";
 import { RefundAbstract } from "../entity/Refund.abstract";
 import { IRefundRepository } from "../repositories/contract/IRefundRepository";
+import { getRepository } from "@core/db/databaseGuards";
+import { TransactionRepositoryMongo } from "../../transaction/repositories/drivers/TransactionRepositoryMongo";
+import { TransactionRepositoryRedis } from "../../transaction/repositories/drivers/TransactionRepostoryRedis";
+import { TransactionRepositorySQL } from "../../transaction/repositories/drivers/TransactionRepositorySQL";
+import { getDatabase } from "@db/DatabaseClient";
+import { TransactionAbstract } from "../../transaction/entity/Transaction.abstract";
 
 export class RefundService {
     private refundRepository: IRefundRepository;
-    private transactionRepository: ITransactionRepository; // à corriger
     private paymentProvider = getPaymentProvider();
 
     constructor(refundRepository: IRefundRepository) {
@@ -37,22 +42,34 @@ export class RefundService {
     // Create Refund
     public async createRefund(refund: RefundAbstract): Promise<RefundAbstract | null> {
         try {
-            // La logique de remboursement.
+            // Get transaction repository
+            const myDB = await getDatabase();
+            const transactionRepository: ITransactionRepository = await getRepository(myDB, TransactionRepositorySQL, TransactionRepositoryRedis, TransactionRepositoryMongo) as ITransactionRepository;
 
-            // Verify if transaction existe:
-            // --- Or juste get a transaction by id n if it's nil, so, return error
-            // transaction can be do only if transaction status is "succeeded"
-            const transaction = await this.transactionRepository.getTransactionById(refund.transaction_id);
+            console.log("Voici mon refund :", refund);
+            console.log("Voici ma transaction de la bdd :", transactionRepository);
+
+            // Verify if transaction existe and if is succeeded:
+            const transaction = await transactionRepository.getTransactionById(refund.transaction_id);
             if(!transaction || transaction.status !== "succeeded") return null;
 
-            // Compare amounts beetween transaction one n a refund one
-            if(transaction.amount < refund.amount) return null;
+            // 
+            refund.id = transaction.metadata.charges.data.find((ch: { status: string; }) => ch.status === "succeeded");
 
-            // do a transaction with using a class from payment/cores/payment !
-            const createdRefund = await this.paymentProvider.refund(transaction.id);
+            // Compare amounts beetween transaction one n a refund one
+            if(transaction.amount < refund.amount) {
+                // Refund with correct amount !
+                refund.amount = transaction.amount;
+            }
+
+            // Refund transaction using payment provider
+            const createdRefund = await this.paymentProvider.refund(refund);
+
+            // refund.id = createdRefund.id;
+            refund.status = createdRefund.status;
 
             // create refund in db and return it
-            return await this.refundRepository.createRefund(createdRefund);
+            return await this.refundRepository.createRefund(refund);
         } catch (error) {
             console.error("Error creating refund in RefundService:", error);
             throw new Error("Failed to create refund.");
