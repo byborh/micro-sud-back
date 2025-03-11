@@ -89,16 +89,15 @@ export class StripePayment implements IPayment {
     // à modifier !
     async refund(paymentIntentId: string): Promise<string> {
         try {
-            const refund = await this.stripe.refunds.create({ payment_intent: paymentIntentId });
-            console.log(`Paiement remboursé avec succès, refund ID: ${refund.id}`);
-            return refund.id;
+            const refundComplete = await this.stripe.refunds.create({ payment_intent: paymentIntentId }); // Remboursement complet !
+            const refundPartial = await this.stripe.refunds.create({ payment_intent: paymentIntentId, amount: 100 }); // Remboursement complet !
+            console.log(`Paiement remboursé avec succès, refund ID: ${refundComplete.id}`);
+            return refundComplete.id;
         } catch (error) {
             console.error("Erreur lors du remboursement:", error);
             throw error;
         }
     }
-    
-
 
     /**
      * Creates a new Stripe customer and returns the customer's ID.

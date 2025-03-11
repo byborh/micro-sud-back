@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { RefundService } from "../services/RefundService";
 import { RefundAbstract } from "../entity/Refund.abstract";
-import { IdGenerator } from "@core/idGenerator";
 import { TStatus } from "../contracts/TStatus";
 
 export class RefundController {
@@ -52,7 +51,7 @@ export class RefundController {
 
 
             const refund = {
-                id: IdGenerator.getInstance().generateId(),
+                id: "id-datte",
                 transaction_id: transaction_id,
                 amount: amount,
                 status: "pending" as TStatus
