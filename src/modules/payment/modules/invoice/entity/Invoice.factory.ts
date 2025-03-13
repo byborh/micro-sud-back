@@ -10,7 +10,7 @@ const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql
 export async function createRoleEntity(invoice: Partial<InvoiceContract>, dbType: DatabaseType = databaseType): Promise<InvoiceAbstract> {
 
     // Validate required fields
-    if (!invoice.id || !invoice.transaction_id || !invoice.user_id || !invoice.amount || !invoice.pdf_link) {
+    if (!invoice.id || !invoice.transaction_id || !invoice.createdAt) {
         throw new Error("Missing required fields for Invoice.");
     }
 

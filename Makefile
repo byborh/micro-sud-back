@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 VERSION=$(shell git rev-parse --short HEAD)
-APP_NAME=datte
-DOCKER_REPO=registry.gitlab.com/datte-company
+APP_NAME=${DB_NAME}
+DOCKER_REPO=registry.gitlab.com/${DB_NAME}-company
 
 dpl ?= .env
 include $(dpl)
@@ -60,7 +60,7 @@ deploy-db:
 mysql: network
 	@echo "Starting MySQL container..."
 	@docker run --name mysql -e MYSQL_DATABASE=${MYSQL_DATABASE} -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -d mysql:5.7
-	@docker network connect datte-network mysql
+	@docker network connect ${DB_NAME}-network mysql
 
 init-mysql:
 	@echo "Initializing MySQL permissions..."
@@ -72,7 +72,7 @@ init-mysql:
 mariadb: network
 	@echo "Starting MariaDB container..."
 	@docker compose up -d mariadb
-	@docker network connect datte-network mariadb
+	@docker network connect ${DB_NAME}-network mariadb
 
 # Redis
 REDIS_CMD=docker compose exec redis redis-cli
@@ -94,7 +94,7 @@ redis-reset:
 redis: network
 	@echo "Starting Redis container..."
 	@docker compose up -d redis
-	@docker network connect datte-network redis
+	@docker network connect ${DB_NAME}-network redis
 
 
 
@@ -103,7 +103,7 @@ redis: network
 postgresql: network
 	@echo "Starting PostgreSQL container..."
 	@docker run --name postgresql -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:latest
-	@docker network connect datte-network postgresql
+	@docker network connect ${DB_NAME}-network postgresql
 	@echo "Waiting for PostgreSQL to be ready..."
 	@sleep 5  # Wait 5 seconds to be sure the container is ready
 	@until docker exec postgresql pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" > /dev/null 2>&1; do sleep 1; done
@@ -120,8 +120,8 @@ init-postgresql:
 # SQLite
 init-sqlite:
 	@echo "Initializing SQLite database..."
-	# @docker compose exec back sh -c "touch /app/data/datte.sqlite"
-	@docker compose exec back sh -c "mkdir -p /app/data && touch /app/data/datte.sqlite && chmod 777 /app/data/datte.sqlite"
+	# @docker compose exec back sh -c "touch /app/data/${DB_NAME}.sqlite"
+	@docker compose exec back sh -c "mkdir -p /app/data && touch /app/data/${DB_NAME}.sqlite && chmod 777 /app/data/${DB_NAME}.sqlite"
 	@echo "SQLite database initialized inside container."
 
 sqlite: network
@@ -136,7 +136,7 @@ mssql: network
 	@echo "Starting MSSQL container..."
 	@docker compose up -d mssql
 	@echo "Connect to network..."
-	@docker network connect datte-network mssql
+	@docker network connect ${DB_NAME}-network mssql
 	@echo "Waiting for MSSQL to be ready..."
 	@sleep 5
 	@docker compose logs --tail=10 mssql
@@ -149,7 +149,7 @@ mongodb: network
 	@echo "Starting MongoDB container..."
 	@docker compose up -d mongodb
 	@echo "Connect to network..."
-	@docker network connect datte-network mongodb
+	@docker network connect ${DB_NAME}-network mongodb
 	@echo "Waiting for MongoDB to be ready..."
 	@sleep 5
 	@docker compose logs --tail=10 mongodb
@@ -163,7 +163,7 @@ prod: deploy-db build-prod network ${MY_DB}
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \
-		--network=datte-network \
+		--network=${DB_NAME}-network \
 		-v $(APP_NAME)-logs:/app/logs \
 		-d $(APP_NAME)
 	@echo "Logs: $(APP_NAME)-logs"
@@ -172,7 +172,7 @@ prod: deploy-db build-prod network ${MY_DB}
 dev: build network
 	@echo "Running development container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} -it --rm --env-file=.env -d $(APP_NAME)-dev
-	@docker network connect datte-network $(APP_NAME)
+	@docker network connect ${DB_NAME}-network $(APP_NAME)
 	@docker logs -f $(APP_NAME)
 
 
@@ -227,4 +227,4 @@ info:
 
 network:
 	@echo "Creating network..."
-	@docker network create datte-network 2>/dev/null || true
+	@docker network create ${DB_NAME}-network 2>/dev/null || true

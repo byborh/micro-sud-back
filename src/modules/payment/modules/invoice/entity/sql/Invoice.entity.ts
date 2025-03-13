@@ -8,30 +8,25 @@ export class InvoiceSQLEntity  extends InvoiceAbstract {
     id: string;
 
     @Column({ type: "varchar", length: 255 })
-    user_id: string;
-
-    @Column({ type: "varchar", length: 255 })
     transaction_id: string;
 
-    @Column({ type: "int", length: 8 })
-    amount: number;
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    createdAt: Date;
     
     @Column({ type: "varchar", length: 255 })
     pdf_link: string;
 
 
-    constructor(data?: Partial<InvoiceContract>) {
+    constructor(data: Partial<InvoiceContract>) {
         super(
             data?.id ?? "",
             data?.transaction_id ?? "",
-            data?.user_id ?? "",
-            data?.amount ?? 0,
+            data?.createdAt ?? new Date(),
             data?.pdf_link ?? ""
         );
         this.id = data?.id ?? "";
         this.transaction_id = data?.transaction_id ?? "";
-        this.user_id = data?.user_id ?? "";
-        this.amount = data?.amount ?? 0;
-        this.pdf_link = data?.pdf_link ?? "";
+        this.createdAt = data?.createdAt ?? new Date();
+        this.pdf_link = data?.pdf_link ?? "";        
     }
 }

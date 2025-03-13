@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { InvoiceService } from "../services/InvoiceService";
+import { IdGenerator } from "@core/idGenerator";
+import { InvoiceAbstract } from "../entity/Invoice.abstract";
 
 export class InvoiceController {
     constructor(private readonly invoiceService: InvoiceService) {}
@@ -64,25 +66,28 @@ export class InvoiceController {
     // Create a invoice
     public async createInvoice(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // const { name, description } = req.body;
+            const { transaction_id } = req.body;
 
-            // Check if required fields are provided
-            // if (!name || !description) {
-                // res.status(400).json({ error: "Action and resource are required." });
-                // return;
-            // }
+            if(transaction_id === "") res.status(401).json({error: "Transaction id is avoid !"})
+
+            const invoice = {
+                id: IdGenerator.getInstance().generateId(),
+                transaction_id: transaction_id,
+                createdAt: new Date(),
+                pdf_link: null
+            } as InvoiceAbstract;
 
             // Create invoice using InvoiceService
-            // const createdInvoice = await this.invoiceService.createInvoice(invoice);
+            const createdInvoice = await this.invoiceService.createInvoice(invoice);
 
             // If creation fails, return 400
-            // if (!createdInvoice) {
-                // res.status(400).json({ error: "Invoice could not be created." });
-                // return;
-            // }
+            if (!createdInvoice) {
+                res.status(400).json({ error: "Invoice could not be created." });
+                return;
+            }
 
             // Return the created invoice data
-            // res.status(201).json(createdInvoice);
+            res.status(201).json(createdInvoice);
         } catch (error) {
             next(error);
         }

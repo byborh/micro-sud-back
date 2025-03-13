@@ -25,8 +25,7 @@ export const invoiceRoutes = (roleController: InvoiceController): express.Router
 
     router.post('/',
         // authMiddleware(['ADMIN']),
-        validateAttributeMiddleware('body', 'name', 'Action missing or invalid in request body'),
-        validateAttributeMiddleware('body', 'description', 'Description missing or invalid in request body'),
+        validateAttributeMiddleware('body', 'transaction_id', 'Action missing or invalid in request body'),
         (req: Request, res: Response, next: NextFunction) => roleController.createInvoice(req, res, next)
     );
 

@@ -4,9 +4,8 @@ import { InvoiceContract } from "../../contracts/IInvoice";
 export class InvoiceRedisEntity extends InvoiceAbstract {
     id: string;
     transaction_id: string;
-    user_id: string;
-    amount: number;
-    pdf_link: string;
+    createdAt: Date;
+    pdf_link?: string;
 
     data: Record<string, any> | null;
 
@@ -14,14 +13,12 @@ export class InvoiceRedisEntity extends InvoiceAbstract {
         super(
             data?.id ?? "",
             data?.transaction_id ?? "",
-            data?.user_id ?? "",
-            data?.amount ?? 0,
+            data?.createdAt ?? new Date(),
             data?.pdf_link ?? ""
         );
         this.id = data?.id ?? "";
         this.transaction_id = data?.transaction_id ?? "";
-        this.user_id = data?.user_id ?? "";
-        this.amount = data?.amount ?? 0;
+        this.createdAt = data?.createdAt ?? new Date();
         this.pdf_link = data?.pdf_link ?? "";        
     }
 
@@ -30,8 +27,7 @@ export class InvoiceRedisEntity extends InvoiceAbstract {
         return {
             id: this.id,
             transaction_id: this.transaction_id,
-            user_id: this.user_id,
-            amount: this.amount.toString(),
+            createdAt: this.createdAt.toISOString(),
             pdf_link: this.pdf_link            
         }
     }
@@ -41,8 +37,7 @@ export class InvoiceRedisEntity extends InvoiceAbstract {
         return new InvoiceRedisEntity({
             id: hash.id,
             transaction_id: hash.transaction_id,
-            user_id: hash.user_id,
-            amount: parseFloat(hash.amount),
+            createdAt: new Date(hash.createdAt),
             pdf_link: hash.pdf_link
         })
     }

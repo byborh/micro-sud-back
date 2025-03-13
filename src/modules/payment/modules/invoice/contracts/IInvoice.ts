@@ -1,7 +1,6 @@
 export interface InvoiceContract {
   id: string;
   transaction_id: string;
-  user_id: string;
-  amount: number;
-  pdf_link: string;
+  createdAt: Date;
+  pdf_link?: string;
 }
