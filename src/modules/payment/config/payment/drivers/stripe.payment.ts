@@ -90,18 +90,11 @@ export class StripePayment implements IPayment {
     // à modifier !
     async refund(refund: RefundAbstract): Promise<any> {
         try {
-            console.log("Voici ma transaction dans stripe.payment :", refund);
-
             const refundComplete = await this.stripe.refunds.create({
-                charge: refund.id,
-                currency: refund.currency,
-                payment_intent: refund.transaction_id,
+                charge: refund.charge_ref,
                 amount: refund.amount
-                // currency !
-            }); // Remboursement complet !
+            });
             
-            console.log(`Paiement remboursé avec succès, refund ID: ${refundComplete.id}`);
-
             return refundComplete;
         } catch (error) {
             console.error("Erreur lors du remboursement:", error);
@@ -155,7 +148,6 @@ export class StripePayment implements IPayment {
                 paymentIntent.status === 'processing') {
     
                 await this.stripe.paymentIntents.cancel(paymentIntentId);
-                console.log(`PaymentIntent ${paymentIntentId} annulé.`);
                 return true;
             }
     

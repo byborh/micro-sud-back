@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { RefundService } from "../services/RefundService";
 import { RefundAbstract } from "../entity/Refund.abstract";
 import { TStatus } from "../contracts/TStatus";
+import { IdGenerator } from "@core/idGenerator";
 
 export class RefundController {
     constructor(private readonly refundService: RefundService) {}
@@ -50,12 +51,18 @@ export class RefundController {
             const { transaction_id, currency, amount } = req.body;
             if(amount === 0) res.status(400).json({ error: "Amount must be greater than 0" });
 
+            // Generate an id for refund
+            const id = IdGenerator.getInstance().generateId();
+
             const refund = {
-                id: "id-didn't-attributed",
-                transaction_id: transaction_id,
+                id: id,
+                transaction_id: transaction_id as string,
+                transaction_ref: "",
+                charge_ref: "",
+                status: "pending" as TStatus,
                 amount: amount as number,
-                currency: currency as string,
-                status: "pending" as TStatus
+                refund_ref: "",
+                createdAt: new Date()
             } as RefundAbstract;
 
             // Create refund using RefundService

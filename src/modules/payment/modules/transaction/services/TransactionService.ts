@@ -92,9 +92,13 @@ export class TransactionService {
                     payment_identifier
                 );
             } else { paymentIntent = await this.paymentProvider.generateLinkForPayment(transaction); }
-            
-            
-                
+
+            const chargeId = paymentIntent.latest_charge || null;
+
+            if (!chargeId) {
+                throw new Error("No charges found in the payment intent.");
+            }
+               
             // Update Transaction's data
             transaction.transaction_ref = paymentIntent.id;
             transaction.status = paymentIntent.status;
@@ -102,7 +106,7 @@ export class TransactionService {
                 ...transaction.metadata,
                 payment_method_types: paymentIntent.payment_method_types,
                 client_secret: paymentIntent.client_secret,
-                charge_id: paymentIntent.charges?.data?.find((ch: { status: string; }) => ch.status === "succeeded")?.id || null
+                charge_id: chargeId
             };
 
             // Verify if stripe has a redirect url

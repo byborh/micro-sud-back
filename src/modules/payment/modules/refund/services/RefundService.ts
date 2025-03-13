@@ -46,15 +46,15 @@ export class RefundService {
             const myDB = await getDatabase();
             const transactionRepository: ITransactionRepository = await getRepository(myDB, TransactionRepositorySQL, TransactionRepositoryRedis, TransactionRepositoryMongo) as ITransactionRepository;
 
-            console.log("Voici mon refund :", refund);
-            console.log("Voici ma transaction de la bdd :", transactionRepository);
-
             // Verify if transaction existe and if is succeeded:
             const transaction = await transactionRepository.getTransactionById(refund.transaction_id);
             if(!transaction || transaction.status !== "succeeded") return null;
 
-            // 
-            refund.id = transaction.metadata.charges.data.find((ch: { status: string; }) => ch.status === "succeeded");
+            // Set transaction id in refund
+            refund.transaction_ref = transaction.transaction_ref;
+
+            // Get charge id and set it in refund
+            refund.charge_ref = transaction.metadata.charge_id;
 
             // Compare amounts beetween transaction one n a refund one
             if(transaction.amount < refund.amount) {
@@ -65,8 +65,10 @@ export class RefundService {
             // Refund transaction using payment provider
             const createdRefund = await this.paymentProvider.refund(refund);
 
-            // refund.id = createdRefund.id;
             refund.status = createdRefund.status;
+            refund.refund_ref = createdRefund.id;
+
+            // Mettre à jour Transaction si c'est remboursé !
 
             // create refund in db and return it
             return await this.refundRepository.createRefund(refund);

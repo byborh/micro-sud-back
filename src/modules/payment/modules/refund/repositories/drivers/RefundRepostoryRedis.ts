@@ -61,8 +61,18 @@ export class RefundRepositoryRedis implements IRefundRepository {
     async createRefund(refund: RefundRedisEntity): Promise<RefundRedisEntity | null> {
         try {
             await this.initialized();
+
+            const refundHash = {
+                id: refund.id,
+                transaction_id: refund.transaction_id,
+                transaction_ref: refund.transaction_ref,
+                charge_ref: refund.charge_ref,
+                amount: refund.amount,
+                status: refund.status.toString(),
+                refund_ref: refund.refund_ref
+            }
             
-            await this.client.hSet(`refund:${refund.id}`, refund.toRedisHash());
+            await this.client.hSet(`refund:${refund.id}`, refundHash);
             await this.client.sAdd('refund_index', refund.id);
 
             const exists = await this.client.exists(`refund:${refund.id}`);
