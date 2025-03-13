@@ -78,16 +78,21 @@ export class InvoiceController {
             } as InvoiceAbstract;
 
             // Create invoice using InvoiceService
-            const createdInvoice = await this.invoiceService.createInvoice(invoice);
+            const { pdfBytes, fileName }  = await this.invoiceService.createInvoice(invoice);
 
             // If creation fails, return 400
-            if (!createdInvoice) {
+            if (!pdfBytes) {
                 res.status(400).json({ error: "Invoice could not be created." });
                 return;
             }
 
-            // Return the created invoice data
-            res.status(201).json(createdInvoice);
+            // Convert Uint8Array to Buffer
+            const pdfBuffer = Buffer.from(pdfBytes);
+
+            // Return the PDF as a response for download
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+            res.send(pdfBuffer);
         } catch (error) {
             next(error);
         }

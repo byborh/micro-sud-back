@@ -10,6 +10,7 @@ import { getDatabase } from '@db/DatabaseClient';
 
 import { createTransactionModule } from '@modules/payment/modules/transaction';
 import { createRefundModule } from '@modules/payment/modules/refund';
+import { createInvoiceModule } from '@modules/payment/modules/invoice';
 
 
 const app = express();
@@ -34,6 +35,7 @@ async function loadModules() {
 
   const transactionModule = await createTransactionModule();
   const refundModule = await createRefundModule();
+  const invoiceModule = await createInvoiceModule();
 
   return {
     userModule,
@@ -42,7 +44,8 @@ async function loadModules() {
     authTokenModule,
     chatAIModule,
     transactionModule,
-    refundModule
+    refundModule,
+    invoiceModule
   };
 }
 
@@ -67,6 +70,7 @@ async function startServer() {
 
     apiRouter.use('/transactions', modules.transactionModule);
     apiRouter.use('/refunds', modules.refundModule);
+    apiRouter.use('/invoices', modules.invoiceModule);
 
     app.use('/api/v0.0.2', apiRouter);
 
