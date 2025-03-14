@@ -12,7 +12,7 @@ import { UserRepositoryMongo } from "@modules/users/repositories/drivers/UserRep
 import { IUserRepository } from "@modules/users/repositories/contract/IUserRepository";
 import { TransactionAbstract } from "../../transaction/entity/Transaction.abstract";
 import { UserAbstract } from "@modules/users/entity/User.abstract";
-import { generateInvoice } from "@modules/payment/cores/pdf/generateInvoice";
+import { storeInvoice } from "@modules/payment/cores/pdf/storeInvoice";
 
 export class InvoiceService {
     private invoiceRepository: IInvoiceRepository;
@@ -72,7 +72,7 @@ export class InvoiceService {
             if(!beneficiary) throw new Error("Beneficiary not found");
 
             // Créer et le renvoyer un pdf
-            const { pdfBytes, fileName } = await generateInvoice(debtor, beneficiary, transaction);
+            const { pdfBytes, fileName } = await storeInvoice(debtor, beneficiary, transaction);
 
             console.log("Voici le nom du fichier génréré : ", fileName);
 

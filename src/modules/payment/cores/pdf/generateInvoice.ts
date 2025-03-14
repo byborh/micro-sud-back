@@ -63,7 +63,7 @@ export async function generateInvoice(
         const pdfBytes = await pdfDoc.save();
 
         // Créer un nom de fichier explicite
-        const fileName = `invoice_${transaction.id}.pdf`;
+        const fileName = `invoice_for_transaction.${transaction.id}.pdf`;
 
 
         fs.writeFileSync(fileName, pdfBytes);

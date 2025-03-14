@@ -1,0 +1,1 @@
+export type TStore = 'local' | 's3' | 'none';
