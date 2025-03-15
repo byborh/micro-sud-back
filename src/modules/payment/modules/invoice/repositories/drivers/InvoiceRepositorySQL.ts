@@ -14,15 +14,10 @@ export class InvoiceRepositorySQL implements IInvoiceRepository {
     }
 
     
-    getInvoiceById(invoiceId: string): Promise<InvoiceAbstract | null> {
+    getInvoiceByTransactionId(invoiceId: string): Promise<InvoiceAbstract | null> {
         throw new Error("Method not implemented.");
     }
-    getInvoiceByUserId(userId: string): Promise<InvoiceAbstract | null> {
-        throw new Error("Method not implemented.");
-    }
-    getInvoices(): Promise<InvoiceAbstract[]> {
-        throw new Error("Method not implemented.");
-    }
+
     createInvoice(invoice: InvoiceAbstract): Promise<InvoiceAbstract | null> {
         throw new Error("Method not implemented.");
     }

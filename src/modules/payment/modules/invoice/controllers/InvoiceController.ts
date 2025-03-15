@@ -7,57 +7,26 @@ export class InvoiceController {
     constructor(private readonly invoiceService: InvoiceService) {}
 
     // Get a invoice by ID
-    public async getInvoiceById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async getInvoiceByTransactionId(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const transactionId = req.params.transactionId;
+
             // Retrieve invoice by ID using InvoiceService
-            const invoice = await this.invoiceService.getInvoiceById(req.params.id);
+            const { pdfBytes, fileName } = await this.invoiceService.getInvoiceByTransactionId(transactionId);
             
-            // If no invoice is found, return 404
-            if (!invoice) {
-                res.status(404).json({ error: "Invoice not found" });
+            // If finding fails, return 400
+            if (!pdfBytes) {
+                res.status(400).json({ error: "Invoice could not be created." });
                 return;
             }
 
-            // Return the invoice data
-            res.status(200).json(invoice);
-        } catch (error) {
-            next(error);
-        }
-    }
+            // Convert Uint8Array to Buffer
+            const pdfBuffer = Buffer.from(pdfBytes);
 
-    // Get an invoice by user ID
-    public async getInvoiceByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            // Retrieve invoice by ID using InvoiceService
-            const invoice = await this.invoiceService.getInvoiceByUserId(req.params.id);
-            
-            // If no invoice is found, return 404
-            if (!invoice) {
-                res.status(404).json({ error: "Invoice not found" });
-                return;
-            }
-
-            // Return the invoice data
-            res.status(200).json(invoice);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Get all invoices
-    public async getInvoices(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            // Retrieve all invoices using InvoiceService
-            const invoices = await this.invoiceService.getInvoices();
-
-            // If no invoices are found, return 404
-            if (!invoices || invoices.length === 0) {
-                res.status(404).json({ error: "No invoices found" });
-                return;
-            }
-
-            // Return all invoices data
-            res.status(200).json(invoices);
+            // Return the PDF as a response for download
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+            res.send(pdfBuffer);
         } catch (error) {
             next(error);
         }

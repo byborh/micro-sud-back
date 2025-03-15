@@ -15,12 +15,13 @@ export async function storeInvoice(
     beneficiary: UserAbstract,
     transaction: TransactionAbstract,
     invoice: InvoiceAbstract
-): Promise<{ pdfBytes: Uint8Array, fileName: string }> {
+): Promise<{ pdfBytes: Uint8Array, fileName: string, filePath: string }> {
     // Generate the invoice
     const { pdfBytes, fileName } = await generateInvoice(debtor, beneficiary, transaction, invoice);
 
     // Verify the choise of user in .env file: STORE_PROVIDER=
     const storeProvider: TStore = process.env.STORAGE_PROVIDER as TStore;
+    let filePath: string = null;
 
     try {
         if(storeProvider === "local") {
@@ -28,10 +29,10 @@ export async function storeInvoice(
             const folderPath = `${process.cwd()}/${process.env.LOCAL_STORAGE_PATH}/invoices`;
             
             // If STORAGE_PROVIDER is local, store the pdf in /var/datte-storage
-            await saveFileLocally(pdfBytes, fileName, folderPath);
+            filePath = await saveFileLocally(pdfBytes, fileName, folderPath);
         } else if(storeProvider === "s3") {
             // If STORAGE_PROVIDER is s3, store the pdf in s3
-            await new S3Service().uploadPdf(pdfBytes, fileName);
+            filePath = await new S3Service().uploadPdf(pdfBytes, fileName);
         }
         // If STORAGE_PROVIDER is none, return the pdf
     } catch(error) {
@@ -39,5 +40,5 @@ export async function storeInvoice(
         throw new Error("Failed to generate invoice.");
     }
     
-    return { pdfBytes: pdfBytes, fileName: fileName };
+    return { pdfBytes: pdfBytes, fileName: fileName, filePath: filePath };
 }

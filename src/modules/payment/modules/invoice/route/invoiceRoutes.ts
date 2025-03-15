@@ -6,22 +6,11 @@ import { authMiddleware } from '@middlewares/authMiddleware';
 export const invoiceRoutes = (roleController: InvoiceController): express.Router => {
     const router = express.Router();
 
-    router.get('/:id',
+    router.get('/transaction-id/:transactionId/',
         // authMiddleware(['ADMIN', 'MANAGER']),
-        validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-        (req: Request, res: Response, next: NextFunction) => roleController.getInvoiceById(req, res, next)    
+        validateAttributeMiddleware('params', 'transactionId', 'Transaction Id missing or invalid in request params.'),
+        (req: Request, res: Response, next: NextFunction) => roleController.getInvoiceByTransactionId(req, res, next)    
     )
-
-    router.get('/:userId',
-        // authMiddleware(['ADMIN', 'MANAGER']),
-        validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-        (req: Request, res: Response, next: NextFunction) => roleController.getInvoiceById(req, res, next)    
-    )
-
-    router.get('/',
-        // authMiddleware(['ADMIN', 'MANAGER']),
-        (req: Request, res: Response, next: NextFunction) => roleController.getInvoices(req, res, next)
-    );
 
     router.post('/',
         // authMiddleware(['ADMIN']),
