@@ -2,11 +2,13 @@ import { TransactionAbstract } from "@modules/payment/modules/transaction/entity
 import { UserAbstract } from "@modules/users/entity/User.abstract";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fs from 'fs';
+import { InvoiceAbstract } from "@modules/payment/modules/invoice/entity/Invoice.abstract";
 
 export async function generateInvoice(
     debtor: UserAbstract,
     beneficiary: UserAbstract,
-    transaction: TransactionAbstract
+    transaction: TransactionAbstract,
+    invoice: InvoiceAbstract
 ): Promise<{ pdfBytes: Uint8Array, fileName: string }> {
     try {
         // Créer un document PDF

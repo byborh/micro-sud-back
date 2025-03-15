@@ -4,6 +4,7 @@ import { generateInvoice } from "./generateInvoice";
 import { TStore } from "@core/store/TStore";
 import { saveFileLocally } from "@core/store/saveFileLocally";
 import { S3Service } from "@core/store/S3Service";
+import { InvoiceAbstract } from "@modules/payment/modules/invoice/entity/Invoice.abstract";
 // import dotenv from "dotenv";
 // import dotenvExpand from "dotenv-expand";
 
@@ -12,10 +13,11 @@ import { S3Service } from "@core/store/S3Service";
 export async function storeInvoice(
     debtor: UserAbstract,
     beneficiary: UserAbstract,
-    transaction: TransactionAbstract
+    transaction: TransactionAbstract,
+    invoice: InvoiceAbstract
 ): Promise<{ pdfBytes: Uint8Array, fileName: string }> {
     // Generate the invoice
-    const { pdfBytes, fileName } = await generateInvoice(debtor, beneficiary, transaction);
+    const { pdfBytes, fileName } = await generateInvoice(debtor, beneficiary, transaction, invoice);
 
     // Verify the choise of user in .env file: STORE_PROVIDER=
     const storeProvider: TStore = process.env.STORAGE_PROVIDER as TStore;

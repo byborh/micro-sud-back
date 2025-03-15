@@ -54,7 +54,7 @@ export class InvoiceService {
 
 
     // Create Invoice
-    public async createInvoice(invoice: InvoiceAbstract): Promise<any | null> { // Corriger le type plus tard !
+    public async createInvoice(invoice: InvoiceAbstract): Promise<{ pdfBytes: Uint8Array, fileName: string } | null> { // Corriger le type plus tard !
         try {
             // Récupérer la transaction !
             const myDB = await getDatabase();
@@ -72,7 +72,7 @@ export class InvoiceService {
             if(!beneficiary) throw new Error("Beneficiary not found");
 
             // Créer et le renvoyer un pdf
-            const { pdfBytes, fileName } = await storeInvoice(debtor, beneficiary, transaction);
+            const { pdfBytes, fileName } = await storeInvoice(debtor, beneficiary, transaction, invoice);
 
             console.log("Voici le nom du fichier génréré : ", fileName);
 
