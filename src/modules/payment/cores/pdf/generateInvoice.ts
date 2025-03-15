@@ -11,6 +11,8 @@ export async function generateInvoice(
     invoice: InvoiceAbstract
 ): Promise<{ pdfBytes: Uint8Array, fileName: string }> {
     try {
+        // Récupérer le logo de l'entreprise si existant !
+        
         // Créer un document PDF
         const pdfDoc = await PDFDocument.create();
         const page = pdfDoc.addPage([600, 700]);
