@@ -77,6 +77,25 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
     }
 
 
+    async getPendingEscrowTransactions(): Promise<TransactionAbstract[] | null> {
+        await this.initialized();
+
+        // Get transaction's id if they are escrow
+        const transactionKeys = await this.client.sMembers("escrow_pending_transactions");
+
+        if(!transactionKeys.length) return null;
+
+        // Get transactions
+        const transactions = await Promise.all(
+            transactionKeys.map(transactionId => this.getTransactionById(transactionId))
+        );
+
+        // Return transaction
+        return transactions.filter(transaction => transaction !== null);
+    }
+    
+
+
     async createTransaction(transaction: TransactionRedisEntity): Promise<TransactionRedisEntity | null> {
         try {
             await this.initialized();
@@ -88,16 +107,24 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
                 payment_provider: transaction.payment_provider,
                 debtor_email: transaction.debtor_email,
                 beneficiary_email: transaction.beneficiary_email,
-                status: transaction.status,
+                status: transaction.status.toString(),
+                is_ewcrow: transaction.is_escrow.toString(),
                 transaction_date: transaction.transaction_date.toISOString(),
                 transaction_ref: transaction.transaction_ref || '',
                 description: transaction.description || '',
                 metadata: JSON.stringify(transaction.metadata || {}),
+                release_date: transaction.release_date.toISOString(),
+                escrow_status: transaction.escrow_status
             };
 
             await this.client.hSet(`transaction:${transaction.id}`, transactionHash);
             await this.client.sAdd('transaction_index', transaction.id);
             await this.client.sAdd(`debtor_transactions:${transaction.debtor_email}`, transaction.id);
+
+            // If transaction is escrow, add it to the set
+            if (transaction.escrow_status === "pending") {
+                await this.client.sAdd('escrow_pending_transactions', transaction.id);
+            }            
 
             const exists = await this.client.exists(`transaction:${transaction.id}`);
             return exists === 1 ? transaction : null;

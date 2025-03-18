@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { TransactionAbstract } from "../Transaction.abstract";
 import { TCurrency } from "../../contracts/TCurrency";
 import { paymentPovider } from "../../contracts/TPaymentProvider";
-import { TStatus } from "../../contracts/TStatus";
+import { TStatus, TEscrowStatus } from "../../contracts/TStatus";
 import { TransactionContract } from "../../contracts/ITransaction";
 
 @Entity("transactions")
@@ -32,7 +32,13 @@ export class TransactionSQLEntity  extends TransactionAbstract {
 
     @Column({ type: "date" })
     transaction_date: Date;
+
+    @Column({ type: "boolean" })
+    is_escrow: boolean;
     
+    @Column({ type: "date" })
+    release_date: Date;
+
     @Column({ type: "varchar", length: 255 })
     transaction_ref?: string;
 
@@ -42,6 +48,8 @@ export class TransactionSQLEntity  extends TransactionAbstract {
     @Column('json', { nullable: true })
     metadata?: any;
 
+    @Column({ type:"varchar", length: 10 })
+    escrow_status?: TEscrowStatus;
 
     constructor(data?: Partial<TransactionContract>) {
         super(
@@ -53,9 +61,12 @@ export class TransactionSQLEntity  extends TransactionAbstract {
             data?.beneficiary_email ?? "",
             data?.status ?? "processing",
             data?.transaction_date ?? new Date(),
+            data?.is_escrow ?? false,
+            data?.release_date ?? null,
             data?.description ?? "",
             data?.transaction_ref ?? "",
-            data?.metadata ?? null
+            data?.metadata ?? null,
+            data?.escrow_status ?? null,
         );
         this.id = data?.id ?? "";
         this.amount = data?.amount ?? 0;
@@ -68,5 +79,8 @@ export class TransactionSQLEntity  extends TransactionAbstract {
         this.description = data?.description ?? "";
         this.transaction_ref = data?.transaction_ref ?? "";
         this.metadata = data?.metadata ?? null;
+        this.is_escrow = data?.is_escrow ?? false;
+        this.escrow_status = data?.escrow_status ?? null;
+        this.release_date = data?.release_date ?? null;
     }
 }

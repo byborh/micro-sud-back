@@ -12,6 +12,9 @@ export class TransactionRepositorySQL implements ITransactionRepository {
         const dataSource = db as SQLDatabase;
         this.repository = dataSource.getDataSource().getRepository(TransactionSQLEntity);
     }
+    getPendingEscrowTransactions(): Promise<TransactionAbstract[] | null> {
+        throw new Error("Method not implemented.");
+    }
 
 
 

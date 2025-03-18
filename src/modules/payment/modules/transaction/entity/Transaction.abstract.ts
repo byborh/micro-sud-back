@@ -1,7 +1,7 @@
 import { TransactionContract } from "../contracts/ITransaction";
 import { TCurrency } from "../contracts/TCurrency";
 import { paymentPovider } from "../contracts/TPaymentProvider";
-import { TStatus } from "../contracts/TStatus";
+import { TStatus, TEscrowStatus } from "../contracts/TStatus";
 
 export abstract class TransactionAbstract implements TransactionContract {
     id: string;
@@ -12,9 +12,12 @@ export abstract class TransactionAbstract implements TransactionContract {
     beneficiary_email: string;
     status: TStatus;
     transaction_date: Date;
+    is_escrow: boolean;
+    release_date: Date;
     transaction_ref?: string;
     description?: string;
     metadata?: any;
+    escrow_status?: TEscrowStatus;
 
     constructor(
         id: string,
@@ -25,9 +28,12 @@ export abstract class TransactionAbstract implements TransactionContract {
         beneficiary_email: string,
         status: TStatus,
         transaction_date: Date,
+        is_escrow: boolean,
+        release_date: Date,
         description?: string,
         transaction_ref?: string,
-        metadata?: any
+        metadata?: any,
+        escrow_status?: TEscrowStatus,
     ) {
         this.id = id,
         this.amount = amount,
@@ -40,6 +46,10 @@ export abstract class TransactionAbstract implements TransactionContract {
         this.description = description,
         this.transaction_ref = transaction_ref,
         this.metadata = metadata
+
+        this.is_escrow = is_escrow,
+        this.escrow_status = escrow_status,
+        this.release_date = release_date
     }
 
     
@@ -54,6 +64,9 @@ export abstract class TransactionAbstract implements TransactionContract {
     getDescription(): string { return this.description; }
     getTransactionRef(): string { return this.transaction_ref; }
     getMetadata(): any { return this.metadata; }
+    getIsEscrow(): boolean { return this.is_escrow; }
+    getEscrowStatus(): TEscrowStatus { return this.escrow_status; }
+    getReleaseDate(): Date { return this.release_date; }
 
 
     setId(id: string): void { this.id = id; }
@@ -67,4 +80,7 @@ export abstract class TransactionAbstract implements TransactionContract {
     setDescription(description: string): void { this.description = description; }
     setTransactionRef(transaction_ref: string): void { this.transaction_ref = transaction_ref; }
     setMetadata(metadata: any): void { this.metadata = metadata; }
+    setIsEscrow(is_escrow: boolean): void { this.is_escrow = is_escrow; }
+    setEscrowStatus(escrow_status: TEscrowStatus): void { this.escrow_status = escrow_status; }
+    setReleaseDate(release_date: Date): void { this.release_date = release_date; }
 }

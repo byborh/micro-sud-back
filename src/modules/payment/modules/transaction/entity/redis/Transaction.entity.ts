@@ -1,6 +1,6 @@
 import { TCurrency } from "../../contracts/TCurrency";
 import { paymentPovider } from "../../contracts/TPaymentProvider";
-import { TStatus } from "../../contracts/TStatus";
+import { TEscrowStatus, TStatus } from "../../contracts/TStatus";
 import { TransactionAbstract } from "../Transaction.abstract";
 import { TransactionContract } from "../../contracts/ITransaction";
 import { PaymentProvider } from "@modules/payment/config/payment/contract/TPaymentProvider";
@@ -14,13 +14,16 @@ export class TransactionRedisEntity extends TransactionAbstract {
     beneficiary_email: string;
     status: TStatus;
     transaction_date: Date;
+    is_escrow: boolean;
+    release_date: Date;
     transaction_ref?: string;
     description?: string;
     metadata?: any;
+    escrow_status?: TEscrowStatus;
 
     data: Record<string, any> | null;
 
-    constructor(data: Partial<TransactionContract>) {
+    constructor(data?: Partial<TransactionContract>) {
         super(
             data?.id ?? "",
             data?.amount ?? 0,
@@ -30,9 +33,12 @@ export class TransactionRedisEntity extends TransactionAbstract {
             data?.beneficiary_email ?? "",
             data?.status ?? "processing",
             data?.transaction_date ?? new Date(),
+            data?.is_escrow ?? false,
+            data?.release_date ?? null,
             data?.description ?? "",
             data?.transaction_ref ?? "",
-            data?.metadata ?? null
+            data?.metadata ?? null,
+            data?.escrow_status ?? null,
         );
         this.id = data?.id ?? "";
         this.amount = data?.amount ?? 0;
@@ -45,6 +51,9 @@ export class TransactionRedisEntity extends TransactionAbstract {
         this.description = data?.description ?? "";
         this.transaction_ref = data?.transaction_ref ?? "";
         this.metadata = data?.metadata ?? null;
+        this.is_escrow = data?.is_escrow ?? false;
+        this.escrow_status = data?.escrow_status ?? null;
+        this.release_date = data?.release_date ?? null;
     }
 
     // Convert object to Redis hash
@@ -58,9 +67,12 @@ export class TransactionRedisEntity extends TransactionAbstract {
             beneficiary_email: this.beneficiary_email,
             status: this.status.toString(),
             transaction_date: this.transaction_date.toISOString(),
+            is_escrow: this.is_escrow.toString(),
+            release_date: this.release_date.toISOString(),
             transaction_ref: this.transaction_ref,
             description: this.description || "",
-            metadata: this.metadata
+            metadata: this.metadata,
+            escrow_status: this.escrow_status.toString()
         }
     }
 
@@ -75,9 +87,12 @@ export class TransactionRedisEntity extends TransactionAbstract {
             beneficiary_email: hash.beneficiary_email,
             status: hash.status as TStatus,
             transaction_date: new Date(hash.transaction_date),
+            is_escrow: hash.is_escrow === 'true',
+            release_date: new Date(hash.release_date),
             transaction_ref: hash.transaction_ref || undefined,
             description: hash.description || undefined,
             metadata: JSON.parse(hash.metadata || '{}'),
+            escrow_status: hash.escrow_status as TEscrowStatus
         })
     }
 }

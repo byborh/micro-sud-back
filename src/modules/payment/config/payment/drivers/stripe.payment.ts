@@ -36,6 +36,8 @@ export class StripePayment implements IPayment {
             payment_method: payment_identifier,
             confirm: true,
             description: transaction.description,
+            capture_method: transaction.is_escrow ? "manual" : "automatic",
+            // Verify if is escrow, if it is, so block the payment in escrow account
             metadata: {
                 transaction_id: transaction.id,
                 beneficiary_email: transaction.beneficiary_email,
@@ -82,12 +84,58 @@ export class StripePayment implements IPayment {
                 debtor_email: transaction.debtor_email,
             },
         });
-
         return session;
-        
     }
 
-    // à modifier !
+
+    /**
+     * Releases all escrow payments that have a release date in the past.
+     * @param pendingTransactions An array of transactions that are pending escrow release.
+     * @returns A promise that resolves when all escrow payments have been released.
+     */
+    async releaseEscrowPayments(pendingTransactions: TransactionAbstract[]): Promise<any> {
+        try {
+            console.log("Releasing escrow payments...");
+
+            // Capture escrow payments
+            for(const transaction of pendingTransactions) {
+                if(new Date(transaction.release_date) <= new Date()) {
+                    await this.stripe.paymentIntents.capture(transaction.transaction_ref);
+                    console.log(`Escrow released for transaction ${transaction.id}`);
+                }
+            }
+        } catch(error) {
+            console.error("Error releasing escrow payments:", error);
+        }
+    }
+
+    async createEscrowAccount(email: string): Promise<string> {
+        try {
+            const account = await this.stripe.accounts.create({
+                type: 'custom',
+                country: process.env.ESCROW_COUNTRY,
+                email: email,
+                capabilities: {
+                    card_payments: { requested: true },
+                    transfers: { requested: true }
+                }
+            })
+            
+            console.log("Escrow Account ID:", account.id); // Stocke acc_xxx dans ESCROW_ACCOUNT
+    
+            return account.id;
+        } catch (error) {
+            console.error("Error creating escrow account: ", error)
+            throw new Error("Error creating escrow account.");
+        }
+    }
+
+    /**
+     * Processes a refund through Stripe.
+     * @param refund The refund object containing details for the refund process.
+     * @returns A promise that resolves to the completed refund object from Stripe.
+     * @throws Will throw an error if the refund process fails.
+     */
     async refund(refund: RefundAbstract): Promise<any> {
         try {
             const refundComplete = await this.stripe.refunds.create({
@@ -136,7 +184,6 @@ export class StripePayment implements IPayment {
             console.error("Error attaching payment method to user's Stripe account:", error);
         }
     }
-
 
     async cancelTransaction(paymentIntentId: string): Promise<boolean> {
         try {

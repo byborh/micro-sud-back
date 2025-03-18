@@ -6,6 +6,8 @@ export interface IPayment {
     directPayment(transaction: TransactionAbstract, payment_identifier: string): Promise<any>;
     generateLinkForPayment(transaction: TransactionAbstract,): Promise<any>;
     refund(refund: RefundAbstract): Promise<any>;
+    releaseEscrowPayments(pendingTransactions: TransactionAbstract[]): Promise<any>;
+    createEscrowAccount(email: string): Promise<string>;
 
     createCustomerId(email: string): Promise<string>;
     attachPaymentAccount(payment_method: string, customerId: string): Promise<boolean>;

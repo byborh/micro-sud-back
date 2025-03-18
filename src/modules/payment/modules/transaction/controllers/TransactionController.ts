@@ -87,10 +87,39 @@ export class TransactionController {
         }
     }
 
+    // Create Escrow Account
+    public async createEscrowAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const email: string = req.params.email;
+
+            const escrowAccount: string = await this.transactionService.createEscrowAccount(email);
+
+            // If creation fails, return 400
+            if (!escrowAccount) {
+                res.status(400).json({ error: "Escrow account could not be created." });
+                return;
+            }
+
+            res.status(200).json(escrowAccount);            
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
     // Create a transaction
     public async createTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-           const { amount, currency, payment_provider, debtor_email, beneficiary_email, payment_identifier, description } = req.body;
+           const {
+                amount,
+                currency,
+                payment_provider,
+                debtor_email,
+                beneficiary_email,
+                payment_identifier,
+                description,
+                is_escrow
+            } = req.body;
 
             if(debtor_email === beneficiary_email) {
                 res.status(400).json({ error: "Debtor and beneficiary emails must be different." });
@@ -98,6 +127,14 @@ export class TransactionController {
             }
 
             const id = IdGenerator.getInstance().generateId();
+
+            // The escrow duration is set to 7 days by default
+            const escrowDuration = parseInt(process.env.ESCROW_DURATION || "7", 10); // en jours
+
+            // Calculate the release date
+            const releaseDate = is_escrow 
+                ? new Date(Date.now() + escrowDuration * 24 * 60 * 60 * 1000) 
+                : new Date(); 
 
             // Create transaction object
             const transaction = {
@@ -109,7 +146,9 @@ export class TransactionController {
                 beneficiary_email: beneficiary_email,
                 status: "processing", // Set the status to "processing" for the moment
                 transaction_date: new Date(),
-                description: description
+                description: description,
+                is_escrow: is_escrow,
+                release_date: releaseDate
             } as TransactionAbstract;
 
             const createdTransaction: TransactionAbstract = await this.transactionService.createPaymentTransaction(transaction, payment_identifier);

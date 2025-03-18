@@ -3,6 +3,16 @@ import { IPayment } from "../contract/IPayment";
 import { RefundAbstract } from "@modules/payment/modules/refund/entity/Refund.abstract";
 
 export class PaypalPayment implements IPayment {
+
+
+    async createEscrowAccount(email: string): Promise<string> {
+
+        return email;
+    }
+    
+    releaseEscrowPayments(pendingTransactions: TransactionAbstract[]): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
     refund(refund: RefundAbstract): Promise<any> {
         throw new Error("Method not implemented.");
     }

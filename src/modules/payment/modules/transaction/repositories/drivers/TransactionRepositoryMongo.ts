@@ -12,6 +12,9 @@ export class TransactionRepositoryMongo implements ITransactionRepository {
         const dataSource = db as MongoDatabase;
         this.repository = dataSource.getDataSource().getRepository(TransactionMongoEntity);
     }
+    getPendingEscrowTransactions(): Promise<TransactionAbstract[] | null> {
+        throw new Error("Method not implemented.");
+    }
     getTransactionsByDebtorEmail(userId: string): Promise<TransactionAbstract[] | null> {
         throw new Error("Method not implemented.");
     }
