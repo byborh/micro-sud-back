@@ -72,8 +72,6 @@ export class TransactionService {
     }
 
 
-
-
     public async createEscrowAccount(email: string): Promise<string> {
         try {
             // Verify if user has already a payment account

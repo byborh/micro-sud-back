@@ -7,20 +7,35 @@ import { TransactionRepositorySQL } from "@modules/payment/modules/transaction/r
 import { TransactionRepositoryRedis } from "@modules/payment/modules/transaction/repositories/drivers/TransactionRepostoryRedis";
 import cron from "node-cron";
 
+console.log("Starting cron job for escrow release...");
+
 // Cron job to release escrow every hour
-cron.schedule("0 * * * *", async () => { // Execution every minute
-    console.log("Running escrow release check...");
+cron.schedule("* * * * *", async () => { // Every minute
+    try {
+        console.log("Running escrow release check...");
 
-    // Get payment provider
-    const paymentProvider = getPaymentProvider();
+        const paymentProvider = getPaymentProvider();
+        let myDB;
 
-    // Get transactions
-    const myDB = await getDatabase();
-    const transactionRepository = getRepository(myDB, TransactionRepositorySQL, TransactionRepositoryRedis, TransactionRepositoryMongo) as ITransactionRepository;
+        // S'assurer de récuéperer la base de donnée
+        (async () => {
+            myDB = await getDatabase();
+            console.log("Database connected:", myDB);
+        })();
 
-    // Get pending escrow transactions
-    const pendingTransactions = await transactionRepository.getPendingEscrowTransactions();
+        
+        const transactionRepository = getRepository(myDB, TransactionRepositorySQL, TransactionRepositoryRedis, TransactionRepositoryMongo) as ITransactionRepository;
 
-    // Capture escrow
-    paymentProvider.releaseEscrowPayments(pendingTransactions);
+        console.log("Fetching pending transactions...");
+        const pendingTransactions = await transactionRepository.getPendingEscrowTransactions();
+
+        console.log(`Found ${pendingTransactions.length} pending transactions.`);
+
+        console.log("Releasing escrow payments...");
+        paymentProvider.releaseEscrowPayments(pendingTransactions);
+
+        console.log("Escrow release job completed.");
+    } catch (error) {
+        console.error("Error in cron job:", error);
+    }
 });

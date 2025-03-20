@@ -102,20 +102,21 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
 
             const transactionHash = {
                 id: transaction.id,
-                amount: transaction.amount.toString(),
+                amount: String(transaction.amount),
                 currency: transaction.currency,
                 payment_provider: transaction.payment_provider,
                 debtor_email: transaction.debtor_email,
                 beneficiary_email: transaction.beneficiary_email,
                 status: transaction.status.toString(),
-                is_ewcrow: transaction.is_escrow.toString(),
+                is_escrow: transaction.is_escrow.toString(),
                 transaction_date: transaction.transaction_date.toISOString(),
                 transaction_ref: transaction.transaction_ref || '',
                 description: transaction.description || '',
-                metadata: JSON.stringify(transaction.metadata || {}),
-                release_date: transaction.release_date.toISOString(),
-                escrow_status: transaction.escrow_status
+                metadata: typeof transaction.metadata === "string" ? transaction.metadata : JSON.stringify(transaction.metadata || {}),
+                release_date: transaction.release_date ? transaction.release_date.toISOString() : "",
+                escrow_status: transaction.escrow_status ? transaction.escrow_status.toString() : ""
             };
+            
 
             await this.client.hSet(`transaction:${transaction.id}`, transactionHash);
             await this.client.sAdd('transaction_index', transaction.id);
@@ -129,7 +130,7 @@ export class TransactionRepositoryRedis implements ITransactionRepository {
             const exists = await this.client.exists(`transaction:${transaction.id}`);
             return exists === 1 ? transaction : null;
         } catch (error) {
-            console.error("Failed to create transaction:", error);
+            console.error("Failed to create transaction in TransactionRepository:", error);
             throw error;
         }
     }

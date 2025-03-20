@@ -46,6 +46,8 @@ export class StripePayment implements IPayment {
             return_url: returnUrl
         });
 
+        console.log("Voici, la transaction qui a été crée suite à la requête: ", paymentIntent);
+
         return paymentIntent;
     }
 
@@ -84,6 +86,9 @@ export class StripePayment implements IPayment {
                 debtor_email: transaction.debtor_email,
             },
         });
+
+        console.log("Voici, la transaction qui a été crée suite à la requête: ", session);
+
         return session;
     }
 
