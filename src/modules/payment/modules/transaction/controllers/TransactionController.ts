@@ -87,26 +87,6 @@ export class TransactionController {
         }
     }
 
-    // Create Escrow Account
-    public async createEscrowAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const email: string = req.params.email;
-
-            const escrowAccount: string = await this.transactionService.createEscrowAccount(email);
-
-            // If creation fails, return 400
-            if (!escrowAccount) {
-                res.status(400).json({ error: "Escrow account could not be created." });
-                return;
-            }
-
-            res.status(200).json(escrowAccount);            
-        } catch (error) {
-            next(error);
-        }
-    }
-
-
     // Create a transaction
     public async createTransaction(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {

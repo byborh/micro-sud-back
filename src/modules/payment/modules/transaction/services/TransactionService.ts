@@ -72,24 +72,6 @@ export class TransactionService {
     }
 
 
-    public async createEscrowAccount(email: string): Promise<string> {
-        try {
-            // Verify if user has already a payment account
-            // !!!
-
-            // Create Escrow Account
-            const escrowAccount = await this.paymentProvider.createEscrowAccount(email);
-
-            if(!escrowAccount) throw new Error("Error create escrow account.");
-
-            return escrowAccount;
-        } catch (error) {
-            console.error("Error create payment account in TransactionService:", error);
-            throw new Error("Error create payment account.");
-        }
-    }
-
-
     // Create Transaction
     public async createPaymentTransaction(transaction: TransactionAbstract, payment_identifier?: string): Promise<TransactionAbstract | null> {
         try {

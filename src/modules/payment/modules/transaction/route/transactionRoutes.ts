@@ -13,12 +13,6 @@ export const transactionRoutes = (transactionController: TransactionController):
         (req: Request, res: Response, next: NextFunction) => transactionController.createPaymentAccount(req, res, next)
     );
 
-    router.post('/create-escrow-account/:email', 
-        // authMiddleware(['ADMIN']),
-        validateAttributeMiddleware('params', 'email', 'Email missing or invalid in request params'),
-        (req: Request, res: Response, next: NextFunction) => transactionController.createEscrowAccount(req, res, next)
-    )
-
     router.get('/:id',
         // authMiddleware(['ADMIN', 'MANAGER']),
         validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),

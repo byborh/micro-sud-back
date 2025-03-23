@@ -7,7 +7,6 @@ export interface IPayment {
     generateLinkForPayment(transaction: TransactionAbstract,): Promise<any>;
     refund(refund: RefundAbstract): Promise<any>;
     releaseEscrowPayments(pendingTransactions: TransactionAbstract[]): Promise<any>;
-    createEscrowAccount(email: string): Promise<string>;
 
     createCustomerId(email: string): Promise<string>;
     attachPaymentAccount(payment_method: string, customerId: string): Promise<boolean>;

@@ -5,11 +5,6 @@ import { RefundAbstract } from "@modules/payment/modules/refund/entity/Refund.ab
 export class PaypalPayment implements IPayment {
 
 
-    async createEscrowAccount(email: string): Promise<string> {
-
-        return email;
-    }
-    
     releaseEscrowPayments(pendingTransactions: TransactionAbstract[]): Promise<any> {
         throw new Error("Method not implemented.");
     }

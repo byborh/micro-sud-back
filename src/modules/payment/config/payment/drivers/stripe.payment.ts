@@ -113,27 +113,7 @@ export class StripePayment implements IPayment {
             console.error("Error releasing escrow payments:", error);
         }
     }
-
-    async createEscrowAccount(email: string): Promise<string> {
-        try {
-            const account = await this.stripe.accounts.create({
-                type: 'custom',
-                country: process.env.ESCROW_COUNTRY,
-                email: email,
-                capabilities: {
-                    card_payments: { requested: true },
-                    transfers: { requested: true }
-                }
-            })
-            
-            console.log("Escrow Account ID:", account.id); // Stocke acc_xxx dans ESCROW_ACCOUNT
     
-            return account.id;
-        } catch (error) {
-            console.error("Error creating escrow account: ", error)
-            throw new Error("Error creating escrow account.");
-        }
-    }
 
     /**
      * Processes a refund through Stripe.
