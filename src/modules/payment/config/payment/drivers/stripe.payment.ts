@@ -51,7 +51,6 @@ export class StripePayment implements IPayment {
         return paymentIntent;
     }
 
-
     /**
      * Generates a link for a payment, to be redirected to Stripe's Checkout UI.
      * @param transaction The transaction object to generate the link for.
@@ -92,7 +91,6 @@ export class StripePayment implements IPayment {
         return session;
     }
 
-
     /**
      * Releases all escrow payments that have a release date in the past.
      * @param pendingTransactions An array of transactions that are pending escrow release.
@@ -112,8 +110,7 @@ export class StripePayment implements IPayment {
         } catch(error) {
             console.error("Error releasing escrow payments:", error);
         }
-    }
-    
+    }    
 
     /**
      * Processes a refund through Stripe.
@@ -170,6 +167,12 @@ export class StripePayment implements IPayment {
         }
     }
 
+    /**
+     * Annule un paiement intenté mais non encore réussi.
+     * @param paymentIntentId L'ID du paiement à annuler.
+     * @returns Un booléen indiquant si le paiement a été annulé avec succès.
+     * @throws Si le paiement est déjà terminé (réussi ou échoué), ou si l'annulation échoue.
+     */
     async cancelTransaction(paymentIntentId: string): Promise<boolean> {
         try {
             const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);

@@ -3,6 +3,7 @@ import { ITransactionRepository } from "../repositories/contract/ITransactionRep
 import { getPaymentProvider } from "@modules/payment/config/payment/PaymentFactory";
 import { paymentPovider } from "../contracts/TPaymentProvider";
 import { InterractWithUser } from "@modules/payment/cores/db/interractWithUser";
+import { TEscrowStatus } from "../contracts/TStatus";
 
 export class TransactionService {
     private transactionRepository: ITransactionRepository; 
@@ -85,7 +86,7 @@ export class TransactionService {
 
             // Verify if is_escrow is true, if it is, transfer the amount to the escrow account
             if(transaction.is_escrow) {
-                
+                transaction.escrow_status = "pending" as TEscrowStatus;
             }
 
             let paymentIntent;
