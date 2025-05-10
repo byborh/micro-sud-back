@@ -4,7 +4,6 @@ import { DataSource } from "typeorm";
 import { UserSQLEntity } from "@modules/users/entity/sql/User.entity";
 import { RoleSQLEntity } from "@modules/roles/entity/sql/Role.entity";
 import { AuthTokenSQLEntity } from "@modules/auth-token/entity/sql/AuthToken.entity";
-import { ChatAISQLEntity } from "@modules/chat-ai/entity/sql/ChatAI.entity";
 import { IDatabase } from "@db/contract/IDatabase";
 import { UserRolesSQLEntity } from "@modules/user-roles/entity/sql/UserRoles.entity";
 import dotenvExpand from "dotenv-expand";
@@ -87,7 +86,7 @@ export class SQLDatabase implements IDatabase {
 
         this.dataSource = new DataSource({
             ...dbConfig,
-            entities: [UserSQLEntity, RoleSQLEntity, UserRolesSQLEntity, AuthTokenSQLEntity, ChatAISQLEntity],  // ADD ALL ENTITIES HERE
+            entities: [UserSQLEntity, RoleSQLEntity, UserRolesSQLEntity, AuthTokenSQLEntity],  // ADD ALL ENTITIES HERE
             synchronize: process.env.NODE_ENV !== "production",   // ATTENTION
             logging: process.env.NODE_ENV === "development",     // ATTENTION
         });

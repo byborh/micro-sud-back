@@ -4,7 +4,6 @@ import { UserContract } from "@modules/users/contracts/IUser";
 import { UserDTO } from "@modules/users/dto/UserDTO";
 import { UserRolesMongoEntity } from "@modules/user-roles/entity/mongo/UserRoles.entity";
 import { AuthTokenMongoEntity } from "@modules/auth-token/entity/mongo/AuthToken.entity";
-import { ChatAIMongoEntity } from "@modules/chat-ai/entity/mongo/ChatAI.entity";
 
 @Entity("users")
 export class UserMongoEntity extends UserAbstract {
@@ -46,9 +45,6 @@ export class UserMongoEntity extends UserAbstract {
 
     @OneToOne(() => AuthTokenMongoEntity, authTokenMongoEntity => authTokenMongoEntity.user)
     authTokenMongoEntity: AuthTokenMongoEntity;
-
-    @OneToMany(() => ChatAIMongoEntity, chatAIMongoEntity => chatAIMongoEntity.user, { cascade: true })
-    chatAIMongoEntity: ChatAIMongoEntity[];
     
 
     constructor(data?: Partial<UserContract>) {
