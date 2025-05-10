@@ -17,14 +17,14 @@ export const AuthTokenRoutes = (authTokenController: AuthTokenController): expre
     // Deconnexion
     router.post(
         "/logout",
-        authMiddleware(["ADMIN", "MANAGER", "USER"]),
+        authMiddleware(["ADMIN", "USER"]),
         (req: Request, res: Response, next: NextFunction) => authTokenController.deleteAuthToken(req, res, next)
     );    
     
     // Get token by user id
     router.get(
         "/tokens/user/:userId",
-        // authMiddleware(["ADMIN", "MANAGER"]),
+        // authMiddleware(["ADMIN"),
         validateAttributeMiddleware("params", "userId", "userId missing or invalid in request params."),
         (req: Request, res: Response, next: NextFunction) => authTokenController.getAuthTokenByUserId(req, res, next)
     );
@@ -32,7 +32,7 @@ export const AuthTokenRoutes = (authTokenController: AuthTokenController): expre
     // Delete token by user id
     router.delete(
         "/tokens/user/:userId",
-        // authMiddleware(["ADMIN", "MANAGER"]),
+        // authMiddleware(["ADMIN"),
         validateAttributeMiddleware("params", "userId", "userId missing or invalid in request params."),
         (req: Request, res: Response, next: NextFunction) => authTokenController.deleteAuthTokenByUserId(req, res, next)
     );

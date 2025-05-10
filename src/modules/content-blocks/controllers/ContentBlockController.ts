@@ -1,117 +1,109 @@
 import { Request, Response, NextFunction } from "express";
-import { UserService } from "../services/ContentBlockService";
+import { ContentBlockService } from "../services/ContentBlockService";
 import { IdGenerator } from "@core/idGenerator";
-import { UserAbstract } from "../entity/ContentBlock.abstract";
+import { ContentBlockAbstract } from "../entity/ContentBlock.abstract";
 
-export class UserController {
-    constructor(private readonly userService: UserService) {}
+export class ContentBlockController {
+    constructor(private readonly ContentBlockService: ContentBlockService) {}
 
-    // Get a user by ID
-    public async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Get a ContentBlock by ID
+    public async getContentBlockById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userDto = await this.userService.getUserById(req.params.id);
-            if (!userDto) {
-                res.status(404).json({ error: "User not found" });
+            const ContentBlockDto = await this.ContentBlockService.getContentBlockById(req.params.id);
+            if (!ContentBlockDto) {
+                res.status(404).json({ error: "ContentBlock not found" });
                 return;
             }
-            res.status(200).json(userDto);
+            res.status(200).json(ContentBlockDto);
         } catch (error) {
             next(error);
         }
     }
 
-    // Get all users
-    public async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Get all ContentBlocks
+    public async getAllContentBlocks(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const users = await this.userService.getUsers();
-            if (!users || users.length === 0) {
-                res.status(404).json({ error: "No users found" });
+            const ContentBlocks = await this.ContentBlockService.getContentBlocks();
+            if (!ContentBlocks || ContentBlocks.length === 0) {
+                res.status(404).json({ error: "No ContentBlocks found" });
                 return;
             }
-            res.status(200).json(users);
+            res.status(200).json(ContentBlocks);
         } catch (error) {
             next(error);
         }
     }
 
-    // Create a user
-    public async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Create a ContentBlock
+    public async createContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
+            const { type, title, content, img, date } = req.body;
 
-            if (!email || !password) {
-                res.status(400).json({ error: "Email and password are required." });
+            if (!type) {
+                res.status(400).json({ error: "Type and password are required." });
                 return;
             }
 
             const idGenerator = IdGenerator.getInstance();
-            const userId: string = idGenerator.generateId();
+            const ContentBlockId: string = idGenerator.generateId();
 
-            const user: UserAbstract = ({
-                id: userId,
-                email,
-                password,
-                salt: "", // À gérer correctement
-                firstname,
-                lastname,
-                pseudo,
-                telnumber,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-
-                stripeCustomerId: null,
-                paypalCustomerId: null
-            } as UserAbstract);
+            const ContentBlock: ContentBlockAbstract = ({
+                id: ContentBlockId,
+                type: type,
+                title: title,
+                content: content,
+                img: img,
+                date: date,
+            }) as ContentBlockAbstract;
             
-            const createdUser = await this.userService.createUser(user);
+            const createdContentBlock = await this.ContentBlockService.createContentBlock(ContentBlock);
 
-            if (!createdUser) {
-                res.status(400).json({ error: "User could not be created." });
+            if (!createdContentBlock) {
+                res.status(400).json({ error: "ContentBlock could not be created." });
                 return;
             }
 
-            res.status(201).json(createdUser);
+            res.status(201).json(createdContentBlock);
         } catch (error) {
             next(error);
         }
     }
 
-    // Modify a user
-    public async modifyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Modify a ContentBlock
+    public async modifyContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { email, password, firstname, lastname, pseudo, telnumber } = req.body;
+            const { type, title, content, img, date } = req.body;
 
             // Verify if id is provided
             if (!req.params.id) {
-                res.status(400).json({ error: "User id is required." });
+                res.status(400).json({ error: "ContentBlock id is required." });
                 return;
             }
     
-            const updatedUser = await this.userService.modifyUser(req.params.id, {
-                email, password, firstname, lastname, pseudo, telnumber
+            const updatedContentBlock = await this.ContentBlockService.modifyContentBlock(req.params.id, {
+                type, title, content, img, date
             });
     
-            if (!updatedUser) {
-                res.status(404).json({ error: "User could not be modified." });
+            if (!updatedContentBlock) {
+                res.status(404).json({ error: "ContentBlock could not be modified." });
                 return;
             }
     
-            res.status(200).json(updatedUser);
+            res.status(200).json(updatedContentBlock);
         } catch (error) {
             next(error);
         }
     }
     
-
-    // Delete a user
-    public async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Delete a ContentBlock
+    public async deleteContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const isDeleted = await this.userService.deleteUser(req.params.id);
+            const isDeleted = await this.ContentBlockService.deleteContentBlock(req.params.id);
             if (!isDeleted) {
-                res.status(404).json({ error: "User could not be deleted." });
+                res.status(404).json({ error: "ContentBlock could not be deleted." });
                 return;
             }
-            res.status(200).json({ message: "User deleted successfully." });
+            res.status(200).json({ message: "ContentBlock deleted successfully." });
         } catch (error) {
             next(error);
         }

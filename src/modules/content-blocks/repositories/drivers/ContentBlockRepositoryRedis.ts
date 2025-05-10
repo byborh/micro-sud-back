@@ -1,9 +1,9 @@
-import { IUserRepository } from "../contract/IContentBlockRepository";
+import { IContentBlockRepository } from "../contract/IContentBlockRepository";
 import { IDatabase } from "@db/contract/IDatabase";
 import { RedisClientType } from "redis";
-import { UserRedisEntity } from "@modules/users/entity/redis/User.entity";
+import { ContentBlockRedisEntity } from "@modules/content-blocks/entity/redis/ContentBlock.entity";
 
-export class UserRepositoryRedis implements IUserRepository {
+export class ContentBlockRepositoryRedis implements IContentBlockRepository {
     private client: RedisClientType;
     private isInitialized: Promise<void>; // Be sure to wait for initialization
     
@@ -24,120 +24,117 @@ export class UserRepositoryRedis implements IUserRepository {
         }
     }
 
-    async findUserByField(field: string, value: string): Promise<UserRedisEntity | null> {
-        return null; // Don't use this method
+    async findContentBlockByField(field: string, value: string): Promise<ContentBlockRedisEntity | null> {
+        return null; // Don't use this method (forbidden)
     }
 
-    async findUserById(userId: string): Promise<UserRedisEntity | null> {
+    async findContentBlockById(contentBlockId: string): Promise<ContentBlockRedisEntity | null> {
         try {
             await this.isInitialized; // Wait for initialization
 
-            const userData = await this.client.hGetAll(`user:${userId}`);
+            const contentBlockData = await this.client.hGetAll(`content_block:${contentBlockId}`);
 
-            return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
+            return Object.keys(contentBlockData).length > 0 
+                ? ContentBlockRedisEntity.fromRedisHash(contentBlockData) 
+                : null;
         } catch (error) {
-            console.error("Failed to find user by field:", error);
+            console.error("Failed to find content block by ID:", error);
             throw error;
         }
     }
 
-    async findUserByEmail(email: string): Promise<UserRedisEntity | null> {
+    async findContentBlocksByType(type: string): Promise<ContentBlockRedisEntity[]> {
         try {
             await this.isInitialized; // Wait for initialization
-
-            const userId = await this.client.hGet(`user_index`, `email:${email}`);
-            if(!userId) return null;
-
-            const userData = await this.client.hGetAll(`user:${userId}`);
-            return Object.keys(userData).length > 0 ? UserRedisEntity.fromRedisHash(userData) : null;
-        } catch (error) {
-            console.error("Failed to find user by email:", error);
-            throw error;
-        }
-    }
-
-    async getAllUsers(): Promise<UserRedisEntity[]> {
-        try {
-            await this.isInitialized; // Wait for initialization
-            const users: UserRedisEntity[] = [];
+            const contentBlocks: ContentBlockRedisEntity[] = [];
             let cursor: number = 0;
 
             do {
-                const reply = await this.client.scan(cursor, { MATCH: "user:*", COUNT: 100});
+                const reply = await this.client.scan(cursor, { MATCH: "content_block:*", COUNT: 100 });
                 cursor = reply.cursor;
                 const keys = reply.keys;
 
-                for(const key of keys) {
-                    const userData = await this.client.hGetAll(key);
-                    users.push(UserRedisEntity.fromRedisHash(userData))
+                for (const key of keys) {
+                    const contentBlockData = await this.client.hGetAll(key);
+                    if (contentBlockData.type === type) {
+                        contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(contentBlockData));
+                    }
                 }
-        
-            } while(cursor !== 0);
-    
-            return users;
+            } while (cursor !== 0);
+
+            return contentBlocks;
         } catch (error) {
-            console.error("Failed to find all users:", error);
+            console.error("Failed to find content blocks by type:", error);
             throw error;
         }
     }
 
-    async createUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
+    async getAllContentBlocks(): Promise<ContentBlockRedisEntity[]> {
+        try {
+            await this.isInitialized; // Wait for initialization
+            const contentBlocks: ContentBlockRedisEntity[] = [];
+            let cursor: number = 0;
+
+            do {
+                const reply = await this.client.scan(cursor, { MATCH: "content_block:*", COUNT: 100 });
+                cursor = reply.cursor;
+                const keys = reply.keys;
+
+                for (const key of keys) {
+                    const contentBlockData = await this.client.hGetAll(key);
+                    contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(contentBlockData));
+                }
+            } while (cursor !== 0);
+
+            return contentBlocks;
+        } catch (error) {
+            console.error("Failed to get all content blocks:", error);
+            throw error;
+        }
+    }
+
+    async createContentBlock(block: ContentBlockRedisEntity): Promise<ContentBlockRedisEntity | null> {
         try {
             await this.isInitialized; // Wait for initialization
 
-            await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+            await this.client.hSet(`content_block:${block.id}`, block.toRedisHash());
 
-            // Create an index in email
-            await this.client.hSet(`user_index`, `email:${user.email}`, user.id);
-
-            // Verify if user was created
-            const exists = await this.client.exists(`user:${user.id}`);
+            // Verify if content block was created
+            const exists = await this.client.exists(`content_block:${block.id}`);
             
-            return exists === 1 ? user : null;
+            return exists === 1 ? block : null;
         } catch (error) {
-            console.error("Failed to create user:", error);
+            console.error("Failed to create content block:", error);
             throw error;
         }
     }
 
-    async modifyUser(user: UserRedisEntity): Promise<UserRedisEntity | null> {
+    async updateContentBlock(block: ContentBlockRedisEntity): Promise<ContentBlockRedisEntity | null> {
         try {
             await this.isInitialized; // Wait for initialization
 
-            await this.client.hSet(`user:${user.id}`, user.toRedisHash());
+            await this.client.hSet(`content_block:${block.id}`, block.toRedisHash());
 
-            // Update the index in email
-            await this.client.hDel("user_index", `email:${user.email}`);
-            await this.client.hSet(`user_index`, `email:${user.email}`, user.id);
-
-            const exists = await this.client.exists(`user:${user.id}`);
+            // Verify if content block was updated
+            const exists = await this.client.exists(`content_block:${block.id}`);
             
-            return exists === 1 ? user : null;
+            return exists === 1 ? block : null;
         } catch (error) {
-            console.error("Failed to modify user:", error);
+            console.error("Failed to modify content block:", error);
             throw error;
         }
     }
 
-    async deleteUser(userId: string): Promise<boolean> {
+    async deleteContentBlockById(contentBlockId: string): Promise<boolean> {
         try {
             await this.isInitialized; // Wait for initialization
 
-            // stock email of user in constant
-            const email = await this.client.hGet(`user:${userId}`, "email");
-
-            // Delete the User
-            const userDel = await this.client.del(`user:${userId}`);
-
-            // Delete user roles of user
-            const userRolesDel = await this.client.del(`user_roles:${userId}`);
-
-            // Delete user index
-            const userIndexDel = await this.client.hDel("user_index", `email:${email}`);
-
-            return userDel > 0 || userRolesDel > 0 || userIndexDel > 0;
+            // Delete the content block
+            const deleted = await this.client.del(`content_block:${contentBlockId}`);
+            
+            return deleted > 0;
         } catch (error) {
-            console.error("Failed to delete user:", error);
+            console.error("Failed to delete content block:", error);
             throw error;
         }
     }

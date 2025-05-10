@@ -5,7 +5,7 @@ import { AuthTokenSQLEntity } from "./sql/AuthToken.entity";
 import { AuthTokenAbstract } from "./AuthToken.abstract";
 import { AuthTokenMongoEntity } from "./mongo/AuthToken.entity";
 
-const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
+const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "redis"; // Default to Redis if not specified
 
 
 export async function createAuthTokenEntity(authToken: Partial<AuthTokenContract>, dbType: DatabaseType = databaseType): Promise<AuthTokenAbstract> {

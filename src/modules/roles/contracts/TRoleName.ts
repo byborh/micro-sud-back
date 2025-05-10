@@ -1,1 +1,1 @@
-export type TRoleName = 'ADMIN' | 'MANAGER' | 'USER';
+export type TRoleName = 'ADMIN' | 'USER';

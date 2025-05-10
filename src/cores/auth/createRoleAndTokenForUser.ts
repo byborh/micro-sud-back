@@ -34,7 +34,6 @@ export class CreateRoleAndTokenForUser {
             // Rôles par défaut
             const defaultRoles: { id: string; name: TRoleName; description: string }[] = [
                 { id: "123sW8eR1tZ4USER", name: "USER", description: "Just a chill user" },
-                { id: "wE3rT6yU8iK2lO7p", name: "MANAGER", description: "Gère les utilisateurs et les permissions avec certaines restrictions" },
                 { id: "qA5sW8eR1tZ4vC9m", name: "ADMIN", description: "Accès total à toutes les ressources" },
             ];
 

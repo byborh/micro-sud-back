@@ -6,7 +6,7 @@ import { UserRolesSQLEntity } from "./sql/UserRoles.entity";
 import { UserRolesMongoEntity } from "./mongo/UserRoles.entity";
 
 
-const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
+const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "redis"; // Default to Redis if not specified
 
 
 export async function createUserRolesEntity(userRoles: Partial<UserRolesContract>, dbType: DatabaseType = databaseType): Promise<UserRolesAbstract> {

@@ -7,13 +7,13 @@ export const roleRoutes = (roleController: RoleController): express.Router => {
     const router = express.Router();
 
     router.get('/:id',
-        // authMiddleware(['ADMIN', 'MANAGER']),
+        // authMiddleware(['ADMIN'),
         validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
         (req: Request, res: Response, next: NextFunction) => roleController.getRoleById(req, res, next)    
     )
 
     router.get('/',
-        // authMiddleware(['ADMIN', 'MANAGER']),
+        // authMiddleware(['ADMIN'),
         (req: Request, res: Response, next: NextFunction) => roleController.getAllRoles(req, res, next)
     );
 

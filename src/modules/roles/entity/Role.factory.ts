@@ -5,7 +5,7 @@ import { RoleAbstract } from "./Role.abstract";
 import { RoleContract } from "../contracts/IRole";
 import { RoleMongoEntity } from "./mongo/Role.entity";
 
-const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
+const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "redis"; // Default to Redis if not specified
 
 
 export async function createRoleEntity(role: Partial<RoleContract>, dbType: DatabaseType = databaseType): Promise<RoleAbstract> {

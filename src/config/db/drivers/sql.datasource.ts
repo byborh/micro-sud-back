@@ -17,7 +17,7 @@ export class SQLDatabase implements IDatabase {
     constructor() {
         // Get type of database from .env
 
-        const dbType = process.env.MY_DB || "mysql"; // Default to MySQL if not specified
+        const dbType = process.env.MY_DB || "redis"; // Default to Redis if not specified
         let dbConfig: any;
     
         // Switch between database types

@@ -1,20 +1,10 @@
-import { UserDTO } from "../dto/UserDTO";
+import { TTypeName } from "./TTypeName";
 
-// Interface of the user
-export interface UserContract {
+export interface ContentBlockContract {
     id: string;
-    firstname?: string;
-    lastname?: string;
-    pseudo?: string;
-    email: string;
-    password: string;
-    salt: string;
-    telnumber?: string;
-    createdAt: Date;
-    updatedAt: Date;
-
-    stripeCustomerId?: string; // Optional
-    paypalCustomerId?: string; // Optional
-
-    toDto(): UserDTO;
+    type: TTypeName;
+    title?: string;
+    content?: string;
+    img?: string;
+    date?: Date;
 }

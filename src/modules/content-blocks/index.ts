@@ -1,22 +1,23 @@
-import express from 'express';
-import { UserController } from './controllers/UserController';
-import { UserService } from './services/ContentBlockService';
-import { UserRepositorySQL } from './repositories/drivers/ContentBlockRepositorySQL';
-import { userRoutes } from './route/contentBlockRoutes';
-import { getDatabase } from '@db/DatabaseClient';
-import { IUserRepository } from './repositories/contract/IContentBlockRepository';
 import { getRepository } from '@core/db/databaseGuards';
-import { UserRepositoryRedis } from './repositories/drivers/ContentBlockRepositoryRedis';
-import { UserRepositoryMongo } from './repositories/drivers/ContentBlockRepositoryMongo';
+import { getDatabase } from '@db/DatabaseClient';
+import express from 'express';
+import { ContentBlockController } from './controllers/ContentBlockController';
+import { IContentBlockRepository } from './repositories/contract/IContentBlockRepository';
+import { ContentBlockRepositoryMongo } from './repositories/drivers/ContentBlockRepositoryMongo';
+import { ContentBlockRepositoryRedis } from './repositories/drivers/ContentBlockRepositoryRedis';
+import { ContentBlockRepositorySQL } from './repositories/drivers/ContentBlockRepositorySQL';
+import { userRoutes } from './route/contentBlockRoutes';
+import { ContentBlockService } from './services/ContentBlockService';
 
-export const createUserModule = async (): Promise<express.Router> => {
+
+export const createContentBlockModule = async (): Promise<express.Router> => {
 
   const myDB = await getDatabase();
 
-  const userRepository = getRepository(myDB, UserRepositorySQL, UserRepositoryRedis, UserRepositoryMongo) as IUserRepository;
+  const userRepository = getRepository(myDB, ContentBlockRepositorySQL, ContentBlockRepositoryRedis, ContentBlockRepositoryMongo) as IContentBlockRepository;
 
-  const userService = new UserService(userRepository);
-  const userController = new UserController(userService);
+  const userService = new ContentBlockService(userRepository);
+  const userController = new ContentBlockController(userService);
 
   return userRoutes(userController);
 };

@@ -1,228 +1,127 @@
-import { UserDTO } from "../dto/UserDTO";
-import { UserMapper } from "../mapper/ContentBlockMapper";
-import { PasswordManager } from "@core/cryptography/PasswordManager";
-import { CreateRoleAndTokenForUser } from "@core/auth/createRoleAndTokenForUser";
-import { UserRolesRepositorySQL } from "@modules/user-roles/repositories/drivers/UserRolesRepositorySQL";
-import { AuthTokenRepositorySQL } from "@modules/auth-token/repositories/drivers/AuthTokenRepositorySQL";
-import { RoleRepositorySQL } from "@modules/roles/repositories/drivers/RoleRepositorySQL";
-import { CreateToken } from "@core/auth/createToken";
-import { getDatabase } from "@db/DatabaseClient";
-import { IUserRepository } from "../repositories/contract/IContentBlockRepository";
-import { IRoleRepository } from "@modules/roles/repositories/contract/IRoleRepository";
-import { getRepository } from "@core/db/databaseGuards";
-import { RoleRepositoryRedis } from "@modules/roles/repositories/drivers/RoleRepostoryRedis";
-import { UserRolesRepositoryRedis } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryRedis";
-import { IUserRolesRepository } from "@modules/user-roles/repositories/contract/IUserRolesRepository";
-import { IAuthTokenRepository } from "@modules/auth-token/repositories/contract/IAuthTokenRepository";
-import { AuthTokenRepositoryRedis } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryRedis";
-import { UserAbstract } from "../entity/ContentBlock.abstract";
-import { AuthTokenAbstract } from "@modules/auth-token/entity/AuthToken.abstract";
-import { createUserEntity } from "../entity/ContentBlock.factory";
-import { RoleRepositoryMongo } from "@modules/roles/repositories/drivers/RoleRepositoryMongo";
-import { UserRolesRepositoryMongo } from "@modules/user-roles/repositories/drivers/UserRolesRepositoryMongo";
-import { AuthTokenRepositoryMongo } from "@modules/auth-token/repositories/drivers/AuthTokenRepositoryMongo";
+import { IContentBlockRepository } from "../repositories/contract/IContentBlockRepository";
+import { ContentBlockAbstract } from "../entity/ContentBlock.abstract";
+import { createContentBlockEntity } from "../entity/ContentBlock.factory";
 import _ from "lodash";
 
+export class ContentBlockService {
+    constructor(private contentBlockRepository: IContentBlockRepository) {}
 
-export class UserService {
-    constructor(private userRepository: IUserRepository) {}
-
-    // Get a user by ID
-    public async getUserById(userId: string): Promise<UserDTO | null> {
+    // Get a content block by ID
+    public async getContentBlockById(id: string): Promise<ContentBlockAbstract | null> {
         try {
-            // Verify if userId is provided
-            if (!userId) {
-                throw new Error("User ID is required.");
+            // Verify if id is provided
+            if (!id) {
+                throw new Error("Content block ID is required.");
             }
 
-            // Call UserRepository to find a user by ID
-            const userEntity: UserAbstract = await this.userRepository.findUserById(userId);
+            // Call repository to find a content block by ID
+            const contentBlockEntity: ContentBlockAbstract = await this.contentBlockRepository.findContentBlockById(id);
 
-            // If no user is found, return null
-            if (!userEntity) {
-                throw new Error("User not found.");
+            // If no content block is found, return null
+            if (!contentBlockEntity) {
+                throw new Error("Content block not found.");
             }
 
-            // Transform the entity to the dto
-            const userDTO: UserDTO = UserMapper.toDTO(userEntity);
-
-            // Return the user
-            return userDTO;
+            // Return the content block
+            return contentBlockEntity;
         } catch (error) {
-            console.error("Error finding user in UserService:", error);
-            throw new Error("Failed to find user by id.");
+            console.error("Error finding content block in ContentBlockService:", error);
+            throw new Error("Failed to find content block by id.");
         }
     }
 
-    // Get a user by Email
-    public async getUserByEmail(email: string): Promise<UserDTO | null> {
+    // Get all content blocks
+    public async getContentBlocks(): Promise<Array<ContentBlockAbstract> | null> {
         try {
-            // Verify if email is provided
-            if (!email) throw new Error("Email is required.");
+            // Call repository to find all content blocks
+            const contentBlocksEntity: ContentBlockAbstract[] = await this.contentBlockRepository.getAllContentBlocks();
 
-            // Call UserRepository to find a user by email
-            const userEntity: UserAbstract = await this.userRepository.findUserByEmail(email);
+            // If no content blocks are found, return null
+            if (!contentBlocksEntity) return null;
 
-            // If no user is found, return null
-            if (!userEntity) {
-                throw new Error("User not found.");
-            }
-
-            // Transform the entity to the dto
-            const userDTO: UserDTO = UserMapper.toDTO(userEntity);
-
-            // Return the user
-            return userDTO;
+            // Return all content blocks in DTO format
+            return contentBlocksEntity;
         } catch (error) {
-            console.error("Error finding user by email in UserService:", error);
-            throw new Error("Failed to find user by email.");
-        }
-    }
-
-    // Get all users
-    public async getUsers(): Promise<Array<UserDTO> | null> {
-        try {
-            // Call UserRepository to find all users
-            const usersEntity: UserAbstract[] = await this.userRepository.getAllUsers();
-
-            // If no users are found, return null
-            if (!usersEntity) return null;
-
-            // Return all users in DTO format
-            return usersEntity.map(userEntity => UserMapper.toDTO(userEntity));
-        } catch (error) {
-            console.error("Error finding users in UserService:", error);
-            throw new Error("Failed to find users.");
+            console.error("Error finding content blocks in ContentBlockService:", error);
+            throw new Error("Failed to find content blocks.");
         }
     }
     
-    // Create user
-    public async createUser(user: UserAbstract): Promise<UserDTO | null> {
+    // Create content block
+    public async createContentBlock(contentBlock: ContentBlockAbstract): Promise<ContentBlockAbstract | null> {
         try {
-            // Factory to create a correct type of user entity
-            const userEntity = await createUserEntity(user);
+            // Factory to create a correct type of content block entity
+            const contentBlockEntity = await createContentBlockEntity(contentBlock);
 
-            // Verify if user exists
-            const localUser: UserAbstract | null = await this.userRepository.findUserByEmail(userEntity.email);
-            if (localUser) {
-                console.error("User already exists:", localUser);
-                throw new Error("User already exists.");
+            // Verify required fields
+            if (!contentBlockEntity.id) throw new Error("ID is required");
+            if (!contentBlockEntity.type) throw new Error("Type is required");
+
+            // Verify if content block exists
+            const existingContentBlock: ContentBlockAbstract | null = 
+                await this.contentBlockRepository.findContentBlockById(contentBlockEntity.id);
+            if (existingContentBlock) {
+                console.error("Content block already exists:", existingContentBlock);
+                throw new Error("Content block already exists.");
             }
 
-            // Password management
-            const passwordManager = PasswordManager.getInstance();
+            // Create content block from repository
+            const createdContentBlock: ContentBlockAbstract | null = 
+                await this.contentBlockRepository.createContentBlock(contentBlockEntity);
 
-            // Creation of the salt
-            const salt: string = passwordManager.generateSalt();
-
-            // Creation of hashed password
-            const hashedPassword: string = passwordManager.hashPassword(userEntity.password, salt);
-
-            // Verification of password
-            // const isPasswordValid: boolean = passwordManager.verifyPassword(userEntity.password, salt, hashedPassword); // IL N'EST PAS UTILISE ???
-
-            // Assign hashed password to user
-            userEntity.setPassword(hashedPassword);
-            userEntity.setSalt(salt);
-
-            // Create user from repository
-            const createdUser: UserAbstract | null = await this.userRepository.createUser(userEntity);
-
-            // User didn't created
-            if (!createdUser) throw new Error("User didn't created...")
-
-            // Initialize the Database
-            const myDB = await getDatabase();
-
-            // Initialize the repository
-            // Role repository
-            const roleRepository = getRepository(myDB, RoleRepositorySQL, RoleRepositoryRedis, RoleRepositoryMongo) as IRoleRepository;
-            // UserRoles repository
-            const userRolesRepository = getRepository(myDB, UserRolesRepositorySQL, UserRolesRepositoryRedis, UserRolesRepositoryMongo) as IUserRolesRepository;
-            // AuthToken repositoryé&
-            const authTokenRepository = getRepository(myDB, AuthTokenRepositorySQL, AuthTokenRepositoryRedis, AuthTokenRepositoryMongo) as IAuthTokenRepository;
-
-            const createToken = CreateToken.getInstance(authTokenRepository);
-
-            // Attribute USER role
-            const createRoleAndTokenForUser = CreateRoleAndTokenForUser.getInstance(roleRepository, userRolesRepository, createToken);
-            const authToken: AuthTokenAbstract | null = await createRoleAndTokenForUser.createRoleAndTokenForUser(createdUser.getId());
-
-            if(!authToken) throw new Error("Attribution of role or token didn't created...");
+            // Content block didn't created
+            if (!createdContentBlock) throw new Error("Content block didn't created...")
 
             // Entity to DTO
-            const userDTO: UserDTO = UserMapper.toDTO(createdUser);
-            return userDTO;
+            return contentBlockEntity;
         } catch (error) {
-            console.error("Error creating user in UserService:", error);
-            throw new Error("Failed to create user.");
+            console.error("Error creating content block in ContentBlockService:", error);
+            throw new Error("Failed to create content block.");
         }
     }
 
-    // Modify user
-    public async modifyUser(userId: string, user: Partial<UserAbstract>): Promise<UserDTO | null> {
+    // Modify content block
+    public async modifyContentBlock(id: string, contentBlock: Partial<ContentBlockAbstract>): Promise<ContentBlockAbstract | null> {
         try {
-            // Factory to create a correct type of user entity
-            const userEntity = await createUserEntity(user);
+            // Factory to create a correct type of content block entity
+            const contentBlockEntity = await createContentBlockEntity(contentBlock);
 
-            // Verify if user exists
-            const existingUserDTO: UserDTO | null = await this.getUserById(userId);
-            if (!existingUserDTO) {
-                throw new Error("User not found.");
+            // Verify if content block exists
+            const existingContentBlockAbstract: ContentBlockAbstract | null = await this.getContentBlockById(id);
+            if (!existingContentBlockAbstract) {
+                throw new Error("Content block not found.");
             }
     
-            // Mapp the DTO to the entity
-            const existingUser: UserAbstract = await UserMapper.toEntity(existingUserDTO);
-
-            // Factory to create a correct type of user entity
-            const existingUserEntity = await createUserEntity(existingUser);
+            // Factory to create a correct type of content block entity
+            const existingContentBlockEntity = await createContentBlockEntity(existingContentBlockAbstract);
     
             // Variable to track changes
             let hasChanges: boolean = false;
     
             // Compare fields and update if necessary
-            if (userEntity.email && userEntity.email !== existingUserEntity.email) {
-                existingUserEntity.setEmail(userEntity.email);
+            if (contentBlockEntity.type && contentBlockEntity.type !== existingContentBlockEntity.type) {
+                existingContentBlockEntity.type = contentBlockEntity.type;
                 hasChanges = true;
             }
     
-            if (userEntity.firstname && userEntity.firstname !== existingUserEntity.firstname) {
-                existingUserEntity.setFirstname(userEntity.firstname);
+            if (contentBlockEntity.title && contentBlockEntity.title !== existingContentBlockEntity.title) {
+                existingContentBlockEntity.title = contentBlockEntity.title;
                 hasChanges = true;
             }
     
-            if (userEntity.lastname && userEntity.lastname !== existingUserEntity.lastname) {
-                existingUserEntity.setLastname(userEntity.lastname);
+            if (contentBlockEntity.content && contentBlockEntity.content !== existingContentBlockEntity.content) {
+                existingContentBlockEntity.content = contentBlockEntity.content;
                 hasChanges = true;
             }
     
-            if (userEntity.pseudo && userEntity.pseudo !== existingUserEntity.pseudo) {
-                existingUserEntity.setPseudo(userEntity.pseudo);
+            if (contentBlockEntity.img && contentBlockEntity.img !== existingContentBlockEntity.img) {
+                existingContentBlockEntity.img = contentBlockEntity.img;
                 hasChanges = true;
             }
     
-            if (userEntity.telnumber && userEntity.telnumber !== existingUserEntity.telnumber) {
-                existingUserEntity.setTelnumber(userEntity.telnumber);
+            if (contentBlockEntity.date && contentBlockEntity.date !== existingContentBlockEntity.date) {
+                existingContentBlockEntity.date = contentBlockEntity.date;
                 hasChanges = true;
-            }
-    
-            // Verify password
-            if (userEntity.password) {
-                const passwordManager = PasswordManager.getInstance();
-                const isPasswordValid: boolean = passwordManager.verifyPassword(
-                    userEntity.password,
-                    existingUserEntity.salt,
-                    existingUserEntity.password
-                );
-    
-                // If password is different
-                if (!isPasswordValid) {
-                    const newSalt = passwordManager.generateSalt();
-                    const hashedPassword = passwordManager.hashPassword(userEntity.password, newSalt);
-                    existingUserEntity.setSalt(newSalt);
-                    existingUserEntity.setPassword(hashedPassword);
-                    hasChanges = true;
-                }
             }
     
             // If no changes are detected, do nothing
@@ -230,49 +129,46 @@ export class UserService {
                 throw new Error("No changes detected.");
             }
     
-            // Mise à jour de la date de modification
-            // Update the updatedAt field
-            existingUserEntity.setUpdatedAt(new Date());
+            // Update the content block in DB
+            const updatedContentBlock: ContentBlockAbstract | null = 
+                await this.contentBlockRepository.updateContentBlock(existingContentBlockEntity);
     
-            // Update the user in DB
-            const updatedUser: UserAbstract | null = await this.userRepository.modifyUser(existingUserEntity);
-    
-            // If user didn't updated, return null
-            if (!updatedUser) {
-                throw new Error("User not updated.");
+            // If content block didn't updated, return null
+            if (!updatedContentBlock) {
+                throw new Error("Content block not updated.");
             }
     
-            // Return the updated user without sensitive userEntity
-            return UserMapper.toDTO(updatedUser);
+            // Return the updated content block
+            return updatedContentBlock;
         } catch (error) {
-            console.error("Error modifying user in UserService:", error);
-            throw new Error("Failed to modify user.");
+            console.error("Error modifying content block in ContentBlockService:", error);
+            throw new Error("Failed to modify content block.");
         }
     }    
 
-    // Delete user
-    public async deleteUser(userId: string): Promise<boolean> {
+    // Delete content block
+    public async deleteContentBlock(id: string): Promise<boolean> {
         try {
-            // Verify if userId is provided
-            if (!userId) {
-                throw new Error("User ID is required.");
+            // Verify if id is provided
+            if (!id) {
+                throw new Error("Content block ID is required.");
             }
 
-            // Find the user by ID
-            const user: UserDTO | null = await this.getUserById(userId);
-            if (!user) {
-                console.error("User not found:", userId);
+            // Find the content block by ID
+            const contentBlock: ContentBlockAbstract | null = await this.getContentBlockById(id);
+            if (!contentBlock) {
+                console.error("Content block not found:", id);
                 return false;
             }
 
-            // Delete the user
-            const isDeleted: boolean = await this.userRepository.deleteUser(userId);
+            // Delete the content block
+            const isDeleted: boolean = await this.contentBlockRepository.deleteContentBlockById(id);
 
-            // Return true if the user is deleted, false otherwise
+            // Return true if the content block is deleted, false otherwise
             return isDeleted;
         } catch (error) {
-            console.error("Error deleting user in UserService:", error);
-            throw new Error("Failed to delete user.");
+            console.error("Error deleting content block in ContentBlockService:", error);
+            throw new Error("Failed to delete content block.");
         }
     }
 }

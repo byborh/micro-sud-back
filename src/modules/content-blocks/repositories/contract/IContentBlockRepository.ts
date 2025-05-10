@@ -1,11 +1,11 @@
-import { UserAbstract } from "@modules/users/entity/User.abstract";
+import { ContentBlockAbstract } from "@modules/content-blocks/entity/ContentBlock.abstract";
 
-export interface IUserRepository {
-    findUserByField(field: string, value: string): Promise<UserAbstract | null>;
-    findUserById(userId: string): Promise<UserAbstract | null>;
-    findUserByEmail(email: string): Promise<UserAbstract | null>;
-    getAllUsers(): Promise<Array<UserAbstract> | null>;
-    createUser(user: UserAbstract): Promise<UserAbstract | null>;
-    modifyUser(user: UserAbstract): Promise<UserAbstract | null>;
-    deleteUser(userId: string): Promise<boolean>;
+export interface IContentBlockRepository {
+    findContentBlockById(id: string): Promise<ContentBlockAbstract | null>;
+    findContentBlocksByType(type: string): Promise<ContentBlockAbstract[]>;
+
+    getAllContentBlocks(): Promise<ContentBlockAbstract[]>;
+    createContentBlock(block: ContentBlockAbstract): Promise<ContentBlockAbstract>;
+    updateContentBlock(block: ContentBlockAbstract): Promise<ContentBlockAbstract>;
+    deleteContentBlockById(id: string): Promise<boolean>;
 }

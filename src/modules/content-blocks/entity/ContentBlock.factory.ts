@@ -1,14 +1,14 @@
 import { DatabaseType } from "@db/contract/DatabaseType";
-import { UserContract } from "../contracts/IUser";
-import { UserRedisEntity } from "./redis/ContentBlock.entity";
-import { UserSQLEntity } from "./sql/ContentBlock.entity";
-import { UserAbstract } from "./ContentBlock.abstract";
-import { UserMongoEntity } from "./mongo/ContentBlock.entity";
+import { ContentBlockContract } from "../contracts/IContentBlock";
+import { ContentBlockRedisEntity } from "./redis/ContentBlock.entity";
+import { ContentBlockSQLEntity } from "./sql/ContentBlock.entity";
+import { ContentBlockAbstract } from "./ContentBlock.abstract";
+import { ContentBlockMongoEntity } from "./mongo/ContentBlock.entity";
 
-const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "mysql"; // Default to MySQL if not specified
+const databaseType: DatabaseType = (process.env.MY_DB as DatabaseType) || "redis"; // Default to Redis if not specified
 
 
-export async function createUserEntity(user: Partial<UserContract>, dbType: DatabaseType = databaseType): Promise<UserAbstract> {
+export async function createContentBlockEntity(user: Partial<ContentBlockContract>, dbType: DatabaseType = databaseType): Promise<ContentBlockAbstract> {
 
     switch(dbType) {
         case "mysql":
@@ -16,11 +16,11 @@ export async function createUserEntity(user: Partial<UserContract>, dbType: Data
         case "sqlite":
         case "mariadb":
         case "mssql":
-            return new UserSQLEntity(user);
+            return new ContentBlockSQLEntity(user);
         case "redis":
-            return new UserRedisEntity(user);
+            return new ContentBlockRedisEntity(user);
         case "mongodb":
-            return new UserMongoEntity(user);
+            return new ContentBlockMongoEntity(user);
         default:
             throw new Error("Unsupported database type.");
         
