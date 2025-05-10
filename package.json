@@ -41,6 +41,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/dotenv": "^8.2.3",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/lodash": "^4.17.15",
