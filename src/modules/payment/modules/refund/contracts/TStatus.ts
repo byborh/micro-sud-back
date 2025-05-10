@@ -1,1 +1,0 @@
-export type TStatus = "pending" | "succeeded " | "failed" | "canceled";
