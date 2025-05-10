@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 set -e  # Stoppe le script si une commande échoue
 

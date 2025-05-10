@@ -18,6 +18,9 @@ COPY ./scripts/entrypoint.sh /usr/bin/entrypoint
 RUN chown -R root:node /usr/bin/entrypoint &&\
     chmod +x /usr/bin/entrypoint
 
+# Remove Windows line endings
+RUN sed -i 's/\r$//' /usr/bin/entrypoint
+
 # Set working directory and user
 WORKDIR ${APP_PATH}
 USER node
@@ -32,4 +35,4 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # Define entrypoint script
-ENTRYPOINT ["entrypoint"]
+ENTRYPOINT ["bash", "/usr/bin/entrypoint"]

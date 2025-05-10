@@ -159,7 +159,7 @@ mongodb: network
 # Put the db that you want to use here : 
 # prod: build-prod network [HERE]
 # ----------------------------------------------------------------------------------------------------------------
-prod: deploy-db build-prod network ${MY_DB}
+prod: build-prod network ${MY_DB}
 	@echo "Running production container..."
 	@docker run --name $(APP_NAME) -p ${PORT}:${PORT} \
 		--env-file=.env \
@@ -167,7 +167,7 @@ prod: deploy-db build-prod network ${MY_DB}
 		-v $(APP_NAME)-logs:/app/logs \
 		-d $(APP_NAME)
 	@echo "Logs: $(APP_NAME)-logs"
-	@docker logs -f $(APP_NAME)
+	docker logs -f $(APP_NAME)
 
 dev: build network
 	@echo "Running development container..."
