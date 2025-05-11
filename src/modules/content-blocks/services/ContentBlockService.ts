@@ -7,168 +7,60 @@ export class ContentBlockService {
     constructor(private contentBlockRepository: IContentBlockRepository) {}
 
     // Get a content block by ID
-    public async getContentBlockById(id: string): Promise<ContentBlockAbstract | null> {
-        try {
-            // Verify if id is provided
-            if (!id) {
-                throw new Error("Content block ID is required.");
-            }
-
-            // Call repository to find a content block by ID
-            const contentBlockEntity: ContentBlockAbstract = await this.contentBlockRepository.findContentBlockById(id);
-
-            // If no content block is found, return null
-            if (!contentBlockEntity) {
-                throw new Error("Content block not found.");
-            }
-
-            // Return the content block
-            return contentBlockEntity;
-        } catch (error) {
-            console.error("Error finding content block in ContentBlockService:", error);
-            throw new Error("Failed to find content block by id.");
-        }
+    public async getContentBlockById(id: string): Promise<ContentBlockAbstract> {
+        if (!id) throw new Error("Content block ID is required.");
+        const block = await this.contentBlockRepository.findContentBlockById(id);
+        if (!block) throw new Error("Content block not found.");
+        return block;
     }
 
     // Get all content blocks
-    public async getContentBlocks(): Promise<Array<ContentBlockAbstract> | null> {
-        try {
-            // Call repository to find all content blocks
-            const contentBlocksEntity: ContentBlockAbstract[] = await this.contentBlockRepository.getAllContentBlocks();
-
-            // If no content blocks are found, return null
-            if (!contentBlocksEntity) return null;
-
-            // Return all content blocks in DTO format
-            return contentBlocksEntity;
-        } catch (error) {
-            console.error("Error finding content blocks in ContentBlockService:", error);
-            throw new Error("Failed to find content blocks.");
-        }
+    public async getContentBlocks(): Promise<ContentBlockAbstract[]> {
+        return await this.contentBlockRepository.getAllContentBlocks();
     }
     
     // Create content block
-    public async createContentBlock(contentBlock: ContentBlockAbstract): Promise<ContentBlockAbstract | null> {
-        try {
-            // Factory to create a correct type of content block entity
-            const contentBlockEntity = await createContentBlockEntity(contentBlock);
+    public async createContentBlock(contentBlock: ContentBlockAbstract): Promise<ContentBlockAbstract> {
+        const entity = await createContentBlockEntity(contentBlock);
+        if (!entity.id || !entity.type) throw new Error("ID and Type are required.");
 
-            // Verify required fields
-            if (!contentBlockEntity.id) throw new Error("ID is required");
-            if (!contentBlockEntity.type) throw new Error("Type is required");
+        const existing = await this.contentBlockRepository.findContentBlockById(entity.id);
+        if (existing) throw new Error("Content block already exists.");
 
-            // Verify if content block exists
-            const existingContentBlock: ContentBlockAbstract | null = 
-                await this.contentBlockRepository.findContentBlockById(contentBlockEntity.id);
-            if (existingContentBlock) {
-                console.error("Content block already exists:", existingContentBlock);
-                throw new Error("Content block already exists.");
-            }
+        const created = await this.contentBlockRepository.createContentBlock(entity);
+        if (!created) throw new Error("Content block not created.");
 
-            // Create content block from repository
-            const createdContentBlock: ContentBlockAbstract | null = 
-                await this.contentBlockRepository.createContentBlock(contentBlockEntity);
-
-            // Content block didn't created
-            if (!createdContentBlock) throw new Error("Content block didn't created...")
-
-            // Entity to DTO
-            return contentBlockEntity;
-        } catch (error) {
-            console.error("Error creating content block in ContentBlockService:", error);
-            throw new Error("Failed to create content block.");
-        }
+        return created;
     }
 
     // Modify content block
-    public async modifyContentBlock(id: string, contentBlock: Partial<ContentBlockAbstract>): Promise<ContentBlockAbstract | null> {
-        try {
-            // Factory to create a correct type of content block entity
-            const contentBlockEntity = await createContentBlockEntity(contentBlock);
+    public async modifyContentBlock(id: string, update: Partial<ContentBlockAbstract>): Promise<ContentBlockAbstract> {
+        const existing = await this.getContentBlockById(id);
+        if (!existing) throw new Error("Content block not found.");
 
-            // Verify if content block exists
-            const existingContentBlockAbstract: ContentBlockAbstract | null = await this.getContentBlockById(id);
-            if (!existingContentBlockAbstract) {
-                throw new Error("Content block not found.");
-            }
-    
-            // Factory to create a correct type of content block entity
-            const existingContentBlockEntity = await createContentBlockEntity(existingContentBlockAbstract);
-    
-            // Variable to track changes
-            let hasChanges: boolean = false;
-    
-            // Compare fields and update if necessary
-            if (contentBlockEntity.type && contentBlockEntity.type !== existingContentBlockEntity.type) {
-                existingContentBlockEntity.type = contentBlockEntity.type;
-                hasChanges = true;
-            }
-    
-            if (contentBlockEntity.title && contentBlockEntity.title !== existingContentBlockEntity.title) {
-                existingContentBlockEntity.title = contentBlockEntity.title;
-                hasChanges = true;
-            }
-    
-            if (contentBlockEntity.content && contentBlockEntity.content !== existingContentBlockEntity.content) {
-                existingContentBlockEntity.content = contentBlockEntity.content;
-                hasChanges = true;
-            }
-    
-            if (contentBlockEntity.img && contentBlockEntity.img !== existingContentBlockEntity.img) {
-                existingContentBlockEntity.img = contentBlockEntity.img;
-                hasChanges = true;
-            }
-    
-            if (contentBlockEntity.date && contentBlockEntity.date !== existingContentBlockEntity.date) {
-                existingContentBlockEntity.date = contentBlockEntity.date;
-                hasChanges = true;
-            }
-    
-            // If no changes are detected, do nothing
-            if (!hasChanges) {
-                throw new Error("No changes detected.");
-            }
-    
-            // Update the content block in DB
-            const updatedContentBlock: ContentBlockAbstract | null = 
-                await this.contentBlockRepository.updateContentBlock(existingContentBlockEntity);
-    
-            // If content block didn't updated, return null
-            if (!updatedContentBlock) {
-                throw new Error("Content block not updated.");
-            }
-    
-            // Return the updated content block
-            return updatedContentBlock;
-        } catch (error) {
-            console.error("Error modifying content block in ContentBlockService:", error);
-            throw new Error("Failed to modify content block.");
-        }
-    }    
+        let hasChanges = false;
+
+        if (update.type && update.type !== existing.type) { existing.type = update.type; hasChanges = true; }
+        if (update.title && update.title !== existing.title) { existing.title = update.title; hasChanges = true; }
+        if (update.content && update.content !== existing.content) { existing.content = update.content; hasChanges = true; }
+        if (update.img && update.img !== existing.img) { existing.img = update.img; hasChanges = true; }
+        if (update.date && update.date !== existing.date) { existing.date = update.date; hasChanges = true; }
+
+        if (!hasChanges) throw new Error("No changes detected.");
+
+        const updated = await this.contentBlockRepository.updateContentBlock(existing);
+        if (!updated) throw new Error("Content block not updated.");
+
+        return updated;
+    }   
 
     // Delete content block
     public async deleteContentBlock(id: string): Promise<boolean> {
-        try {
-            // Verify if id is provided
-            if (!id) {
-                throw new Error("Content block ID is required.");
-            }
+        if (!id) throw new Error("Content block ID is required.");
 
-            // Find the content block by ID
-            const contentBlock: ContentBlockAbstract | null = await this.getContentBlockById(id);
-            if (!contentBlock) {
-                console.error("Content block not found:", id);
-                return false;
-            }
+        const exists = await this.getContentBlockById(id);
+        if (!exists) throw new Error("Content block not found.");
 
-            // Delete the content block
-            const isDeleted: boolean = await this.contentBlockRepository.deleteContentBlockById(id);
-
-            // Return true if the content block is deleted, false otherwise
-            return isDeleted;
-        } catch (error) {
-            console.error("Error deleting content block in ContentBlockService:", error);
-            throw new Error("Failed to delete content block.");
-        }
+        return await this.contentBlockRepository.deleteContentBlockById(id);
     }
 }

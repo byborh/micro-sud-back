@@ -5,73 +5,61 @@ import { ContentBlockRedisEntity } from "@modules/content-blocks/entity/redis/Co
 
 export class ContentBlockRepositoryRedis implements IContentBlockRepository {
     private client: RedisClientType;
-    private isInitialized: Promise<void>; // Be sure to wait for initialization
-    
+    private isInitialized: Promise<void>;
+
     constructor(private db: IDatabase) {
         this.client = db.getDataSource() as RedisClientType;
         this.isInitialized = this.initialized();
     }
 
-    // Connect to database
-    async initialized(): Promise<void> {
+    private async initialized(): Promise<void> {
         try {
             if (!this.client.isOpen) {
                 await this.client.connect();
+                console.log("[Redis] Client connected.");
             }
         } catch (error) {
-            console.error('Failed to connect to Redis:', error);
+            console.error('[Redis] Failed to connect:', error);
             throw error;
         }
     }
 
-    async findContentBlockByField(field: string, value: string): Promise<ContentBlockRedisEntity | null> {
-        return null; // Don't use this method (forbidden)
-    }
-
     async findContentBlockById(contentBlockId: string): Promise<ContentBlockRedisEntity | null> {
         try {
-            await this.isInitialized; // Wait for initialization
-
+            await this.isInitialized;
             const contentBlockData = await this.client.hGetAll(`content_block:${contentBlockId}`);
-
-            return Object.keys(contentBlockData).length > 0 
-                ? ContentBlockRedisEntity.fromRedisHash(contentBlockData) 
+            return Object.keys(contentBlockData).length > 0
+                ? ContentBlockRedisEntity.fromRedisHash(contentBlockData)
                 : null;
         } catch (error) {
-            console.error("Failed to find content block by ID:", error);
+            console.error("[Redis] Failed to find content block by ID:", error);
             throw error;
         }
     }
 
     async findContentBlocksByType(type: string): Promise<ContentBlockRedisEntity[]> {
         try {
-            await this.isInitialized; // Wait for initialization
+            await this.isInitialized;
+            const keys = await this.client.sMembers(`content_block:type:${type}`);
             const contentBlocks: ContentBlockRedisEntity[] = [];
-            let cursor: number = 0;
 
-            do {
-                const reply = await this.client.scan(cursor, { MATCH: "content_block:*", COUNT: 100 });
-                cursor = reply.cursor;
-                const keys = reply.keys;
-
-                for (const key of keys) {
-                    const contentBlockData = await this.client.hGetAll(key);
-                    if (contentBlockData.type === type) {
-                        contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(contentBlockData));
-                    }
+            for (const id of keys) {
+                const data = await this.client.hGetAll(`content_block:${id}`);
+                if (Object.keys(data).length > 0) {
+                    contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(data));
                 }
-            } while (cursor !== 0);
+            }
 
             return contentBlocks;
         } catch (error) {
-            console.error("Failed to find content blocks by type:", error);
+            console.error("[Redis] Failed to find content blocks by type:", error);
             throw error;
         }
     }
 
     async getAllContentBlocks(): Promise<ContentBlockRedisEntity[]> {
         try {
-            await this.isInitialized; // Wait for initialization
+            await this.isInitialized;
             const contentBlocks: ContentBlockRedisEntity[] = [];
             let cursor: number = 0;
 
@@ -81,60 +69,79 @@ export class ContentBlockRepositoryRedis implements IContentBlockRepository {
                 const keys = reply.keys;
 
                 for (const key of keys) {
-                    const contentBlockData = await this.client.hGetAll(key);
-                    contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(contentBlockData));
+                    const data = await this.client.hGetAll(key);
+                    if (Object.keys(data).length > 0) {
+                        contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(data));
+                    }
                 }
             } while (cursor !== 0);
 
             return contentBlocks;
         } catch (error) {
-            console.error("Failed to get all content blocks:", error);
+            console.error("[Redis] Failed to get all content blocks:", error);
             throw error;
         }
     }
 
     async createContentBlock(block: ContentBlockRedisEntity): Promise<ContentBlockRedisEntity | null> {
         try {
-            await this.isInitialized; // Wait for initialization
+            await this.isInitialized;
+            const key = `content_block:${block.id}`;
+            await this.client.hSet(key, block.toRedisHash());
 
-            await this.client.hSet(`content_block:${block.id}`, block.toRedisHash());
+            // Indexation secondaire
+            if (block.type) {
+                await this.client.sAdd(`content_block:type:${block.type}`, block.id);
+            }
 
-            // Verify if content block was created
-            const exists = await this.client.exists(`content_block:${block.id}`);
-            
+            const exists = await this.client.exists(key);
+            console.log(`[Redis] Created content block: ${block.id}`);
             return exists === 1 ? block : null;
         } catch (error) {
-            console.error("Failed to create content block:", error);
+            console.error("[Redis] Failed to create content block:", error);
             throw error;
         }
     }
 
     async updateContentBlock(block: ContentBlockRedisEntity): Promise<ContentBlockRedisEntity | null> {
         try {
-            await this.isInitialized; // Wait for initialization
+            await this.isInitialized;
+            const key = `content_block:${block.id}`;
+            const existing = await this.client.hGet(key, "type");
 
-            await this.client.hSet(`content_block:${block.id}`, block.toRedisHash());
+            await this.client.hSet(key, block.toRedisHash());
 
-            // Verify if content block was updated
-            const exists = await this.client.exists(`content_block:${block.id}`);
-            
+            // Met à jour l'index si le type a changé
+            if (existing && existing !== block.type && existing.length > 0) {
+                await this.client.sRem(`content_block:type:${existing}`, block.id);
+            }
+            if (block.type) {
+                await this.client.sAdd(`content_block:type:${block.type}`, block.id);
+            }
+
+            const exists = await this.client.exists(key);
+            console.log(`[Redis] Updated content block: ${block.id}`);
             return exists === 1 ? block : null;
         } catch (error) {
-            console.error("Failed to modify content block:", error);
+            console.error("[Redis] Failed to update content block:", error);
             throw error;
         }
     }
 
     async deleteContentBlockById(contentBlockId: string): Promise<boolean> {
         try {
-            await this.isInitialized; // Wait for initialization
+            await this.isInitialized;
 
-            // Delete the content block
+            const existing = await this.client.hGet(`content_block:${contentBlockId}`, "type");
+            if (existing) {
+                await this.client.sRem(`content_block:type:${existing}`, contentBlockId);
+            }
+
             const deleted = await this.client.del(`content_block:${contentBlockId}`);
-            
+            console.log(`[Redis] Deleted content block: ${contentBlockId}`);
             return deleted > 0;
         } catch (error) {
-            console.error("Failed to delete content block:", error);
+            console.error("[Redis] Failed to delete content block:", error);
             throw error;
         }
     }

@@ -9,7 +9,6 @@ export class ContentBlockRedisEntity extends ContentBlockAbstract {
     content?: string;
     img?: string;
     date?: Date;
-
     data: Record<string, any> | null;
 
     constructor(data: Partial<ContentBlockContract>) {
@@ -17,13 +16,20 @@ export class ContentBlockRedisEntity extends ContentBlockAbstract {
 
         this.id = data.id!;
         this.type = data.type!;
-        this.title = data.title! ?? null;
-        this.content = data.content! ?? null;
-        this.img = data.img! ?? null;
-        this.date = data.date! ?? new Date();
+        this.title = data.title ?? null;
+        this.content = data.content ?? null;
+        this.img = data.img ?? null;
+
+        const dateParsed = data.date instanceof Date
+            ? data.date
+            : typeof data.date === "string"
+            ? new Date(data.date)
+            : new Date();
+
+        this.date = isNaN(dateParsed.getTime()) ? new Date() : dateParsed;
+        this.data = null;
     }
 
-    // Convert object to Redis hash
     toRedisHash(): { [key: string]: string } {
         return {
             id: this.id,
@@ -35,16 +41,17 @@ export class ContentBlockRedisEntity extends ContentBlockAbstract {
         };
     }
 
-
-    // Convert Redis hash to object
     static fromRedisHash(hash: { [key: string]: string }): ContentBlockRedisEntity {
+        const dateParsed = hash.date ? new Date(hash.date) : new Date();
+        const safeDate = isNaN(dateParsed.getTime()) ? new Date() : dateParsed;
+
         return new ContentBlockRedisEntity({
             id: hash.id,
             type: hash.type as TTypeName,
             title: hash.title || null,
             content: hash.content || null,
             img: hash.img || null,
-            date: hash.date ? new Date(hash.date) : new Date(),
+            date: safeDate,
         });
     }
 }

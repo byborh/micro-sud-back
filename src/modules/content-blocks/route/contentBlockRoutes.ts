@@ -1,40 +1,47 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { ContentBlockController } from '../controllers/ContentBlockController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
-import { lengthRequirementMiddleware } from '@middlewares/lengthRequirementMiddleware';
+import { authMiddleware } from '@middlewares/authMiddleware';
 
-export const userRoutes = (userController: ContentBlockController): express.Router => {
+export const contentBlockRoutes = (contentBlockController: ContentBlockController): express.Router => {
   const router = express.Router();
 
-  router.get('/:id', 
-    // authMiddleware(['ADMIN', 'USER']),
+  // Get by ID
+  router.get(
+    '/:id',
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-    (req: Request, res: Response, next: NextFunction) => userController.getContentBlockById(req, res, next)
+    (req: Request, res: Response, next: NextFunction) => contentBlockController.getContentBlockById(req, res, next)
   );
 
-  router.get('/',
-    // authMiddleware(['ADMIN'),
-    (req: Request, res: Response, next: NextFunction) => userController.getAllContentBlocks(req, res, next)
+  // Get all
+  router.get(
+    '/',
+    (req: Request, res: Response, next: NextFunction) => contentBlockController.getAllContentBlocks(req, res, next)
   );
 
-  router.post('/',
-    validateAttributeMiddleware('body', 'email', 'Email missing or invalid in request body'),
-    validateAttributeMiddleware('body', 'password', 'Password missing or invalid in request body'),
-    lengthRequirementMiddleware(8, 'password'),
-    lengthRequirementMiddleware(3, 'email'),
-    (req: Request, res: Response, next: NextFunction) => userController.createContentBlock(req, res, next)
+  // Create
+  router.post(
+    '/',
+    // authMiddleware(['ADMIN']),
+    validateAttributeMiddleware('body', 'type', 'Type missing or invalid in request body.'),
+    (req: Request, res: Response, next: NextFunction) => contentBlockController.createContentBlock(req, res, next)
   );
 
-  router.patch('/:id',
-    // authMiddleware(['ADMIN', 'USER']),
+  // Update
+  router.patch(
+    '/:id',
+    // authMiddleware(['ADMIN']),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-    (req: Request, res: Response, next: NextFunction) => userController.modifyContentBlock(req, res, next)
+    // Optionnel : ajouter une middleware pour valider que body contient au moins une des propriétés autorisées
+    (req: Request, res: Response, next: NextFunction) => contentBlockController.modifyContentBlock(req, res, next)
   );
 
-  router.delete('/:id',
-    // authMiddleware(['ADMIN', 'USER']),
+  // Delete
+  router.delete(
+    '/:id',
+    // authMiddleware(['ADMIN']),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
-    (req: Request, res: Response, next: NextFunction) => userController.deleteContentBlock(req, res, next)
+    (req: Request, res: Response, next: NextFunction) => contentBlockController.deleteContentBlock(req, res, next)
   );
 
   return router;
