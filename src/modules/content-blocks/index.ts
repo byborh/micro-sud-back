@@ -6,7 +6,7 @@ import { IContentBlockRepository } from './repositories/contract/IContentBlockRe
 import { ContentBlockRepositoryMongo } from './repositories/drivers/ContentBlockRepositoryMongo';
 import { ContentBlockRepositoryRedis } from './repositories/drivers/ContentBlockRepositoryRedis';
 import { ContentBlockRepositorySQL } from './repositories/drivers/ContentBlockRepositorySQL';
-import { userRoutes } from './route/contentBlockRoutes';
+import { contentBlockRoutes } from './route/contentBlockRoutes';
 import { ContentBlockService } from './services/ContentBlockService';
 
 
@@ -19,5 +19,5 @@ export const createContentBlockModule = async (): Promise<express.Router> => {
   const userService = new ContentBlockService(userRepository);
   const userController = new ContentBlockController(userService);
 
-  return userRoutes(userController);
+  return contentBlockRoutes(userController);
 };

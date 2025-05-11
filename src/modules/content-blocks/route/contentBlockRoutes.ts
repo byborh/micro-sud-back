@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { ContentBlockController } from '../controllers/ContentBlockController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
-import { authMiddleware } from '@middlewares/authMiddleware';
+import { validateContentBlockByTypeMiddleware } from '@middlewares/validateContentBlocksType';
 
 export const contentBlockRoutes = (contentBlockController: ContentBlockController): express.Router => {
   const router = express.Router();
@@ -24,6 +24,7 @@ export const contentBlockRoutes = (contentBlockController: ContentBlockControlle
     '/',
     // authMiddleware(['ADMIN']),
     validateAttributeMiddleware('body', 'type', 'Type missing or invalid in request body.'),
+    validateContentBlockByTypeMiddleware,
     (req: Request, res: Response, next: NextFunction) => contentBlockController.createContentBlock(req, res, next)
   );
 
@@ -32,6 +33,7 @@ export const contentBlockRoutes = (contentBlockController: ContentBlockControlle
     '/:id',
     // authMiddleware(['ADMIN']),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
+    validateContentBlockByTypeMiddleware,
     // Optionnel : ajouter une middleware pour valider que body contient au moins une des propriétés autorisées
     (req: Request, res: Response, next: NextFunction) => contentBlockController.modifyContentBlock(req, res, next)
   );
