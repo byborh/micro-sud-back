@@ -14,10 +14,7 @@ export class ContentBlockRepositoryRedis implements IContentBlockRepository {
 
     private async initialized(): Promise<void> {
         try {
-            if (!this.client.isOpen) {
-                await this.client.connect();
-                console.log("[Redis] Client connected.");
-            }
+            if (!this.client.isOpen) {await this.client.connect();}
         } catch (error) {
             console.error('[Redis] Failed to connect:', error);
             throw error;
@@ -95,7 +92,6 @@ export class ContentBlockRepositoryRedis implements IContentBlockRepository {
             }
 
             const exists = await this.client.exists(key);
-            console.log(`[Redis] Created content block: ${block.id}`);
             return exists === 1 ? block : null;
         } catch (error) {
             console.error("[Redis] Failed to create content block:", error);
@@ -120,7 +116,6 @@ export class ContentBlockRepositoryRedis implements IContentBlockRepository {
             }
 
             const exists = await this.client.exists(key);
-            console.log(`[Redis] Updated content block: ${block.id}`);
             return exists === 1 ? block : null;
         } catch (error) {
             console.error("[Redis] Failed to update content block:", error);
@@ -138,7 +133,6 @@ export class ContentBlockRepositoryRedis implements IContentBlockRepository {
             }
 
             const deleted = await this.client.del(`content_block:${contentBlockId}`);
-            console.log(`[Redis] Deleted content block: ${contentBlockId}`);
             return deleted > 0;
         } catch (error) {
             console.error("[Redis] Failed to delete content block:", error);

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ContentBlockService } from "../services/ContentBlockService";
 import { IdGenerator } from "@core/idGenerator";
 import { ContentBlockAbstract } from "../entity/ContentBlock.abstract";
+import { TTypeName } from "../contracts/TTypeName";
 
 export class ContentBlockController {
     constructor(private readonly contentBlockService: ContentBlockService) {}
@@ -14,6 +15,19 @@ export class ContentBlockController {
                 return;
             }
             res.status(200).json(contentBlock);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async getContentBlocksByType(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const contentBlocks = await this.contentBlockService.getContentBlocksByType(req.params.type as TTypeName);
+            if (!contentBlocks || contentBlocks.length === 0) {
+                res.status(404).json({ error: "No ContentBlocks found" });
+                return;
+            }
+            res.status(200).json(contentBlocks);
         } catch (error) {
             next(error);
         }

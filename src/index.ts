@@ -6,6 +6,7 @@ import { createRoleModule } from '@modules/roles';
 import { createUserRolesModule } from '@modules/user-roles';
 import { createAuthTokenModule } from '@modules/auth-token';
 import { getDatabase } from '@db/DatabaseClient';
+import { createContentBlockModule } from '@modules/content-blocks';
 
 
 const app = express();
@@ -25,6 +26,7 @@ async function loadModules() {
   const roleModule = await createRoleModule();
   const userRolesModule = await createUserRolesModule();
   const authTokenModule = await createAuthTokenModule();
+  const contentBlockModule = await createContentBlockModule();
 
 
   return {
@@ -32,6 +34,7 @@ async function loadModules() {
     roleModule,
     userRolesModule,
     authTokenModule,
+    contentBlockModule,
   };
 }
 
@@ -51,6 +54,7 @@ async function startServer() {
     apiRouter.use('/userroles', modules.userRolesModule);
     apiRouter.use('/auth', modules.authTokenModule);
     apiRouter.use('/roles', modules.roleModule);
+    apiRouter.use('/contentblocks', modules.contentBlockModule);
 
     app.use('/api/v0.0.2', apiRouter);
 

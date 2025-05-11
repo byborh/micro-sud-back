@@ -2,6 +2,7 @@ import { IContentBlockRepository } from "../repositories/contract/IContentBlockR
 import { ContentBlockAbstract } from "../entity/ContentBlock.abstract";
 import { createContentBlockEntity } from "../entity/ContentBlock.factory";
 import _ from "lodash";
+import { TTypeName } from "../contracts/TTypeName";
 
 export class ContentBlockService {
     constructor(private contentBlockRepository: IContentBlockRepository) {}
@@ -10,8 +11,16 @@ export class ContentBlockService {
     public async getContentBlockById(id: string): Promise<ContentBlockAbstract> {
         if (!id) throw new Error("Content block ID is required.");
         const block = await this.contentBlockRepository.findContentBlockById(id);
-        if (!block) throw new Error("Content block not found.");
+        if (!block) throw new Error("Content block not found in getContentBlockById service.");
         return block;
+    }
+
+    // Get a content block by type
+    public async getContentBlocksByType(type: TTypeName): Promise<ContentBlockAbstract[]> {
+        if (!type) throw new Error("Content block type is required.");
+        const blocks = await this.contentBlockRepository.findContentBlocksByType(type);
+        if (!blocks) throw new Error("Content blocks not found in service getContentBlocksByType.");
+        return blocks;
     }
 
     // Get all content blocks
@@ -36,7 +45,7 @@ export class ContentBlockService {
     // Modify content block
     public async modifyContentBlock(id: string, update: Partial<ContentBlockAbstract>): Promise<ContentBlockAbstract> {
         const existing = await this.getContentBlockById(id);
-        if (!existing) throw new Error("Content block not found.");
+        if (!existing) throw new Error("Content block not found in service modifyContentBlock.");
 
         let hasChanges = false;
 
@@ -59,7 +68,7 @@ export class ContentBlockService {
         if (!id) throw new Error("Content block ID is required.");
 
         const exists = await this.getContentBlockById(id);
-        if (!exists) throw new Error("Content block not found.");
+        if (!exists) throw new Error("Content block not found in service deleteContentBlock.");
 
         return await this.contentBlockRepository.deleteContentBlockById(id);
     }

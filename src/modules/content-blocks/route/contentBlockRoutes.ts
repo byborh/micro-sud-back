@@ -13,6 +13,13 @@ export const contentBlockRoutes = (contentBlockController: ContentBlockControlle
     (req: Request, res: Response, next: NextFunction) => contentBlockController.getContentBlockById(req, res, next)
   );
 
+  // Get by Type
+  router.get(
+    '/type/:type',
+    validateAttributeMiddleware('params', 'type', 'Type missing or invalid in request params.'),
+    (req: Request, res: Response, next: NextFunction) => contentBlockController.getContentBlocksByType(req, res, next)
+  );
+
   // Get all
   router.get(
     '/',
