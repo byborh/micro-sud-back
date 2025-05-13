@@ -40,6 +40,7 @@ export class ContentBlockController {
                 res.status(404).json({ error: "No ContentBlocks found" });
                 return;
             }
+            console.log("contentBlocks in controller", contentBlocks);
             res.status(200).json(contentBlocks);
         } catch (error) {
             next(error);

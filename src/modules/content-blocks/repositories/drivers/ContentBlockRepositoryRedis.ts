@@ -59,26 +59,35 @@ export class ContentBlockRepositoryRedis implements IContentBlockRepository {
             await this.isInitialized;
             const contentBlocks: ContentBlockRedisEntity[] = [];
             let cursor: number = 0;
-
+    
             do {
                 const reply = await this.client.scan(cursor, { MATCH: "content_block:*", COUNT: 100 });
                 cursor = reply.cursor;
                 const keys = reply.keys;
-
+    
                 for (const key of keys) {
-                    const data = await this.client.hGetAll(key);
-                    if (Object.keys(data).length > 0) {
-                        contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(data));
+                    // Vérification du type de la clé avant de la lire
+                    const keyType = await this.client.type(key);
+    
+                    // Si la clé est de type "hash", on la récupère
+                    if (keyType === 'hash') {
+                        const data = await this.client.hGetAll(key);
+                        if (Object.keys(data).length > 0) {
+                            contentBlocks.push(ContentBlockRedisEntity.fromRedisHash(data));
+                        }
+                    } else {
+                        console.log(`Skipping key ${key} of type ${keyType}`);
                     }
                 }
             } while (cursor !== 0);
-
+    
             return contentBlocks;
         } catch (error) {
             console.error("[Redis] Failed to get all content blocks:", error);
             throw error;
         }
     }
+    
 
     async createContentBlock(block: ContentBlockRedisEntity): Promise<ContentBlockRedisEntity | null> {
         try {

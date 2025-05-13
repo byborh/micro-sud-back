@@ -7,10 +7,19 @@ import { createUserRolesModule } from '@modules/user-roles';
 import { createAuthTokenModule } from '@modules/auth-token';
 import { getDatabase } from '@db/DatabaseClient';
 import { createContentBlockModule } from '@modules/content-blocks';
+import cors from 'cors';
 
 
 const app = express();
 const port = 3000;
+
+// Enable CORS
+app.use(cors({
+  origin: process.env.FRONT_DASHBOARD || 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true //  if i want to enable cookies or authentication headers
+}));
 
 // Middleware global
 app.use(express.json());

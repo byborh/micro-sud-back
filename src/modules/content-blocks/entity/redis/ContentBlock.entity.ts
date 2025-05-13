@@ -42,9 +42,10 @@ export class ContentBlockRedisEntity extends ContentBlockAbstract {
     }
 
     static fromRedisHash(hash: { [key: string]: string }): ContentBlockRedisEntity {
+        console.log("Hash from Redis:", hash);
         const dateParsed = hash.date ? new Date(hash.date) : new Date();
         const safeDate = isNaN(dateParsed.getTime()) ? new Date() : dateParsed;
-
+    
         return new ContentBlockRedisEntity({
             id: hash.id,
             type: hash.type as TTypeName,
@@ -54,4 +55,5 @@ export class ContentBlockRedisEntity extends ContentBlockAbstract {
             date: safeDate,
         });
     }
+    
 }
