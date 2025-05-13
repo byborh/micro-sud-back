@@ -5,9 +5,9 @@ const requiredFieldsMap: Record<TTypeName, string[]> = {
   machine: ["type", "title", "img"],
   blog: ["type", "title", "content"], // Img is optional and Date will come later
   section: ["type", "title", "content", "img"],
-  historique: ["type", "text"],
-  engagements: ["type", "text"],
-  savoir_faire: ["type", "text"],
+  historique: ["type", "content"],
+  engagements: ["type", "content"],
+  savoir_faire: ["type", "content"],
 };
 
 /**

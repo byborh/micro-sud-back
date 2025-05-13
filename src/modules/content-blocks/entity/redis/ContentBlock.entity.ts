@@ -37,7 +37,7 @@ export class ContentBlockRedisEntity extends ContentBlockAbstract {
             title: this.title ?? "",
             content: this.content ?? "",
             img: this.img ?? "",
-            date: this.date.toISOString(),
+            date: this.date instanceof Date ? this.date.toISOString() : new Date(this.date).toISOString()
         };
     }
 
