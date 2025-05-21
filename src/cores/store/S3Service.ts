@@ -1,5 +1,4 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
+import { PutObjectCommand, S3Client, DeleteObjectCommand, ObjectCannedACL } from "@aws-sdk/client-s3";
 
 export class S3Service {
     private s3Client: S3Client;
@@ -14,14 +13,34 @@ export class S3Service {
         });
     }
 
-    async uploadPdf(pdfFile: Uint8Array, fileName: string): Promise<string> {
+    private getMimeType(fileName: string): string {
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        const mimeTypes: Record<string, string> = {
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            png: 'image/png',
+            webp: 'image/webp',
+            gif: 'image/gif'
+        };
+        return mimeTypes[ext || ''] || 'application/octet-stream';
+    }
+    
+
+    // UploadImg
+    /*
+        1 - Get image from client
+        2 - Upload image to S3
+    */
+
+    async uploadImg(imgFile: Uint8Array, fileName: string): Promise<string> {
         const bucketName = process.env.AWS_BUCKET_NAME!;
         
         const params = {
             Bucket: bucketName,
             Key: fileName,
-            Body: pdfFile,
-            ContentType: 'application/pdf'
+            Body: imgFile,
+            ContentType: this.getMimeType(fileName),
+            ACL: 'public-read' as ObjectCannedACL
         };
 
         try {
@@ -29,41 +48,24 @@ export class S3Service {
             const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
             return fileUrl;
         } catch (error) {
-            console.error('Error uploading PDF:', error);
+            console.error('Error uploading image:', error);
             throw error;
         }
     }
 
-    async downloadPdf(pdfLink: string): Promise<Uint8Array> {
+    // DownloadImg
+    /*
+        1 - Get image from S3
+        2 - Send image to client
+    */
+
+    async deleteImg(fileName: string): Promise<void> {
         const bucketName = process.env.AWS_BUCKET_NAME!;
-        const fileName = pdfLink.split("/").pop();
-
-        if (!fileName) {
-            throw new Error("Invalid PDF link format");
-        }
-
-        const params = {
-            Bucket: bucketName,
-            Key: fileName
-        };
-
+        const params = { Bucket: bucketName, Key: fileName };
         try {
-            const response = await this.s3Client.send(new GetObjectCommand(params));
-
-            if (!response.Body) {
-                throw new Error("Empty response body");
-            }
-
-            const stream = response.Body as Readable;
-            const chunks: Uint8Array[] = [];
-
-            for await (const chunk of stream) {
-                chunks.push(chunk as Uint8Array);
-            }
-
-            return Buffer.concat(chunks);
+            await this.s3Client.send(new DeleteObjectCommand(params));
         } catch (error) {
-            console.error("Error downloading PDF:", error);
+            console.error('Error deleting image:', error);
             throw error;
         }
     }
