@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client, DeleteObjectCommand, ObjectCannedACL } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export class S3Service {
     private s3Client: S3Client;
@@ -40,12 +40,13 @@ export class S3Service {
             Key: fileName,
             Body: imgFile,
             ContentType: this.getMimeType(fileName),
-            ACL: 'public-read' as ObjectCannedACL
+            // ACL: 'public-read' as ObjectCannedACL
         };
 
         try {
             await this.s3Client.send(new PutObjectCommand(params));
             const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+            console.log('Image uploaded successfully:', fileUrl);
             return fileUrl;
         } catch (error) {
             console.error('Error uploading image:', error);

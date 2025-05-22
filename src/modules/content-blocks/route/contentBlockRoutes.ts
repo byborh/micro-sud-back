@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { ContentBlockController } from '../controllers/ContentBlockController';
 import { validateAttributeMiddleware } from '@middlewares/validateAttributeMiddleware';
 import { validateContentBlockByTypeMiddleware } from '@middlewares/validateContentBlocksType';
+import { upload } from '@middlewares/MulterImgMiddleware';
 
 export const contentBlockRoutes = (contentBlockController: ContentBlockController): express.Router => {
   const router = express.Router();
@@ -30,7 +31,8 @@ export const contentBlockRoutes = (contentBlockController: ContentBlockControlle
   router.post(
     '/',
     // authMiddleware(['ADMIN']),
-    validateAttributeMiddleware('body', 'type', 'Type missing or invalid in request body.'),
+    // validateAttributeMiddleware('body', 'type', 'Type missing or invalid in request body.'),
+    upload.single('img'),
     validateContentBlockByTypeMiddleware,
     (req: Request, res: Response, next: NextFunction) => contentBlockController.createContentBlock(req, res, next)
   );

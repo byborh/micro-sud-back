@@ -51,15 +51,19 @@ export class ContentBlockController {
     public async createContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { type, title, content, date } = req.body;
-            let { img } = req.body;
 
             if (!type) {
                 res.status(400).json({ error: "Type is required." });
                 return;
             }
 
-            // Si l'image est existante, alors on la crée sur s3, sinon on laisse vide
-            if(img !== "") {img = await this.s3Service.uploadImg(img, "TEST-NAME");}            
+            let img = "";
+            if(req.file) {
+                const fileName = `contentsblocks/${type}-${Date.now()}-${req.file.originalname}`;
+                img = await this.s3Service.uploadImg(req.file.buffer, fileName);
+            }
+
+            console.log("img in controller", img);
 
             const idGenerator = IdGenerator.getInstance();
             const id: string = idGenerator.generateId();
@@ -89,17 +93,18 @@ export class ContentBlockController {
     public async modifyContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { type, title, content, date } = req.body;
-            let { img } = req.body;
 
             if (!req.params.id) {
                 res.status(400).json({ error: "ContentBlock id is required." });
                 return;
             }
 
-            // On supprime l'ancienne image sur s3 et on crée la nouvelle
-            if(img !== "") {
-                await this.s3Service.deleteImg("TEST-NAME");
-                img = await this.s3Service.uploadImg(img, "TEST-NAME");
+            let img = "";
+            // à récupérer l'adresse de l'ancienne image pour le supprimer
+            if(req.file) {
+                // await this.s3Service.deleteImg(req.)
+                const fileName = `contentsblocks/${type}-${Date.now()}-${req.file.originalname}`;
+                img = await this.s3Service.uploadImg(req.file.buffer, fileName);
             }
 
             const updated = await this.contentBlockService.modifyContentBlock(req.params.id, {
