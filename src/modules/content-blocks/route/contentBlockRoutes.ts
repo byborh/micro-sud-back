@@ -37,14 +37,12 @@ export const contentBlockRoutes = (contentBlockController: ContentBlockControlle
     (req: Request, res: Response, next: NextFunction) => contentBlockController.createContentBlock(req, res, next)
   );
 
-  // Update
   router.patch(
     '/:id',
-    // authMiddleware(['ADMIN']),
+    upload.single('img'),
     validateAttributeMiddleware('params', 'id', 'Id missing or invalid in request params.'),
     validateContentBlockByTypeMiddleware,
-    // Optionnel : ajouter une middleware pour valider que body contient au moins une des propriétés autorisées
-    (req: Request, res: Response, next: NextFunction) => contentBlockController.modifyContentBlock(req, res, next)
+    (req, res, next) => contentBlockController.modifyContentBlock(req, res, next)
   );
 
   // Delete

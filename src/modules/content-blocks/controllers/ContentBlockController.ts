@@ -52,10 +52,6 @@ export class ContentBlockController {
         try {
             const { type, title, content, date } = req.body;
 
-            if (!type) {
-                res.status(400).json({ error: "Type is required." });
-                return;
-            }
 
             let img = "";
             if(req.file) {
@@ -107,6 +103,9 @@ export class ContentBlockController {
                 img = await this.s3Service.uploadImg(req.file.buffer, fileName);
             }
 
+            console.log("img:", img);
+            console.log("updated content block: ", type, title, content, img, date);
+
             const updated = await this.contentBlockService.modifyContentBlock(req.params.id, {
                 type,
                 title,
@@ -128,7 +127,10 @@ export class ContentBlockController {
 
     public async deleteContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            await this.s3Service.deleteImg("TEST-NAME");
+            const contentBlock: ContentBlockAbstract = await this.contentBlockService.getContentBlockById(req.params.id);
+            const fileName: string = contentBlock.img.split("/").pop()! || "";
+            await this.s3Service.deleteImg(fileName);
+
             const isDeleted = await this.contentBlockService.deleteContentBlock(req.params.id);
             if (!isDeleted) {
                 res.status(404).json({ error: "ContentBlock could not be deleted." });

@@ -10,6 +10,7 @@ export class ContentBlockService {
     // Get a content block by ID
     public async getContentBlockById(id: string): Promise<ContentBlockAbstract> {
         if (!id) throw new Error("Content block ID is required.");
+        console.log("id: ", id);
         const block = await this.contentBlockRepository.findContentBlockById(id);
         if (!block) throw new Error("Content block not found in getContentBlockById service.");
         return block;
@@ -45,6 +46,10 @@ export class ContentBlockService {
     // Modify content block
     public async modifyContentBlock(id: string, update: Partial<ContentBlockAbstract>): Promise<ContentBlockAbstract> {
         const existing = await this.getContentBlockById(id);
+
+        console.log("existing content block: ", existing);
+        console.log("updating content block: ", update);
+
         if (!existing) throw new Error("Content block not found in service modifyContentBlock.");
 
         let hasChanges = false;
