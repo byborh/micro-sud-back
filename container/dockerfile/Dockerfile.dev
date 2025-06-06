@@ -33,3 +33,5 @@ COPY . .
 
 # Define entrypoint script
 ENTRYPOINT ["entrypoint"]
+
+RUN chmod +x run.sh

@@ -128,8 +128,10 @@ export class ContentBlockController {
     public async deleteContentBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const contentBlock: ContentBlockAbstract = await this.contentBlockService.getContentBlockById(req.params.id);
-            const fileName: string = contentBlock.img.split("/").pop()! || "";
-            await this.s3Service.deleteImg(fileName);
+            if(contentBlock.img) {
+                const fileName: string = contentBlock.img.split("/").pop()! || "";
+                await this.s3Service.deleteImg(fileName);
+            }
 
             const isDeleted = await this.contentBlockService.deleteContentBlock(req.params.id);
             if (!isDeleted) {
